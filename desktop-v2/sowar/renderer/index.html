@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: file: blob: https://unpkg.com; img-src 'self' data: file: blob:; media-src 'self' data: file: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://unpkg.com;" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laqtat Generator Desktop V2</title>
+  <title>صور Generator Desktop V2</title>
   <link rel="stylesheet" href="../../renderer/styles.css" />
   <link rel="stylesheet" href="../../shared/paper-light.css" />
   <script src="https://unpkg.com/lucide@latest" defer></script>
@@ -574,7 +574,7 @@
 <body class="paper-light-body">
   <div class="v2-root">
     
-    <header class="paper-top-bar unified-laqtat-header">
+    <header class="paper-top-bar unified-sowar-header">
       <div class="paper-logo-section">
         <img id="brand-logo" class="paper-brand-logo-image" alt="Infograph" />
         <div class="paper-project-actions" aria-label="إدارة المشروع">
@@ -594,8 +594,8 @@
           <a href="../../renderer/index.html" class="paper-nav-pill">الأنفوجراف</a>
           <a href="../../motadawel/renderer/index.html" class="paper-nav-pill">المتداول</a>
           <a href="../../personalities/renderer/index.html" class="paper-nav-pill">شخصيات</a>
-          <a href="#" class="paper-nav-pill paper-nav-pill-active">لقطات</a>
-          <a href="../../sowar/renderer/index.html" class="paper-nav-pill">صور</a>
+          <a href="../../laqtat/renderer/index.html" class="paper-nav-pill">لقطات</a>
+          <a href="#" class="paper-nav-pill paper-nav-pill-active">صور</a>
         </div>
 
         <button id="settings-btn" class="paper-project-icon-btn paper-settings-btn" type="button" title="الإعدادات" aria-label="الإعدادات">
@@ -616,7 +616,7 @@
               <div id="preview-exact-root" style="position:absolute; inset:0; width:100%; height:100%; direction:ltr;"></div>
             </div>
           </div>
-          <div class="status-note" id="preview-summary">اختر فيديوًا رئيسيًا للبدء.</div>
+          <div class="status-note" id="preview-summary">اختر صورة رئيسية للبدء.</div>
         </div>
 
         <div class="panel-section save-section">
@@ -663,17 +663,17 @@
 
       <section class="right-panel">
         <div class="tabs-header">
-          <button class="tab-btn active" data-target="tab-project"><i data-lucide="video"></i><span>المشروع</span></button>
+          <button class="tab-btn active" data-target="tab-project"><i data-lucide="image"></i><span>المشروع</span></button>
           <button class="tab-btn" data-target="tab-text"><i data-lucide="type"></i><span>النصوص</span></button>
           <button class="tab-btn" data-target="tab-audio"><i data-lucide="music"></i><span>الصوتيات</span></button>
         </div>
         <div class="tab-content">
           <div id="tab-project" class="tab-panel active">
             <div class="setting-group">
-              <label class="setting-label">الفيديو الأساسي</label>
+              <label class="setting-label">الصورة الأساسية</label>
               <div class="inline-row" style="margin-bottom:0.55rem;">
-                <button id="pick-main-video-btn" class="btn-secondary" type="button">اختيار فيديو</button>
-                <span id="main-video-label" class="muted-text" style="flex:1;"></span>
+                <button id="pick-main-image-btn" class="btn-secondary" type="button">اختيار صورة</button>
+                <span id="main-image-label" class="muted-text" style="flex:1;"></span>
               </div>
             </div>
 
@@ -714,7 +714,6 @@
             <div class="setting-group">
               <div class="setting-label">
                 <span>التحكم بالمشهد</span>
-                <label class="checkbox-row"><input id="keep-source-audio-checkbox" type="checkbox" /> إبقاء صوت الفيديو</label>
               </div>
               <div class="editor-grid-3">
                 <label>
@@ -808,7 +807,7 @@
     </div>
   </div>
 
-  <script src="./generated/preview-player-laqtat.js"></script>
+  <script src="./generated/preview-player-sowar.js"></script>
   <script src="./app.js" defer></script>
 </body>
 </html>

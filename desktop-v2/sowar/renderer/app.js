@@ -1,5 +1,5 @@
 const FPS = 25;
-const PROJECT_TYPE = 'laqtat';
+const PROJECT_TYPE = 'sowar';
 const PROJECT_AUTOSAVE_DELAY_MS = 1600;
 const TEXT_PRESET_VALUES = ['dark', 'gold', 'blue', 'red', 'orange'];
 
@@ -11,24 +11,23 @@ const state = {
   appVersion: '1.0.0',
   project: {
     currentProjectPath: '',
-    projectName: 'Laqtat Project',
+    projectName: 'صور Project',
     isDirty: false,
     isSaving: false,
     lastSavedAt: null,
     autosaveEnabled: true,
     createdAt: null,
   },
-  mainVideo: '',
-  mainVideoUrl: '',
-  mainVideoDurationMs: 0,
+  mainImage: '',
+  mainImageUrl: '',
+  mainImageDurationMs: 0,
   frame: '',
   fitMode: 'blurred-background',
   blurBackgroundAmount: 36,
   backgroundScale: 1.18,
-  videoScale: 1,
-  videoX: 0,
-  videoY: 0,
-  keepSourceAudio: false,
+  imageScale: 1,
+  imageX: 0,
+  imageY: 0,
   segments: [],
   blurRegions: [],
   text: '',
@@ -62,8 +61,8 @@ const elements = {
   cancelRenderBtn: document.getElementById('cancel-render-btn'),
   openOutputBtn: document.getElementById('open-output-btn'),
   refreshAssetsBtn: document.getElementById('refresh-assets-btn'),
-  pickMainVideoBtn: document.getElementById('pick-main-video-btn'),
-  mainVideoLabel: document.getElementById('main-video-label'),
+  pickMainImageBtn: document.getElementById('pick-main-image-btn'),
+  mainImageLabel: document.getElementById('main-image-label'),
   frameSelect: document.getElementById('frame-select'),
   fitModeSelect: document.getElementById('fit-mode-select'),
   backgroundBlurInput: document.getElementById('background-blur-input'),
@@ -71,7 +70,6 @@ const elements = {
   backgroundScaleInput: document.getElementById('background-scale-input'),
   backgroundScaleValue: document.getElementById('background-scale-value'),
   blurredBgGroup: document.getElementById('blurred-bg-group'),
-  keepSourceAudioCheckbox: document.getElementById('keep-source-audio-checkbox'),
   scaleInput: document.getElementById('scale-input'),
   scaleValue: document.getElementById('scale-value'),
   xInput: document.getElementById('x-input'),
@@ -315,37 +313,8 @@ function markProjectDirty() {
   scheduleAutosave();
 }
 
-async function readMediaDurationMs(fileUrl, fallbackMs = 0) {
-  if (!fileUrl) return fallbackMs;
-  return new Promise((resolve) => {
-    const media = document.createElement('video');
-    let settled = false;
-    const finish = (value) => {
-      if (settled) return;
-      settled = true;
-      media.remove();
-      resolve(value);
-    };
-    const timeoutId = window.setTimeout(() => finish(fallbackMs), 6000);
-    media.preload = 'metadata';
-    media.src = fileUrl;
-    media.onloadedmetadata = () => {
-      window.clearTimeout(timeoutId);
-      if (Number.isFinite(media.duration) && media.duration > 0) {
-        finish(Math.round(media.duration * 1000));
-      } else {
-        finish(fallbackMs);
-      }
-    };
-    media.onerror = () => {
-      window.clearTimeout(timeoutId);
-      finish(fallbackMs);
-    };
-  });
-}
-
 function normalizeSegments() {
-  const limit = Math.max(1000, state.mainVideoDurationMs || 1000);
+  const limit = Math.max(1000, state.mainImageDurationMs || 1000);
   state.segments = (Array.isArray(state.segments) ? state.segments : [])
     .map((segment, index) => {
       const startMs = clamp(Number(segment.startMs || 0), 0, limit);
@@ -359,22 +328,22 @@ function normalizeSegments() {
     })
     .filter((segment) => segment.endMs > segment.startMs);
 
-  if (!state.segments.length && state.mainVideoDurationMs > 0) {
+  if (!state.segments.length && state.mainImageDurationMs > 0) {
     state.segments = [{
       id: createId('segment'),
       label: 'المقطع الكامل',
       startMs: 0,
-      endMs: state.mainVideoDurationMs,
+      endMs: state.mainImageDurationMs,
     }];
   }
 }
 
 function normalizeBlurRegions() {
-  const videoLimit = Math.max(1000, state.mainVideoDurationMs || 1000);
+  const imageLimit = Math.max(1000, state.mainImageDurationMs || 1000);
   state.blurRegions = (Array.isArray(state.blurRegions) ? state.blurRegions : []).map((region, index) => {
     const alwaysOn = region.alwaysOn !== false;
-    const startMs = clamp(Number(region.startMs || 0), 0, videoLimit);
-    const endMs = clamp(Number(region.endMs || videoLimit), startMs, videoLimit);
+    const startMs = clamp(Number(region.startMs || 0), 0, imageLimit);
+    const endMs = clamp(Number(region.endMs || imageLimit), startMs, imageLimit);
     return {
       id: region.id || createId(`blur-${index + 1}`),
       x: clamp(Number(region.x || 0), 0, 1919),
@@ -403,12 +372,12 @@ function getTotalPreviewDurationFrames() {
 
 function buildPreviewInputProps() {
   return {
-    mainVideoUrl: state.mainVideoUrl || null,
+    mainImageUrl: state.mainImageUrl || null,
     frameUrl: getFileUrlForAsset(state.frame, state.assets.frem_mutadawel || []) || null,
     mainText: state.text || '',
-    videoScale: Number(state.videoScale || 1),
-    videoX: Number(state.videoX || 0),
-    videoY: Number(state.videoY || 0),
+    imageScale: Number(state.imageScale || 1),
+    imageX: Number(state.imageX || 0),
+    imageY: Number(state.imageY || 0),
     effects: Array.isArray(state.effects) ? state.effects : [],
     textBottomOffset: Number(state.textBottomOffset || 160),
     textFontSize: Number(state.textFontSize || 46),
@@ -420,14 +389,13 @@ function buildPreviewInputProps() {
     fitMode: state.fitMode || 'blurred-background',
     blurBackgroundAmount: Number(state.blurBackgroundAmount || 36),
     backgroundScale: Number(state.backgroundScale || 1.18),
-    keepSourceAudio: state.keepSourceAudio === true,
     segments: state.segments.map((segment) => ({ ...segment })),
     blurRegions: state.blurRegions.map((region) => ({ ...region })),
   };
 }
 
 function previewApi() {
-  return window.DesktopRemotionPreviewLaqtat || window.window?.DesktopRemotionPreviewLaqtat || null;
+  return window.DesktopRemotionPreviewSowar || window.window?.DesktopRemotionPreviewSowar || null;
 }
 
 async function renderPreview() {
@@ -451,18 +419,18 @@ function schedulePreviewRender(delayMs = 60) {
 function updateRuntimeSummary() {
   const totalFrames = getTotalPreviewDurationFrames();
   const totalSeconds = (totalFrames / FPS).toFixed(1);
-  elements.runtimeSummary.textContent = state.mainVideo ? `${state.segments.length} مقطع | ${totalSeconds}ث` : '';
-  elements.previewSummary.textContent = state.mainVideo
+  elements.runtimeSummary.textContent = state.mainImage ? `${state.segments.length} مقطع | ${totalSeconds}ث` : '';
+  elements.previewSummary.textContent = state.mainImage
     ? `المدة التقريبية: ${totalSeconds} ثانية | ${state.blurRegions.length} منطقة تمويه`
-    : 'اختر فيديوًا رئيسيًا للبدء.';
+    : 'اختر صورة رئيسية للبدء.';
 }
 
-function updateMainVideoLabel() {
-  if (!state.mainVideo) {
-    elements.mainVideoLabel.textContent = 'لم يتم الاختيار';
+function updateMainImageLabel() {
+  if (!state.mainImage) {
+    elements.mainImageLabel.textContent = 'لم يتم الاختيار';
     return;
   }
-  elements.mainVideoLabel.textContent = `${prettifyPath(state.mainVideo)} (${formatSeconds(state.mainVideoDurationMs)})`;
+  elements.mainImageLabel.textContent = `${prettifyPath(state.mainImage)} (${formatSeconds(state.mainImageDurationMs)})`;
 }
 
 function renderSegmentsList() {
@@ -470,7 +438,7 @@ function renderSegmentsList() {
   if (!state.segments.length) {
     const empty = document.createElement('div');
     empty.className = 'muted-text';
-    empty.textContent = 'سيظهر هنا المقطع الكامل بعد اختيار الفيديو.';
+    empty.textContent = 'سيظهر هنا المقطع الكامل بعد اختيار الصورة.';
     elements.segmentList.appendChild(empty);
     return;
   }
@@ -591,8 +559,8 @@ function renderBlurRegionsList() {
         ${sliderFieldMarkup({ id: region.id, field: 'endY', label: 'موضع النهاية Y', min: 0, max: 1080, step: 1, value: region.endY ?? region.y })}
       </div>
       <div class="editor-grid-3 blur-time-grid" style="${region.alwaysOn !== false ? 'display:none;' : ''}" data-time-fields="${region.id}">
-        ${sliderFieldMarkup({ id: region.id, field: 'startMs', label: 'بداية التمويه', min: 0, max: Math.max(1, state.mainVideoDurationMs || 1000), step: 100, value: region.startMs })}
-        ${sliderFieldMarkup({ id: region.id, field: 'endMs', label: 'نهاية التمويه', min: 100, max: Math.max(100, state.mainVideoDurationMs || 1000), step: 100, value: region.endMs })}
+        ${sliderFieldMarkup({ id: region.id, field: 'startMs', label: 'بداية التمويه', min: 0, max: Math.max(1, state.mainImageDurationMs || 1000), step: 100, value: region.startMs })}
+        ${sliderFieldMarkup({ id: region.id, field: 'endMs', label: 'نهاية التمويه', min: 100, max: Math.max(100, state.mainImageDurationMs || 1000), step: 100, value: region.endMs })}
         <div class="slider-field">
           <span class="slider-head">
             <span class="field-caption">مدة التمويه</span>
@@ -641,7 +609,7 @@ function refreshBlurRegionCard(regionId) {
 
 function syncUI() {
   updateProjectStatusUi();
-  updateMainVideoLabel();
+  updateMainImageLabel();
   elements.frameSelect.value = state.frame || '';
   elements.fitModeSelect.value = state.fitMode;
   elements.backgroundBlurInput.value = String(state.blurBackgroundAmount);
@@ -649,13 +617,12 @@ function syncUI() {
   elements.backgroundScaleInput.value = String(state.backgroundScale);
   if (elements.backgroundScaleValue) elements.backgroundScaleValue.textContent = state.backgroundScale.toFixed(2);
   elements.blurredBgGroup.style.display = state.fitMode === 'blurred-background' ? '' : 'none';
-  elements.keepSourceAudioCheckbox.checked = state.keepSourceAudio;
-  elements.scaleInput.value = String(state.videoScale);
-  elements.scaleValue.textContent = state.videoScale.toFixed(2);
-  elements.xInput.value = String(state.videoX);
-  elements.xValue.textContent = `${state.videoX}px`;
-  elements.yInput.value = String(state.videoY);
-  elements.yValue.textContent = `${state.videoY}px`;
+  elements.scaleInput.value = String(state.imageScale);
+  elements.scaleValue.textContent = state.imageScale.toFixed(2);
+  elements.xInput.value = String(state.imageX);
+  elements.xValue.textContent = `${state.imageX}px`;
+  elements.yInput.value = String(state.imageY);
+  elements.yValue.textContent = `${state.imageY}px`;
   elements.textInput.value = state.text;
   elements.bottomOffsetInput.value = String(state.textBottomOffset);
   elements.bottomOffsetValue.textContent = `${state.textBottomOffset}px`;
@@ -674,20 +641,19 @@ function syncUI() {
   updateRuntimeSummary();
 }
 
-function buildLaqtatProjectData() {
+function buildSowarProjectData() {
   return {
     scene: {
-      mainVideo: state.mainVideo,
-      mainVideoUrl: state.mainVideoUrl,
-      mainVideoDurationMs: state.mainVideoDurationMs,
+      mainImage: state.mainImage,
+      mainImageUrl: state.mainImageUrl,
+      mainImageDurationMs: state.mainImageDurationMs,
       frame: state.frame,
       fitMode: state.fitMode,
       blurBackgroundAmount: state.blurBackgroundAmount,
       backgroundScale: state.backgroundScale,
-      videoScale: state.videoScale,
-      videoX: state.videoX,
-      videoY: state.videoY,
-      keepSourceAudio: state.keepSourceAudio,
+      imageScale: state.imageScale,
+      imageX: state.imageX,
+      imageY: state.imageY,
       segments: state.segments.map((segment) => ({ ...segment })),
       blurRegions: state.blurRegions.map((region) => ({ ...region })),
     },
@@ -718,13 +684,13 @@ function buildProjectPayload() {
     currentProjectPath: state.project.currentProjectPath,
     projectName: state.project.projectName,
     createdAt: state.project.createdAt,
-    data: buildLaqtatProjectData(),
+    data: buildSowarProjectData(),
   };
 }
 
 function applyProjectMeta(project, filePath) {
   state.project.currentProjectPath = filePath || '';
-  state.project.projectName = project?.projectName || (filePath ? prettifyPath(filePath).replace(/\.lqt$/i, '') : 'Laqtat Project');
+  state.project.projectName = project?.projectName || (filePath ? prettifyPath(filePath).replace(/\\.swr$/i, '') : 'صور Project');
   state.project.createdAt = project?.createdAt || state.project.createdAt;
   state.project.lastSavedAt = project?.updatedAt || new Date().toISOString();
   state.project.isDirty = false;
@@ -772,17 +738,18 @@ async function applyOpenedProject(project, filePath) {
 
   isApplyingProjectData = true;
   try {
-    state.mainVideo = scene.mainVideo || '';
-    state.mainVideoUrl = scene.mainVideoUrl || (state.mainVideo ? window.desktopApi.toFileUrl(state.mainVideo) : '');
-    state.mainVideoDurationMs = Number(scene.mainVideoDurationMs || 0);
+    state.mainImage = scene.mainImage || '';
+    state.mainImageUrl = scene.mainImageUrl || (state.mainImage ? window.desktopApi.toFileUrl(state.mainImage) : '');
+    state.mainImageDurationMs = state.mainImage
+      ? Math.max(1000, Number(scene.mainImageDurationMs || 10000))
+      : Number(scene.mainImageDurationMs || 0);
     state.frame = scene.frame || '';
     state.fitMode = scene.fitMode || 'blurred-background';
     state.blurBackgroundAmount = Number(scene.blurBackgroundAmount || 36);
     state.backgroundScale = Number(scene.backgroundScale || 1.18);
-    state.videoScale = Number(scene.videoScale || 1);
-    state.videoX = Number(scene.videoX || 0);
-    state.videoY = Number(scene.videoY || 0);
-    state.keepSourceAudio = scene.keepSourceAudio === true;
+    state.imageScale = Number(scene.imageScale || 1);
+    state.imageX = Number(scene.imageX || 0);
+    state.imageY = Number(scene.imageY || 0);
     state.segments = Array.isArray(scene.segments) ? scene.segments.map((segment) => ({ ...segment })) : [];
     state.blurRegions = Array.isArray(scene.blurRegions) ? scene.blurRegions.map((region) => ({ ...region })) : [];
     state.text = typeof text.value === 'string' ? text.value : '';
@@ -827,21 +794,17 @@ function activateTab(tabId) {
   });
 }
 
-async function handleMainVideoSelection(result) {
+async function handleMainImageSelection(result) {
   if (!result?.path || !result?.url) return;
-  state.mainVideo = result.path;
-  state.mainVideoUrl = result.url;
-  try {
-    state.mainVideoDurationMs = await readMediaDurationMs(result.url, 10000);
-  } catch {
-    state.mainVideoDurationMs = 10000;
-  }
+  state.mainImage = result.path;
+  state.mainImageUrl = result.url;
+  state.mainImageDurationMs = Math.max(1000, state.mainImageDurationMs || 10000);
   if (!state.segments.length) {
     state.segments = [{
       id: createId('segment'),
       label: 'المقطع الكامل',
       startMs: 0,
-      endMs: state.mainVideoDurationMs,
+      endMs: state.mainImageDurationMs,
     }];
   } else {
     normalizeSegments();
@@ -859,7 +822,7 @@ function updateAssets(assets) {
 }
 
 function appendSegment() {
-  const limit = Math.max(1000, state.mainVideoDurationMs || 10000);
+  const limit = Math.max(1000, state.mainImageDurationMs || 10000);
   const last = state.segments[state.segments.length - 1];
   const fallbackStart = last ? clamp(last.endMs - 3000, 0, limit - 1000) : 0;
   const fallbackEnd = last ? clamp(last.endMs, fallbackStart + 1000, limit) : limit;
@@ -876,7 +839,7 @@ function appendSegment() {
 }
 
 function appendBlurRegion() {
-  const limit = Math.max(1000, state.mainVideoDurationMs || 10000);
+  const limit = Math.max(1000, state.mainImageDurationMs || 10000);
   state.blurRegions.push({
     id: createId('blur'),
     x: 830,
@@ -1004,9 +967,9 @@ function bindStaticEvents() {
 
   elements.projectSaveBtn.addEventListener('click', () => saveCurrentProject());
   elements.projectOpenBtn.addEventListener('click', openProjectFromDisk);
-  elements.pickMainVideoBtn.addEventListener('click', async () => {
-    const result = await window.desktopApi.pickMainVideo();
-    await handleMainVideoSelection(result);
+  elements.pickMainImageBtn.addEventListener('click', async () => {
+    const result = await window.desktopApi.pickMainImage();
+    await handleMainImageSelection(result);
   });
   elements.frameSelect.addEventListener('change', async (event) => {
     state.frame = event.target.value;
@@ -1032,25 +995,19 @@ function bindStaticEvents() {
     markProjectDirty();
     schedulePreviewRender();
   });
-  elements.keepSourceAudioCheckbox.addEventListener('change', async (event) => {
-    state.keepSourceAudio = event.target.checked;
-    markProjectDirty();
-    await renderPreview();
-  });
-
   [
-    [elements.scaleInput, 'videoScale', (value) => clamp(Number(value || 1), 0.5, 3)],
-    [elements.xInput, 'videoX', (value) => Number(value || 0)],
-    [elements.yInput, 'videoY', (value) => Number(value || 0)],
+    [elements.scaleInput, 'imageScale', (value) => clamp(Number(value || 1), 0.5, 3)],
+    [elements.xInput, 'imageX', (value) => Number(value || 0)],
+    [elements.yInput, 'imageY', (value) => Number(value || 0)],
     [elements.bottomOffsetInput, 'textBottomOffset', (value) => Number(value || 160)],
     [elements.fontSizeInput, 'textFontSize', (value) => Number(value || 46)],
     [elements.bgMusicVolumeInput, 'bgMusicVolume', (value) => Number(value || 25)],
   ].forEach(([element, key, parser]) => {
     element.addEventListener('input', async (event) => {
       state[key] = parser(event.target.value);
-      if (key === 'videoScale') elements.scaleValue.textContent = state.videoScale.toFixed(2);
-      if (key === 'videoX') elements.xValue.textContent = `${state.videoX}px`;
-      if (key === 'videoY') elements.yValue.textContent = `${state.videoY}px`;
+      if (key === 'imageScale') elements.scaleValue.textContent = state.imageScale.toFixed(2);
+      if (key === 'imageX') elements.xValue.textContent = `${state.imageX}px`;
+      if (key === 'imageY') elements.yValue.textContent = `${state.imageY}px`;
       if (key === 'textBottomOffset') elements.bottomOffsetValue.textContent = `${state.textBottomOffset}px`;
       if (key === 'textFontSize') elements.fontSizeValue.textContent = `${state.textFontSize}px`;
       if (key === 'bgMusicVolume') elements.bgMusicVolumeValue.textContent = `${state.bgMusicVolume}%`;
@@ -1100,8 +1057,8 @@ function bindStaticEvents() {
   });
 
   elements.renderBtn.addEventListener('click', async () => {
-    if (!state.mainVideo) {
-      alert('يرجى اختيار الفيديو الرئيسي أولاً');
+    if (!state.mainImage) {
+      alert('يرجى اختيار الصورة الرئيسية أولاً');
       return;
     }
     if (state.isRendering) return;
@@ -1112,26 +1069,25 @@ function bindStaticEvents() {
     setNavInteractivity(false);
     elements.renderResult.classList.add('is-hidden');
     elements.renderResult.innerHTML = '';
-    setStatus('جاري الرندر', 'يتم الآن تجهيز فيديو لقطات.');
+    setStatus('جاري الرندر', 'يتم الآن تجهيز فيديو صور.');
     setProgress(0.02, 'بدء مهمة الرندر...');
 
     try {
       const payload = {
-        model: 'laqtat',
-        compositionId: 'LaqtatVideo',
-        mainVideo: state.mainVideo,
-        mainVideoDurationMs: state.mainVideoDurationMs || 0,
+        model: 'sowar',
+        compositionId: 'SowarVideo',
+        mainImage: state.mainImage,
+        mainImageDurationMs: state.mainImageDurationMs || 10000,
         frame: state.frame || null,
         fitMode: state.fitMode,
         blurBackgroundAmount: state.blurBackgroundAmount,
         backgroundScale: state.backgroundScale,
-        keepSourceAudio: state.keepSourceAudio,
         segments: state.segments.map((segment) => ({ ...segment })),
         blurRegions: state.blurRegions.map((region) => ({ ...region })),
         text: state.text || '',
-        videoScale: Number(state.videoScale || 1),
-        videoX: Number(state.videoX || 0),
-        videoY: Number(state.videoY || 0),
+        imageScale: Number(state.imageScale || 1),
+        imageX: Number(state.imageX || 0),
+        imageY: Number(state.imageY || 0),
         effects: [],
         textBottomOffset: Number(state.textBottomOffset || 160),
         textFontSize: Number(state.textFontSize || 46),
@@ -1143,20 +1099,20 @@ function bindStaticEvents() {
         turboMode: state.turboMode !== false,
       };
       const result = await window.desktopApi.render(payload);
-      setStatus('اكتمل الرندر', 'تم حفظ فيديو لقطات بنجاح');
+      setStatus('اكتمل الرندر', 'تم حفظ فيديو صور بنجاح');
       setProgress(1, 'اكتمل الرندر');
       elements.renderResult.classList.remove('is-hidden');
       elements.renderResult.innerHTML = result?.outputPath
         ? `تم حفظ الفيديو: <span class="muted-text">${result.outputPath}</span>
            <span class="result-actions">
-             <button id="laqtat-reveal-file-btn" class="btn-secondary" type="button">إظهار الملف</button>
-             <button id="laqtat-open-folder-btn" class="btn-secondary" type="button">فتح المجلد</button>
+             <button id="sowar-reveal-file-btn" class="btn-secondary" type="button">إظهار الملف</button>
+             <button id="sowar-open-folder-btn" class="btn-secondary" type="button">فتح المجلد</button>
            </span>`
         : 'اكتمل الرندر.';
-      document.getElementById('laqtat-reveal-file-btn')?.addEventListener('click', () => {
+      document.getElementById('sowar-reveal-file-btn')?.addEventListener('click', () => {
         window.desktopApi.revealInFolder(result.outputPath);
       });
-      document.getElementById('laqtat-open-folder-btn')?.addEventListener('click', () => {
+      document.getElementById('sowar-open-folder-btn')?.addEventListener('click', () => {
         window.desktopApi.openOutputFolder();
       });
     } catch (error) {
@@ -1175,7 +1131,7 @@ function bindStaticEvents() {
   });
 
   elements.cancelRenderBtn.addEventListener('click', async () => {
-    const canceled = await window.desktopApi.cancelRender({ model: 'laqtat' });
+    const canceled = await window.desktopApi.cancelRender({ model: 'sowar' });
     if (canceled) {
       setStatus('تم الإيقاف', 'تم إيقاف عملية الرندر بناءً على طلبك.');
       setProgress(-1);
@@ -1226,5 +1182,5 @@ async function bootstrap() {
 
 bootstrap().catch((error) => {
   console.error(error);
-  setStatus('تعذر التشغيل', error?.message || 'فشل تهيئة واجهة لقطات');
+  setStatus('تعذر التشغيل', error?.message || 'فشل تهيئة واجهة صور');
 });

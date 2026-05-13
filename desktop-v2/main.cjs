@@ -303,22 +303,30 @@ function clearPendingRequests(errorMessage, targetWorkerName = null) {
 let renderWorkerInfograph = null;
 let renderWorkerMotadawel = null;
 let renderWorkerPersonalities = null;
+let renderWorkerLaqtat = null;
+let renderWorkerSowar = null;
 
 function getWorkerName(model) {
   if (model === 'motadawel') return 'motadawel';
   if (model === 'personalities') return 'personalities';
+  if (model === 'laqtat') return 'laqtat';
+  if (model === 'sowar') return 'sowar';
   return 'infograph';
 }
 
 function getWorkerRef(workerName) {
   if (workerName === 'motadawel') return renderWorkerMotadawel;
   if (workerName === 'personalities') return renderWorkerPersonalities;
+  if (workerName === 'laqtat') return renderWorkerLaqtat;
+  if (workerName === 'sowar') return renderWorkerSowar;
   return renderWorkerInfograph;
 }
 
 function setWorkerRef(workerName, worker) {
   if (workerName === 'motadawel') renderWorkerMotadawel = worker;
   else if (workerName === 'personalities') renderWorkerPersonalities = worker;
+  else if (workerName === 'laqtat') renderWorkerLaqtat = worker;
+  else if (workerName === 'sowar') renderWorkerSowar = worker;
   else renderWorkerInfograph = worker;
 }
 
@@ -335,6 +343,10 @@ function spawnRenderWorker(model) {
     workerEntry = path.join(desktopPaths.codeRoot, 'motadawel', 'worker', 'render-worker-motadawel.cjs');
   } else if (workerName === 'personalities') {
     workerEntry = path.join(desktopPaths.codeRoot, 'personalities', 'worker', 'render-worker-personalities.cjs');
+  } else if (workerName === 'laqtat') {
+    workerEntry = path.join(desktopPaths.codeRoot, 'laqtat', 'worker', 'render-worker-laqtat.cjs');
+  } else if (workerName === 'sowar') {
+    workerEntry = path.join(desktopPaths.codeRoot, 'sowar', 'worker', 'render-worker-sowar.cjs');
   } else {
     workerEntry = desktopPaths.workerScript;
   }
@@ -593,6 +605,24 @@ ipcMain.handle('desktop:pick-main-video', async () => {
   const result = await dialog.showOpenDialog({
     title: 'Select main video',
     filters: [{ name: 'Videos', extensions: ['mp4', 'mov', 'webm'] }],
+    properties: ['openFile'],
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+
+  const filePath = result.filePaths[0];
+  return {
+    path: filePath,
+    url: toFileUrl(filePath),
+  };
+});
+
+ipcMain.handle('desktop:pick-main-image', async () => {
+  const result = await dialog.showOpenDialog({
+    title: 'Select main image',
+    filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
     properties: ['openFile'],
   });
 
@@ -1094,5 +1124,11 @@ app.on('before-quit', () => {
   }
   if (renderWorkerPersonalities && !renderWorkerPersonalities.killed) {
     renderWorkerPersonalities.kill();
+  }
+  if (renderWorkerLaqtat && !renderWorkerLaqtat.killed) {
+    renderWorkerLaqtat.kill();
+  }
+  if (renderWorkerSowar && !renderWorkerSowar.killed) {
+    renderWorkerSowar.kill();
   }
 });

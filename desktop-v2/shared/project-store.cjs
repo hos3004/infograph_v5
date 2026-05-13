@@ -25,6 +25,13 @@ const PROJECT_CONFIGS = {
     displayName: 'Laqtat',
     dialogName: 'Laqtat Project',
   },
+  sowar: {
+    projectType: 'sowar',
+    extension: '.swr',
+    extensionName: 'swr',
+    displayName: 'Sowar',
+    dialogName: 'Sowar Project',
+  },
   personalities: {
     projectType: 'personalities',
     extension: '.chp',
@@ -43,6 +50,10 @@ function getProjectConfig(projectType) {
 }
 
 function inferProjectConfigFromUrl(url = '') {
+  if (/[\\/]sowar[\\/]renderer[\\/]|\/sowar\/renderer\//i.test(url)) {
+    return PROJECT_CONFIGS.sowar;
+  }
+
   if (/[\\/]laqtat[\\/]renderer[\\/]|\/laqtat\/renderer\//i.test(url)) {
     return PROJECT_CONFIGS.laqtat;
   }

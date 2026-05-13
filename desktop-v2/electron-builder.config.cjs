@@ -6,6 +6,7 @@ const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2Build');
 const bundleStagingDir = path.join(buildRoot, 'bundle-staging', 'remotion-bundle');
 const motadawelBundleStagingDir = path.join(buildRoot, 'bundle-staging-motadawel', 'remotion-bundle');
 const laqtatBundleStagingDir = path.join(buildRoot, 'bundle-staging-laqtat', 'remotion-bundle');
+const sowarBundleStagingDir = path.join(buildRoot, 'bundle-staging-sowar', 'remotion-bundle');
 const personalitiesBundleStagingDir = path.join(buildRoot, 'bundle-staging-personalities', 'remotion-bundle');
 const outputDir = process.env.DESKTOP_V2_BUILD_DIR || path.join(buildRoot, 'dist');
 
@@ -23,6 +24,7 @@ module.exports = {
     'desktop-v2/shared/**/*',
     'desktop-v2/motadawel/**/*',
     'desktop-v2/laqtat/**/*',
+    'desktop-v2/sowar/**/*',
     'desktop-v2/personalities/**/*',
     'package.json',
   ],
@@ -43,6 +45,11 @@ module.exports = {
     {
       from: laqtatBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-laqtat/remotion-bundle',
+      filter: ['**/*'],
+    },
+    {
+      from: sowarBundleStagingDir,
+      to: 'desktop-v2/generated/bundle-staging-sowar/remotion-bundle',
       filter: ['**/*'],
     },
     {

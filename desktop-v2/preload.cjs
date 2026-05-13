@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('desktopApi', {
   pickSlides: () => ipcRenderer.invoke('desktop:pick-slides'),
   pickSlideImage: () => ipcRenderer.invoke('desktop:pick-slide-image'),
   pickMainVideo: () => ipcRenderer.invoke('desktop:pick-main-video'),
+  pickMainImage: () => ipcRenderer.invoke('desktop:pick-main-image'),
   pickVoiceover: () => ipcRenderer.invoke('desktop:pick-voiceover'),
   refreshAssets: () => ipcRenderer.invoke('desktop:refresh-assets'),
   render: (payload) => ipcRenderer.invoke('desktop:render', payload),
