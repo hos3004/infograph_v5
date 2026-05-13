@@ -157,26 +157,12 @@ function ensureBundle() {
   }));
 }
 
-function normalizeSegments(segments, fallbackDurationMs) {
-  const safeSegments = Array.isArray(segments) ? segments : [];
-  const normalized = safeSegments
-    .map((segment, index) => ({
-      id: segment.id || `segment-${index + 1}`,
-      startMs: Number(segment.startMs || 0),
-      endMs: Number(segment.endMs || 0),
-      label: typeof segment.label === 'string' ? segment.label : '',
-    }))
-    .filter((segment) => Number.isFinite(segment.startMs) && Number.isFinite(segment.endMs) && segment.endMs > segment.startMs);
-
-  if (normalized.length > 0) {
-    return normalized;
-  }
-
+function normalizeSegments(_segments, fallbackDurationMs) {
   return [{
-    id: 'segment-1',
+    id: 'image-duration',
     startMs: 0,
     endMs: Math.max(1000, Number(fallbackDurationMs || 10000)),
-    label: 'المقطع الكامل',
+    label: '',
   }];
 }
 
@@ -230,6 +216,9 @@ async function renderImageVideo(payload) {
       imageScale: Number(payload.imageScale || 1),
       imageX: Number(payload.imageX || 0),
       imageY: Number(payload.imageY || 0),
+      imageMotionEnabled: payload.imageMotionEnabled === true,
+      imageMotionStartY: Number(payload.imageMotionStartY || 0),
+      imageMotionEndY: Number(payload.imageMotionEndY || -200),
       effects: Array.isArray(payload.effects) ? payload.effects : [],
       textBottomOffset: Number(payload.textBottomOffset || 160),
       textFontSize: Number(payload.textFontSize || 46),

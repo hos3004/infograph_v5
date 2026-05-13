@@ -44,6 +44,9 @@ export type SowarProps = {
   imageScale: number;
   imageX: number;
   imageY: number;
+  imageMotionEnabled?: boolean;
+  imageMotionStartY?: number;
+  imageMotionEndY?: number;
   effects: SowarEffect[];
   textBottomOffset: number;
   textFontSize: number;

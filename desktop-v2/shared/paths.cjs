@@ -53,7 +53,7 @@ function ensureDesktopDirs(paths) {
 
   if (paths.packaged) {
     ensureDir(paths.assetsDir);
-    ['overlays', 'music', 'endpage', 'fonts', 'motadawel_intros', 'motadawel_outros', 'frem_mutadawel'].forEach((name) => {
+    ['overlays', 'music', 'endpage', 'fonts', 'motadawel_intros', 'motadawel_outros', 'frem_mutadawel', 'frame_sewar'].forEach((name) => {
       ensureDir(path.join(paths.assetsDir, name));
     });
   }

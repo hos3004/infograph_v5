@@ -5,7 +5,7 @@ const TEXT_PRESET_VALUES = ['dark', 'gold', 'blue', 'red', 'orange'];
 
 const state = {
   assets: {
-    frem_mutadawel: [],
+    frame_sewar: [],
     music: [],
   },
   appVersion: '1.0.0',
@@ -36,6 +36,9 @@ const state = {
   textPreset: 'dark',
   textAnimationType: 'motion-blur',
   cinematicBarSize: 6,
+  imageMotionEnabled: false,
+  imageMotionStartY: 0,
+  imageMotionEndY: -200,
   effects: [],
   bgMusic: '',
   bgMusicVolume: 25,
@@ -63,6 +66,8 @@ const elements = {
   refreshAssetsBtn: document.getElementById('refresh-assets-btn'),
   pickMainImageBtn: document.getElementById('pick-main-image-btn'),
   mainImageLabel: document.getElementById('main-image-label'),
+  imageDurationInput: document.getElementById('image-duration-input'),
+  imageDurationValue: document.getElementById('image-duration-value'),
   frameSelect: document.getElementById('frame-select'),
   fitModeSelect: document.getElementById('fit-mode-select'),
   backgroundBlurInput: document.getElementById('background-blur-input'),
@@ -76,8 +81,12 @@ const elements = {
   xValue: document.getElementById('x-value'),
   yInput: document.getElementById('y-input'),
   yValue: document.getElementById('y-value'),
-  addSegmentBtn: document.getElementById('add-segment-btn'),
-  segmentList: document.getElementById('segment-list'),
+  imageMotionCheckbox: document.getElementById('image-motion-checkbox'),
+  imageMotionControls: document.getElementById('image-motion-controls'),
+  imageMotionStartYInput: document.getElementById('image-motion-startY-input'),
+  imageMotionStartYValue: document.getElementById('image-motion-startY-value'),
+  imageMotionEndYInput: document.getElementById('image-motion-endY-input'),
+  imageMotionEndYValue: document.getElementById('image-motion-endY-value'),
   addBlurBtn: document.getElementById('add-blur-btn'),
   blurList: document.getElementById('blur-list'),
   textInput: document.getElementById('text-input'),
@@ -119,56 +128,6 @@ function clamp(value, min, max) {
 
 function formatSeconds(ms) {
   return `${(Math.max(0, ms) / 1000).toFixed(1)}ث`;
-}
-
-function normalizeTimeText(value) {
-  const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
-  const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
-  return String(value || '')
-    .trim()
-    .replace(/[٠-٩]/g, (digit) => String(arabicDigits.indexOf(digit)))
-    .replace(/[۰-۹]/g, (digit) => String(persianDigits.indexOf(digit)))
-    .replace(/،/g, '.')
-    .replace(/,/g, '.')
-    .replace(/\s+/g, '');
-}
-
-function formatTimecode(ms) {
-  const totalTenths = Math.max(0, Math.round((Number(ms) || 0) / 100));
-  const minutes = Math.floor(totalTenths / 600);
-  const seconds = Math.floor((totalTenths % 600) / 10);
-  const tenths = totalTenths % 10;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${tenths}`;
-}
-
-function parseTimecodeToMs(value) {
-  const text = normalizeTimeText(value);
-  if (!text) return null;
-  const colonParts = text.split(':');
-
-  if (colonParts.length > 1) {
-    const numericParts = colonParts.map((part) => Number(part));
-    if (numericParts.some((part) => !Number.isFinite(part) || part < 0)) return null;
-    const seconds = numericParts.pop();
-    const minutes = numericParts.pop() || 0;
-    const hours = numericParts.pop() || 0;
-    if (numericParts.length > 0 || seconds >= 60 || minutes >= 60) return null;
-    return Math.round(((hours * 3600) + (minutes * 60) + seconds) * 1000);
-  }
-
-  const dotParts = text.split('.');
-  if (
-    dotParts.length === 2 &&
-    dotParts[1].length === 2 &&
-    Number(dotParts[0]) > 0 &&
-    Number(dotParts[0]) < 60 &&
-    Number(dotParts[1]) < 60
-  ) {
-    return Math.round(((Number(dotParts[0]) * 60) + Number(dotParts[1])) * 1000);
-  }
-
-  const seconds = Number(text);
-  return Number.isFinite(seconds) && seconds >= 0 ? Math.round(seconds * 1000) : null;
 }
 
 function escapeAttr(value) {
@@ -313,29 +272,22 @@ function markProjectDirty() {
   scheduleAutosave();
 }
 
-function normalizeSegments() {
-  const limit = Math.max(1000, state.mainImageDurationMs || 1000);
-  state.segments = (Array.isArray(state.segments) ? state.segments : [])
-    .map((segment, index) => {
-      const startMs = clamp(Number(segment.startMs || 0), 0, limit);
-      const endMs = clamp(Number(segment.endMs || limit), 0, limit);
-      return {
-        id: segment.id || createId(`segment-${index + 1}`),
-        label: typeof segment.label === 'string' ? segment.label : '',
-        startMs,
-        endMs: Math.max(startMs + 100, endMs),
-      };
-    })
-    .filter((segment) => segment.endMs > segment.startMs);
+function getImageDurationMs() {
+  return Math.max(1000, Math.round(Number(state.mainImageDurationMs || 10000)));
+}
 
-  if (!state.segments.length && state.mainImageDurationMs > 0) {
-    state.segments = [{
-      id: createId('segment'),
-      label: 'المقطع الكامل',
-      startMs: 0,
-      endMs: state.mainImageDurationMs,
-    }];
+function normalizeSegments() {
+  if (!state.mainImageDurationMs) {
+    state.segments = [];
+    return;
   }
+
+  state.segments = [{
+    id: state.segments?.[0]?.id || 'image-duration',
+    label: '',
+    startMs: 0,
+    endMs: getImageDurationMs(),
+  }];
 }
 
 function normalizeBlurRegions() {
@@ -364,20 +316,20 @@ function normalizeBlurRegions() {
 }
 
 function getTotalPreviewDurationFrames() {
-  return Math.max(
-    25,
-    state.segments.reduce((sum, segment) => sum + Math.max(1, Math.round(((segment.endMs - segment.startMs) / 1000) * FPS)), 0),
-  );
+  return Math.max(25, Math.round((getImageDurationMs() / 1000) * FPS));
 }
 
 function buildPreviewInputProps() {
   return {
     mainImageUrl: state.mainImageUrl || null,
-    frameUrl: getFileUrlForAsset(state.frame, state.assets.frem_mutadawel || []) || null,
+    frameUrl: getFileUrlForAsset(state.frame, state.assets.frame_sewar || []) || null,
     mainText: state.text || '',
     imageScale: Number(state.imageScale || 1),
     imageX: Number(state.imageX || 0),
     imageY: Number(state.imageY || 0),
+    imageMotionEnabled: state.imageMotionEnabled === true,
+    imageMotionStartY: Number(state.imageMotionStartY || 0),
+    imageMotionEndY: Number(state.imageMotionEndY || -200),
     effects: Array.isArray(state.effects) ? state.effects : [],
     textBottomOffset: Number(state.textBottomOffset || 160),
     textFontSize: Number(state.textFontSize || 46),
@@ -419,7 +371,7 @@ function schedulePreviewRender(delayMs = 60) {
 function updateRuntimeSummary() {
   const totalFrames = getTotalPreviewDurationFrames();
   const totalSeconds = (totalFrames / FPS).toFixed(1);
-  elements.runtimeSummary.textContent = state.mainImage ? `${state.segments.length} مقطع | ${totalSeconds}ث` : '';
+  elements.runtimeSummary.textContent = state.mainImage ? `${totalSeconds}ث` : '';
   elements.previewSummary.textContent = state.mainImage
     ? `المدة التقريبية: ${totalSeconds} ثانية | ${state.blurRegions.length} منطقة تمويه`
     : 'اختر صورة رئيسية للبدء.';
@@ -431,87 +383,6 @@ function updateMainImageLabel() {
     return;
   }
   elements.mainImageLabel.textContent = `${prettifyPath(state.mainImage)} (${formatSeconds(state.mainImageDurationMs)})`;
-}
-
-function renderSegmentsList() {
-  elements.segmentList.innerHTML = '';
-  if (!state.segments.length) {
-    const empty = document.createElement('div');
-    empty.className = 'muted-text';
-    empty.textContent = 'سيظهر هنا المقطع الكامل بعد اختيار الصورة.';
-    elements.segmentList.appendChild(empty);
-    return;
-  }
-
-  const table = document.createElement('div');
-  table.className = 'segment-table';
-  table.innerHTML = `
-    <div class="segment-row-head" aria-hidden="true">
-      <span>#</span>
-      <span>البداية</span>
-      <span>النهاية</span>
-      <span>المدة</span>
-      <span></span>
-    </div>
-  `;
-
-  state.segments.forEach((segment, index) => {
-    const row = document.createElement('div');
-    row.className = 'segment-row';
-    row.dataset.segmentRow = segment.id;
-    row.innerHTML = `
-      <div class="segment-index">${index + 1}</div>
-      <input
-        type="text"
-        class="input-v2 segment-time-input"
-        inputmode="decimal"
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="بداية المقطع ${index + 1}"
-        data-field="startMs"
-        data-id="${escapeAttr(segment.id)}"
-        value="${formatTimecode(segment.startMs)}"
-      />
-      <input
-        type="text"
-        class="input-v2 segment-time-input"
-        inputmode="decimal"
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="نهاية المقطع ${index + 1}"
-        data-field="endMs"
-        data-id="${escapeAttr(segment.id)}"
-        value="${formatTimecode(segment.endMs)}"
-      />
-      <div class="segment-duration" data-segment-duration="${escapeAttr(segment.id)}">${formatTimecode(segment.endMs - segment.startMs)}</div>
-      <button type="button" class="btn-secondary segment-delete-btn" data-action="delete-segment" data-id="${escapeAttr(segment.id)}">حذف</button>
-    `;
-    table.appendChild(row);
-  });
-
-  elements.segmentList.appendChild(table);
-}
-
-function getSegmentRow(segmentId) {
-  return Array.from(elements.segmentList.querySelectorAll('[data-segment-row]'))
-    .find((row) => row.dataset.segmentRow === segmentId) || null;
-}
-
-function refreshSegmentRow(segmentId, { formatInputs = false } = {}) {
-  const segment = state.segments.find((item) => item.id === segmentId);
-  const row = getSegmentRow(segmentId);
-  if (!segment || !row) return;
-
-  const startInput = row.querySelector('[data-field="startMs"]');
-  const endInput = row.querySelector('[data-field="endMs"]');
-  const duration = Array.from(row.querySelectorAll('[data-segment-duration]'))
-    .find((item) => item.dataset.segmentDuration === segmentId);
-
-  if (formatInputs && startInput) startInput.value = formatTimecode(segment.startMs);
-  if (formatInputs && endInput) endInput.value = formatTimecode(segment.endMs);
-  if (duration) duration.textContent = formatTimecode(Math.max(0, segment.endMs - segment.startMs));
-
-  updateRuntimeSummary();
 }
 
 function renderBlurRegionsList() {
@@ -623,6 +494,12 @@ function syncUI() {
   elements.xValue.textContent = `${state.imageX}px`;
   elements.yInput.value = String(state.imageY);
   elements.yValue.textContent = `${state.imageY}px`;
+  if (elements.imageMotionCheckbox) elements.imageMotionCheckbox.checked = state.imageMotionEnabled === true;
+  if (elements.imageMotionControls) elements.imageMotionControls.style.display = state.imageMotionEnabled ? 'grid' : 'none';
+  if (elements.imageMotionStartYInput) elements.imageMotionStartYInput.value = String(state.imageMotionStartY || 0);
+  if (elements.imageMotionStartYValue) elements.imageMotionStartYValue.textContent = `${state.imageMotionStartY || 0}px`;
+  if (elements.imageMotionEndYInput) elements.imageMotionEndYInput.value = String(state.imageMotionEndY || -200);
+  if (elements.imageMotionEndYValue) elements.imageMotionEndYValue.textContent = `${state.imageMotionEndY || -200}px`;
   elements.textInput.value = state.text;
   elements.bottomOffsetInput.value = String(state.textBottomOffset);
   elements.bottomOffsetValue.textContent = `${state.textBottomOffset}px`;
@@ -636,7 +513,11 @@ function syncUI() {
   if (elements.turboRenderCheckbox) {
     elements.turboRenderCheckbox.checked = state.turboMode !== false;
   }
-  renderSegmentsList();
+  if (elements.imageDurationInput) {
+    const seconds = getImageDurationMs() / 1000;
+    elements.imageDurationInput.value = seconds.toFixed(1);
+    elements.imageDurationValue.textContent = `${seconds.toFixed(1)}ث`;
+  }
   renderBlurRegionsList();
   updateRuntimeSummary();
 }
@@ -654,7 +535,6 @@ function buildSowarProjectData() {
       imageScale: state.imageScale,
       imageX: state.imageX,
       imageY: state.imageY,
-      segments: state.segments.map((segment) => ({ ...segment })),
       blurRegions: state.blurRegions.map((region) => ({ ...region })),
     },
     text: {
@@ -750,7 +630,7 @@ async function applyOpenedProject(project, filePath) {
     state.imageScale = Number(scene.imageScale || 1);
     state.imageX = Number(scene.imageX || 0);
     state.imageY = Number(scene.imageY || 0);
-    state.segments = Array.isArray(scene.segments) ? scene.segments.map((segment) => ({ ...segment })) : [];
+    state.segments = [];
     state.blurRegions = Array.isArray(scene.blurRegions) ? scene.blurRegions.map((region) => ({ ...region })) : [];
     state.text = typeof text.value === 'string' ? text.value : '';
     state.textBottomOffset = Number(text.bottomOffset || 160);
@@ -799,16 +679,7 @@ async function handleMainImageSelection(result) {
   state.mainImage = result.path;
   state.mainImageUrl = result.url;
   state.mainImageDurationMs = Math.max(1000, state.mainImageDurationMs || 10000);
-  if (!state.segments.length) {
-    state.segments = [{
-      id: createId('segment'),
-      label: 'المقطع الكامل',
-      startMs: 0,
-      endMs: state.mainImageDurationMs,
-    }];
-  } else {
-    normalizeSegments();
-  }
+  normalizeSegments();
   normalizeBlurRegions();
   syncUI();
   markProjectDirty();
@@ -817,25 +688,8 @@ async function handleMainImageSelection(result) {
 
 function updateAssets(assets) {
   state.assets = assets || state.assets;
-  formatAssetOptions(elements.frameSelect, state.assets.frem_mutadawel || [], 'بدون إطار');
+  formatAssetOptions(elements.frameSelect, state.assets.frame_sewar || [], 'بدون إطار');
   formatAssetOptions(elements.bgMusicSelect, state.assets.music || [], 'بدون موسيقى');
-}
-
-function appendSegment() {
-  const limit = Math.max(1000, state.mainImageDurationMs || 10000);
-  const last = state.segments[state.segments.length - 1];
-  const fallbackStart = last ? clamp(last.endMs - 3000, 0, limit - 1000) : 0;
-  const fallbackEnd = last ? clamp(last.endMs, fallbackStart + 1000, limit) : limit;
-  state.segments.push({
-    id: createId('segment'),
-    label: '',
-    startMs: fallbackStart,
-    endMs: fallbackEnd,
-  });
-  normalizeSegments();
-  syncUI();
-  markProjectDirty();
-  renderPreview();
 }
 
 function appendBlurRegion() {
@@ -857,47 +711,6 @@ function appendBlurRegion() {
     endMs: limit,
   });
   normalizeBlurRegions();
-  syncUI();
-  markProjectDirty();
-  renderPreview();
-}
-
-function handleSegmentsInput(event) {
-  const target = event.target;
-  const id = target.dataset.id;
-  const field = target.dataset.field;
-  if (!id || !field) return;
-  const segment = state.segments.find((item) => item.id === id);
-  if (!segment) return;
-  if (field === 'startMs' || field === 'endMs') {
-    const nextMs = parseTimecodeToMs(target.value);
-    target.classList.toggle('is-invalid', nextMs === null);
-    if (nextMs === null) return;
-    segment[field] = nextMs;
-    refreshSegmentRow(id);
-    markProjectDirty();
-  }
-}
-
-function commitSegmentEdit(event) {
-  const target = event.target;
-  const id = target.dataset.id;
-  const field = target.dataset.field;
-  if (!id || (field !== 'startMs' && field !== 'endMs')) return;
-
-  const nextMs = parseTimecodeToMs(target.value);
-  if (nextMs === null) {
-    target.classList.add('is-invalid');
-    refreshSegmentRow(id, { formatInputs: true });
-    target.classList.remove('is-invalid');
-    return;
-  }
-
-  const segment = state.segments.find((item) => item.id === id);
-  if (!segment) return;
-  segment[field] = nextMs;
-  target.classList.remove('is-invalid');
-  normalizeSegments();
   syncUI();
   markProjectDirty();
   renderPreview();
@@ -930,23 +743,6 @@ function handleBlurInput(event) {
 }
 
 function attachDynamicListHandlers() {
-  elements.segmentList.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-action="delete-segment"]');
-    if (!button) return;
-    state.segments = state.segments.filter((segment) => segment.id !== button.dataset.id);
-    normalizeSegments();
-    syncUI();
-    markProjectDirty();
-    renderPreview();
-  });
-  elements.segmentList.addEventListener('input', handleSegmentsInput);
-  elements.segmentList.addEventListener('change', commitSegmentEdit);
-  elements.segmentList.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && event.target?.dataset?.id) {
-      event.target.blur();
-    }
-  });
-
   elements.blurList.addEventListener('click', (event) => {
     const button = event.target.closest('[data-action="delete-blur"]');
     if (!button) return;
@@ -970,6 +766,43 @@ function bindStaticEvents() {
   elements.pickMainImageBtn.addEventListener('click', async () => {
     const result = await window.desktopApi.pickMainImage();
     await handleMainImageSelection(result);
+  });
+  elements.imageDurationInput?.addEventListener('input', (event) => {
+    const nextSeconds = clamp(Number(event.target.value || 10), 1, 3600);
+    state.mainImageDurationMs = Math.round(nextSeconds * 1000);
+    normalizeSegments();
+    normalizeBlurRegions();
+    if (elements.imageDurationValue) {
+      elements.imageDurationValue.textContent = `${(state.mainImageDurationMs / 1000).toFixed(1)}ث`;
+    }
+    updateRuntimeSummary();
+    markProjectDirty();
+    schedulePreviewRender();
+  });
+  elements.imageDurationInput?.addEventListener('change', () => {
+    syncUI();
+    renderPreview();
+  });
+  if (elements.imageMotionCheckbox) {
+    elements.imageMotionCheckbox.addEventListener('change', async (event) => {
+      state.imageMotionEnabled = event.target.checked;
+      syncUI();
+      markProjectDirty();
+      schedulePreviewRender();
+    });
+  }
+  [
+    [elements.imageMotionStartYInput, 'imageMotionStartY', (v) => Number(v || 0)],
+    [elements.imageMotionEndYInput, 'imageMotionEndY', (v) => Number(v || 0)],
+  ].forEach(([element, key, parser]) => {
+    if (!element) return;
+    element.addEventListener('input', async (event) => {
+      state[key] = parser(event.target.value);
+      if (key === 'imageMotionStartY' && elements.imageMotionStartYValue) elements.imageMotionStartYValue.textContent = `${state.imageMotionStartY}px`;
+      if (key === 'imageMotionEndY' && elements.imageMotionEndYValue) elements.imageMotionEndYValue.textContent = `${state.imageMotionEndY}px`;
+      markProjectDirty();
+      schedulePreviewRender();
+    });
   });
   elements.frameSelect.addEventListener('change', async (event) => {
     state.frame = event.target.value;
@@ -1037,7 +870,6 @@ function bindStaticEvents() {
     await renderPreview();
   });
 
-  elements.addSegmentBtn.addEventListener('click', appendSegment);
   elements.addBlurBtn.addEventListener('click', appendBlurRegion);
   elements.openOutputBtn.addEventListener('click', () => window.desktopApi.openOutputFolder());
   elements.turboRenderCheckbox?.addEventListener('change', () => {
@@ -1088,6 +920,9 @@ function bindStaticEvents() {
         imageScale: Number(state.imageScale || 1),
         imageX: Number(state.imageX || 0),
         imageY: Number(state.imageY || 0),
+        imageMotionEnabled: state.imageMotionEnabled === true,
+        imageMotionStartY: Number(state.imageMotionStartY || 0),
+        imageMotionEndY: Number(state.imageMotionEndY || -200),
         effects: [],
         textBottomOffset: Number(state.textBottomOffset || 160),
         textFontSize: Number(state.textFontSize || 46),

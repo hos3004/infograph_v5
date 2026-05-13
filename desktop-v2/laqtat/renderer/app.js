@@ -5,7 +5,7 @@ const TEXT_PRESET_VALUES = ['dark', 'gold', 'blue', 'red', 'orange'];
 
 const state = {
   assets: {
-    frem_mutadawel: [],
+    frame_sewar: [],
     music: [],
   },
   appVersion: '1.0.0',
@@ -404,7 +404,7 @@ function getTotalPreviewDurationFrames() {
 function buildPreviewInputProps() {
   return {
     mainVideoUrl: state.mainVideoUrl || null,
-    frameUrl: getFileUrlForAsset(state.frame, state.assets.frem_mutadawel || []) || null,
+    frameUrl: getFileUrlForAsset(state.frame, state.assets.frame_sewar || []) || null,
     mainText: state.text || '',
     videoScale: Number(state.videoScale || 1),
     videoX: Number(state.videoX || 0),
@@ -854,7 +854,7 @@ async function handleMainVideoSelection(result) {
 
 function updateAssets(assets) {
   state.assets = assets || state.assets;
-  formatAssetOptions(elements.frameSelect, state.assets.frem_mutadawel || [], 'بدون إطار');
+  formatAssetOptions(elements.frameSelect, state.assets.frame_sewar || [], 'بدون إطار');
   formatAssetOptions(elements.bgMusicSelect, state.assets.music || [], 'بدون موسيقى');
 }
 

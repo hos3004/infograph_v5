@@ -14993,11 +14993,22 @@ Check that all your Remotion packages are on the same version. If your dependenc
     imageScale,
     imageX,
     imageY,
+    imageMotionEnabled,
+    imageMotionStartY = 0,
+    imageMotionEndY = 0,
     blurBackgroundAmount,
     backgroundScale
   }) => {
-    const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${imageY}px)`;
-    return /* @__PURE__ */ import_react4.default.createElement(AbsoluteFill, { style: { backgroundColor: "#000" } }, fitMode === "blurred-background" ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(
+    const frame = useCurrentFrame();
+    const { durationInFrames } = useVideoConfig();
+    const motionY = imageMotionEnabled ? interpolate(frame, [0, durationInFrames], [imageMotionStartY, imageMotionEndY], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp"
+    }) : 0;
+    const currentY = imageY + motionY;
+    const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${currentY}px)`;
+    const entryOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    return /* @__PURE__ */ import_react4.default.createElement(AbsoluteFill, { style: { backgroundColor: "#000", opacity: entryOpacity } }, fitMode === "blurred-background" ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(
       Img,
       {
         src,
@@ -15009,7 +15020,8 @@ Check that all your Remotion packages are on the same version. If your dependenc
           objectFit: "cover",
           objectPosition: "center center",
           transform: `scale(${backgroundScale})`,
-          filter: `blur(${blurBackgroundAmount}px) brightness(0.85)`
+          filter: `blur(${blurBackgroundAmount}px) brightness(0.85)`,
+          opacity: entryOpacity
         }
       }
     ), /* @__PURE__ */ import_react4.default.createElement(
@@ -15203,6 +15215,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
     imageScale,
     imageX,
     imageY,
+    imageMotionEnabled,
+    imageMotionStartY,
+    imageMotionEndY,
     backgroundScale,
     blurBackgroundAmount
   }) => {
@@ -15216,6 +15231,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
         imageScale,
         imageX,
         imageY,
+        imageMotionEnabled,
+        imageMotionStartY,
+        imageMotionEndY,
         blurBackgroundAmount,
         backgroundScale
       }
@@ -15244,6 +15262,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
     imageScale,
     imageX,
     imageY,
+    imageMotionEnabled,
+    imageMotionStartY,
+    imageMotionEndY,
     effects,
     textBottomOffset,
     textFontSize,
@@ -15282,6 +15303,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
           imageScale,
           imageX,
           imageY,
+          imageMotionEnabled,
+          imageMotionStartY,
+          imageMotionEndY,
           backgroundScale,
           blurBackgroundAmount
         }

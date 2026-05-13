@@ -11,6 +11,7 @@ const ASSET_DIRECTORIES = {
   motadawel_intros: 'motadawel_intros',
   motadawel_outros: 'motadawel_outros',
   frem_mutadawel: 'frem_mutadawel',
+  frame_sewar: 'frame_sewar',
 };
 
 function toFileUrl(filePath) {
@@ -70,6 +71,7 @@ function listAssetsSnapshot(paths) {
     motadawel_intros: listAssetFiles(paths, 'motadawel_intros'),
     motadawel_outros: listAssetFiles(paths, 'motadawel_outros'),
     frem_mutadawel: listAssetFiles(paths, 'frem_mutadawel'),
+    frame_sewar: listAssetFiles(paths, 'frame_sewar'),
   };
 }
 

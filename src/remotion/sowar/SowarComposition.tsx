@@ -10,6 +10,7 @@ import {
   interpolate,
   staticFile,
   useCurrentFrame,
+  useVideoConfig,
 } from 'remotion';
 import { VisualEffects } from '../VisualEffects';
 import { SOWAR_TEXT_PRESETS, type SowarBlurRegion, type SowarProps } from './types';
@@ -185,6 +186,9 @@ const SegmentImageLayer: React.FC<{
   imageScale: number;
   imageX: number;
   imageY: number;
+  imageMotionEnabled?: boolean;
+  imageMotionStartY?: number;
+  imageMotionEndY?: number;
   blurBackgroundAmount: number;
   backgroundScale: number;
 }> = ({
@@ -193,13 +197,26 @@ const SegmentImageLayer: React.FC<{
   imageScale,
   imageX,
   imageY,
+  imageMotionEnabled,
+  imageMotionStartY = 0,
+  imageMotionEndY = 0,
   blurBackgroundAmount,
   backgroundScale,
 }) => {
-  const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${imageY}px)`;
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const motionY = imageMotionEnabled
+    ? interpolate(frame, [0, durationInFrames], [imageMotionStartY, imageMotionEndY], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+      })
+    : 0;
+  const currentY = imageY + motionY;
+  const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${currentY}px)`;
+  const entryOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#000' }}>
+    <AbsoluteFill style={{ backgroundColor: '#000', opacity: entryOpacity }}>
       {fitMode === 'blurred-background' ? (
         <>
           <Img
@@ -213,6 +230,7 @@ const SegmentImageLayer: React.FC<{
               objectPosition: 'center center',
               transform: `scale(${backgroundScale})`,
               filter: `blur(${blurBackgroundAmount}px) brightness(0.85)`,
+              opacity: entryOpacity,
             }}
           />
           <AbsoluteFill
@@ -443,6 +461,9 @@ const SegmentScene: React.FC<{
   imageScale: number;
   imageX: number;
   imageY: number;
+  imageMotionEnabled?: boolean;
+  imageMotionStartY?: number;
+  imageMotionEndY?: number;
   backgroundScale: number;
   blurBackgroundAmount: number;
 }> = ({
@@ -453,6 +474,9 @@ const SegmentScene: React.FC<{
   imageScale,
   imageX,
   imageY,
+  imageMotionEnabled,
+  imageMotionStartY,
+  imageMotionEndY,
   backgroundScale,
   blurBackgroundAmount,
 }) => {
@@ -468,6 +492,9 @@ const SegmentScene: React.FC<{
           imageScale={imageScale}
           imageX={imageX}
           imageY={imageY}
+          imageMotionEnabled={imageMotionEnabled}
+          imageMotionStartY={imageMotionStartY}
+          imageMotionEndY={imageMotionEndY}
           blurBackgroundAmount={blurBackgroundAmount}
           backgroundScale={backgroundScale}
         />
@@ -500,6 +527,9 @@ export const SowarComposition: React.FC<SowarProps> = ({
   imageScale,
   imageX,
   imageY,
+  imageMotionEnabled,
+  imageMotionStartY,
+  imageMotionEndY,
   effects,
   textBottomOffset,
   textFontSize,
@@ -547,6 +577,9 @@ export const SowarComposition: React.FC<SowarProps> = ({
               imageScale={imageScale}
               imageX={imageX}
               imageY={imageY}
+              imageMotionEnabled={imageMotionEnabled}
+              imageMotionStartY={imageMotionStartY}
+              imageMotionEndY={imageMotionEndY}
               backgroundScale={backgroundScale}
               blurBackgroundAmount={blurBackgroundAmount}
             />

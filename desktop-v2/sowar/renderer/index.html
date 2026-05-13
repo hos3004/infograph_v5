@@ -259,80 +259,10 @@
       align-items: center;
     }
 
-    .segment-list,
     .blur-list {
       display: flex;
       flex-direction: column;
       gap: 0.7rem;
-    }
-
-    .segment-list {
-      gap: 0.4rem;
-    }
-
-    .segment-table {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .segment-row,
-    .segment-row-head {
-      display: grid;
-      grid-template-columns: 42px minmax(110px, 1fr) minmax(110px, 1fr) 90px 64px;
-      gap: 0.45rem;
-      align-items: center;
-    }
-
-    .segment-row-head {
-      color: var(--text-mu);
-      font-size: 0.74rem;
-      font-weight: 700;
-      padding: 0 0.45rem;
-    }
-
-    .segment-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 0.42rem;
-    }
-
-    .segment-index,
-    .segment-duration {
-      font-variant-numeric: tabular-nums;
-      text-align: center;
-    }
-
-    .segment-index {
-      color: var(--text);
-      font-weight: 800;
-    }
-
-    .segment-duration {
-      color: var(--text-mu);
-      font-size: 0.82rem;
-      direction: ltr;
-      unicode-bidi: isolate;
-    }
-
-    .segment-time-input {
-      min-height: 38px;
-      padding: 0.46rem 0.55rem;
-      text-align: center;
-      direction: ltr;
-      unicode-bidi: isolate;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .segment-time-input.is-invalid {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-    }
-
-    .segment-delete-btn {
-      min-height: 38px;
-      padding: 0.42rem 0.55rem;
     }
 
     .editor-card {
@@ -675,6 +605,11 @@
                 <button id="pick-main-image-btn" class="btn-secondary" type="button">اختيار صورة</button>
                 <span id="main-image-label" class="muted-text" style="flex:1;"></span>
               </div>
+              <div class="inline-row">
+                <label class="muted-text" for="image-duration-input" style="white-space:nowrap; font-weight:700;">مدة الصورة (ث)</label>
+                <input id="image-duration-input" class="number-input" type="number" min="1" max="3600" step="0.5" value="10" style="max-width:130px; text-align:center; direction:ltr;" />
+                <span id="image-duration-value" class="muted-text">10.0ث</span>
+              </div>
             </div>
 
             <div class="setting-group">
@@ -732,14 +667,22 @@
                   <div id="y-value" class="muted-text">0px</div>
                 </label>
               </div>
-            </div>
-
-            <div class="setting-group">
-              <div class="setting-label">
-                <span>المقاطع</span>
-                <button id="add-segment-btn" type="button" class="btn-secondary">إضافة مقطع</button>
+              <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;padding:.35rem 0;font-weight:700;font-size:.88rem;">
+                <input id="image-motion-checkbox" type="checkbox" />
+                <span>حركة الصورة (تمرير عمودي)</span>
+              </label>
+              <div id="image-motion-controls" style="display:none;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem;">
+                <label>
+                  <span class="field-caption">بداية الحركة (Y)</span>
+                  <input id="image-motion-startY-input" type="range" class="range-input" min="-540" max="540" step="10" value="0" />
+                  <div id="image-motion-startY-value" class="muted-text">0px</div>
+                </label>
+                <label>
+                  <span class="field-caption">نهاية الحركة (Y)</span>
+                  <input id="image-motion-endY-input" type="range" class="range-input" min="-540" max="540" step="10" value="-200" />
+                  <div id="image-motion-endY-value" class="muted-text">-200px</div>
+                </label>
               </div>
-              <div id="segment-list" class="segment-list"></div>
             </div>
 
             <div class="setting-group">
