@@ -14869,6 +14869,8 @@ Check that all your Remotion packages are on the same version. If your dependenc
   var FRAMES_PER_CHAR = 1;
   var CURSOR_BLINK_RATE = 8;
   var IS_PLAYER = getRemotionEnvironment().isPlayer;
+  var COMPOSITION_WIDTH = 1920;
+  var COMPOSITION_HEIGHT = 1080;
   var isRTL = (s) => /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/.test(s);
   var AdaptiveVideo = (props) => {
     if (!props.src) {
@@ -15065,6 +15067,72 @@ Check that all your Remotion packages are on the same version. If your dependenc
       )
     ));
   };
+  var buildBlurRegionMask = ({
+    width,
+    height,
+    regionWidth,
+    regionHeight,
+    bleed,
+    radius,
+    feather
+  }) => {
+    const safeWidth = Math.max(1, width);
+    const safeHeight = Math.max(1, height);
+    const safeRegionWidth = Math.max(1, regionWidth);
+    const safeRegionHeight = Math.max(1, regionHeight);
+    const safeRadius = Math.min(radius, safeRegionWidth / 2, safeRegionHeight / 2);
+    const stdDeviation = Math.max(0.1, feather / 2);
+    const innerInset = feather > 0 ? Math.min(feather, safeRegionWidth / 2, safeRegionHeight / 2) : 0;
+    const innerWidth = Math.max(0, safeRegionWidth - innerInset * 2);
+    const innerHeight = Math.max(0, safeRegionHeight - innerInset * 2);
+    const innerRadius = Math.max(0, safeRadius - innerInset);
+    const filter = feather > 0 ? `<filter id="feather" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${stdDeviation}" /></filter>` : "";
+    const featheredRect = feather > 0 ? `<rect x="${bleed}" y="${bleed}" width="${safeRegionWidth}" height="${safeRegionHeight}" rx="${safeRadius}" ry="${safeRadius}" fill="white" filter="url(#feather)" />` : `<rect x="${bleed}" y="${bleed}" width="${safeRegionWidth}" height="${safeRegionHeight}" rx="${safeRadius}" ry="${safeRadius}" fill="white" />`;
+    const solidCenter = feather > 0 && innerWidth > 0 && innerHeight > 0 ? `<rect x="${bleed + innerInset}" y="${bleed + innerInset}" width="${innerWidth}" height="${innerHeight}" rx="${innerRadius}" ry="${innerRadius}" fill="white" />` : "";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${safeWidth}" height="${safeHeight}" viewBox="0 0 ${safeWidth} ${safeHeight}"><defs>${filter}</defs>${featheredRect}${solidCenter}</svg>`;
+    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+  };
+  var FullFrameBlurredVideoClone = ({
+    sourceUrl,
+    startFrom,
+    endAt,
+    fitMode,
+    videoScale,
+    videoX,
+    videoY,
+    backgroundScale,
+    blurBackgroundAmount,
+    blurAmount,
+    cropX,
+    cropY
+  }) => /* @__PURE__ */ import_react4.default.createElement(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        left: -cropX,
+        top: -cropY,
+        width: COMPOSITION_WIDTH,
+        height: COMPOSITION_HEIGHT,
+        filter: `blur(${blurAmount}px)`
+      }
+    },
+    /* @__PURE__ */ import_react4.default.createElement(
+      SegmentVideoLayer,
+      {
+        src: sourceUrl,
+        startFrom,
+        endAt,
+        fitMode,
+        videoScale,
+        videoX,
+        videoY,
+        blurBackgroundAmount,
+        backgroundScale,
+        keepSourceAudio: false
+      }
+    )
+  );
   var BlurRegionOverlay = ({
     region,
     currentMs,
@@ -15080,94 +15148,63 @@ Check that all your Remotion packages are on the same version. If your dependenc
   }) => {
     const borderRadius = Math.max(0, region.radius ?? 12);
     const feather = Math.max(0, Math.min(80, region.feather ?? 0));
+    const blurAmount = Math.max(0, region.blur);
+    const bleed = Math.max(24, region.blur * 2, region.feather ?? 0);
     const motionStartMs = Number(region.startMs ?? 0);
     const motionEndMs = Number(region.endMs ?? motionStartMs);
     const motionProgress = region.motionEnabled && motionEndMs > motionStartMs ? Math.max(0, Math.min(1, (currentMs - motionStartMs) / (motionEndMs - motionStartMs))) : 0;
     const animatedX = region.x + ((region.endX ?? region.x) - region.x) * motionProgress;
     const animatedY = region.y + ((region.endY ?? region.y) - region.y) * motionProgress;
+    const cropX = animatedX - bleed;
+    const cropY = animatedY - bleed;
+    const cropWidth = region.width + bleed * 2;
+    const cropHeight = region.height + bleed * 2;
+    const maskImage = import_react4.default.useMemo(
+      () => buildBlurRegionMask({
+        width: cropWidth,
+        height: cropHeight,
+        regionWidth: region.width,
+        regionHeight: region.height,
+        bleed,
+        radius: borderRadius,
+        feather
+      }),
+      [borderRadius, bleed, cropHeight, cropWidth, feather, region.height, region.width]
+    );
     const style = {
       position: "absolute",
-      left: animatedX,
-      top: animatedY,
-      width: region.width,
-      height: region.height,
-      pointerEvents: "none"
-    };
-    const clipStyle = {
-      position: "absolute",
-      inset: 0,
+      left: cropX,
+      top: cropY,
+      width: cropWidth,
+      height: cropHeight,
+      pointerEvents: "none",
       overflow: "hidden",
-      borderRadius,
-      boxShadow: "0 0 0 1px rgba(255,255,255,0.18) inset"
+      WebkitMaskImage: maskImage,
+      maskImage,
+      WebkitMaskRepeat: "no-repeat",
+      maskRepeat: "no-repeat",
+      WebkitMaskSize: "100% 100%",
+      maskSize: "100% 100%",
+      WebkitMaskPosition: "0 0",
+      maskPosition: "0 0"
     };
-    const featherStyle = feather > 0 ? {
-      position: "absolute",
-      inset: 0,
-      filter: `blur(${Math.max(0.5, feather / 2)}px)`,
-      opacity: 0.92
-    } : {};
-    const foregroundTransform = `scale(${Math.max(1.02, videoScale)}) translateX(${videoX}px) translateY(${videoY}px)`;
-    const renderBlurContent = () => {
-      if (fitMode === "blurred-background") {
-        return /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(
-          AdaptiveVideo,
-          {
-            src: sourceUrl,
-            startFrom,
-            endAt,
-            muted: true,
-            style: {
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center center",
-              transform: `scale(${backgroundScale}) scale(1.08)`,
-              filter: `blur(${Math.max(8, Math.round(blurBackgroundAmount * 0.75))}px) saturate(0.9)`
-            }
-          }
-        ), /* @__PURE__ */ import_react4.default.createElement(
-          AbsoluteFill,
-          {
-            style: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }
-          },
-          /* @__PURE__ */ import_react4.default.createElement(
-            AdaptiveVideo,
-            {
-              src: sourceUrl,
-              startFrom,
-              endAt,
-              muted: true,
-              style: buildCenteredVideoStyle({
-                objectFit: "contain",
-                transform: foregroundTransform,
-                filter: `blur(${region.blur}px)`
-              })
-            }
-          )
-        ));
+    return /* @__PURE__ */ import_react4.default.createElement("div", { "data-laqtat-blur-region": region.id, style }, /* @__PURE__ */ import_react4.default.createElement(
+      FullFrameBlurredVideoClone,
+      {
+        sourceUrl,
+        startFrom,
+        endAt,
+        fitMode,
+        videoScale,
+        videoX,
+        videoY,
+        backgroundScale,
+        blurBackgroundAmount,
+        blurAmount,
+        cropX,
+        cropY
       }
-      return /* @__PURE__ */ import_react4.default.createElement(
-        AdaptiveVideo,
-        {
-          src: sourceUrl,
-          startFrom,
-          endAt,
-          muted: true,
-          style: buildCenteredVideoStyle({
-            objectFit: fitMode === "cover" ? "cover" : "contain",
-            transform: foregroundTransform,
-            filter: `blur(${region.blur}px)`
-          })
-        }
-      );
-    };
-    return /* @__PURE__ */ import_react4.default.createElement("div", { "data-laqtat-blur-region": region.id, style }, feather > 0 ? /* @__PURE__ */ import_react4.default.createElement("div", { style: featherStyle }, /* @__PURE__ */ import_react4.default.createElement("div", { style: clipStyle }, renderBlurContent())) : null, /* @__PURE__ */ import_react4.default.createElement("div", { style: clipStyle }, renderBlurContent()));
+    ));
   };
   var regionIsActive = (region, segmentStartMs, localFrame, fps) => {
     if (region.alwaysOn !== false)
