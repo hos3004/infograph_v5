@@ -1,0 +1,32 @@
+{
+  "branch_suggestion": "feature/personalities-clean-infograph-clone",
+  "created_or_modified_files": [
+    "desktop-v2/personalities/renderer/index.html",
+    "desktop-v2/personalities/renderer/app.js",
+    "desktop-v2/personalities/renderer/styles.css",
+    "desktop-v2/personalities/renderer/personality-presets.js",
+    "desktop-v2/personalities/renderer/prompt-templates.js",
+    "desktop-v2/personalities/renderer/generated/preview-player.js",
+    "desktop-v2/personalities/preview/player-entry.tsx",
+    "desktop-v2/personalities/scripts/build-preview-player-personalities.mjs",
+    "desktop-v2/personalities/scripts/build-remotion-bundle-personalities.mjs",
+    "package.json",
+    "desktop-v2/main.cjs",
+    "desktop-v2/preload.cjs",
+    "desktop-v2/shared/project-store.cjs",
+    "desktop-v2/shared/payload.cjs",
+    "desktop-v2/electron-builder.config.cjs",
+    "desktop-v2/renderer/index.html",
+    "desktop-v2/motadawel/renderer/index.html",
+    "desktop-v2/worker/render-worker.cjs",
+    "src/remotion/Slide.tsx",
+    "src/remotion/types.ts"
+  ],
+  "notes": [
+    "Personalities section is a clean Infograph-like module with tabs: الشرائح، الصوتيات، محتوى.",
+    "No text tab in Personalities. Slides render with empty text, so no on-screen text overlays.",
+    "Video slide trim fields are stored as trimStartMs / trimEndMs and passed to Remotion Video startFrom/endAt.",
+    "Content tab generates scene prompts only; it does not create slides automatically.",
+    "Main voiceover is generated from the full script and stored as the global voiceover."
+  ]
+}

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: file: blob: https://unpkg.com https://fonts.googleapis.com; img-src 'self' data: file: blob:; media-src 'self' data: file: blob:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://unpkg.com;" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شخصيات - Infograph Desktop V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <style>
+    :root { --bg:#f4f1ec; --surface:#fff; --surface-r:#faf8f4; --border:#e8e3da; --border-s:#d4ccbf; --accent:#5a9a6a; --accent-dk:#3d7a4d; --accent-lt:#eaf3ec; --text:#1c1a18; --text-mu:#7a736a; --text-fa:#a89f96; --danger:#dc2626; --success:#16a34a; --warn:#b45309; --font:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif; --font-mono:'JetBrains Mono','Courier New',monospace; --sh-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04); --r-sm:6px; --r-md:10px; --r-lg:16px; }
+    body { background:var(--bg)!important; color:var(--text)!important; margin:0; padding:0; overflow:hidden; font-family:var(--font); }
+    .v2-root{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);padding:.75rem 2rem;border-bottom:1px solid var(--border);box-shadow:var(--sh-sm);height:60px;flex-shrink:0;}
+    .logo-section,.top-bar-btns,.project-actions-wrap{display:flex;align-items:center;gap:.65rem;}
+    .brand-logo-image{height:54px;object-fit:contain;display:block;flex-shrink:0;}
+    .project-actions{display:inline-flex;align-items:center;gap:5px;}
+    .project-icon-btn,.btn-icon{position:relative;width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface-r);color:var(--text-mu);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .18s ease;font-family:var(--font);}
+    .project-icon-btn:hover,.btn-icon:hover{background:var(--accent-lt);border-color:var(--accent);color:var(--accent);} .project-icon-btn.is-dirty{color:var(--warn);border-color:#f59e0b;background:#fffbeb;} .project-icon-btn.is-saving{color:var(--accent);} .project-status-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;border:1.5px solid var(--surface);opacity:0;background:var(--success);} .project-icon-btn.is-dirty .project-status-dot,.project-icon-btn.is-saving .project-status-dot{opacity:1;} .project-icon-btn.is-dirty .project-status-dot{background:#f59e0b;} .project-save-status{color:var(--text-mu);font-size:.76rem;font-weight:600;white-space:nowrap;}
+    .nav-pills-wrap{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px;} .nav-pill{padding:.28rem .8rem;border-radius:16px;font-size:.86rem;font-weight:700;text-decoration:none;color:var(--text-mu);transition:all .2s;white-space:nowrap;} .nav-pill:hover{color:var(--text);} .nav-pill-active{background:var(--surface);color:var(--text);box-shadow:var(--sh-sm);}
+    .main-content{display:flex;flex:1;gap:.75rem;padding:.75rem;min-height:0;overflow:hidden;}
+    .right-panel{flex:1;background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;box-shadow:var(--sh-sm);} .left-panel{flex:1.2;display:flex;flex-direction:column;gap:.75rem;overflow:hidden;min-width:0;min-height:0;}
+    .tabs-header{display:flex;min-height:82px;border-bottom:1px solid var(--border);background:var(--surface-r);position:relative;flex-shrink:0;} .tab-btn{flex:1;padding:.8rem .5rem .95rem;border:none;background:transparent;font-weight:700;font-size:.94rem;color:var(--text-mu);cursor:pointer;transition:color .2s,background .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;font-family:var(--font);} .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.5);} .tab-btn.active{color:var(--text);background:var(--surface);box-shadow:inset 0 -3px 0 var(--accent);} .tab-btn svg,.tab-btn i{width:20px!important;height:20px!important;stroke-width:1.7;}
+    .tab-content{padding:.75rem;flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;} .tab-panel{display:none;overflow-y:auto;min-height:0;} .tab-panel.active{display:flex;flex-direction:column;gap:.85rem;}
+    .muted-text{color:var(--text-mu);font-size:.84rem;} .accent-text{color:var(--accent);font-weight:700;} .ui-hidden{display:none!important;}
+    .setting-group{background:var(--surface-r);padding:.85rem;border-radius:var(--r-md);border:1px solid var(--border);margin-bottom:.0;} .setting-label{font-weight:700;color:var(--text);font-size:.86rem;margin-bottom:.55rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;}
+    button,select,input,textarea{font-family:var(--font);} .input-v2,.number-input,.textarea-v2,select{width:100%;padding:.6rem .75rem;border-radius:var(--r-sm);border:1px solid var(--border);color:var(--text);background:var(--surface);font-size:.88rem;box-sizing:border-box;} .input-v2:focus,.number-input:focus,.textarea-v2:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(90,154,106,.12);} .textarea-v2{min-height:96px;resize:vertical;line-height:1.6;}
+    .btn-primary,.btn-secondary{border-radius:var(--r-sm);border:1px solid var(--border);cursor:pointer;font-family:var(--font);font-size:.87rem;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:40px;padding:.6rem .95rem;} .btn-primary{background:var(--accent);color:white;border-color:var(--accent);} .btn-primary:hover:not(:disabled){filter:brightness(1.06);} .btn-secondary{background:var(--surface);color:var(--text-mu);} .btn-secondary:hover:not(:disabled){background:var(--bg);color:var(--text);border-color:var(--border-s);} .btn-secondary.is-success{background:#dcfce7;color:#166534;border-color:#86efac;} .btn-danger{color:var(--danger);border-color:#fecaca;background:#fef2f2;} button:disabled{opacity:.55;cursor:not-allowed;}
+    .grid-2,.grid-3{display:grid;gap:.75rem;} .grid-2{grid-template-columns:repeat(2,minmax(0,1fr));} .grid-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .slides-list,.scene-list{display:flex;flex-direction:column;gap:.55rem;} .empty-state{text-align:center;cursor:pointer;color:var(--text-fa);padding:2.5rem;display:flex;flex-direction:column;align-items:center;gap:.75rem;border:2px dashed var(--border-s);border-radius:var(--r-md);transition:all .2s;background:var(--surface-r);} .empty-state:hover{border-color:var(--accent);background:var(--accent-lt);color:var(--accent);}
+    .slide-card{display:grid;grid-template-columns:24px 112px 1fr 38px;gap:10px;padding:10px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--border);align-items:start;transition:border-color .18s,box-shadow .18s;} .slide-card:hover{border-color:var(--border-s);box-shadow:var(--sh-sm);} .slide-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(90,154,106,.18);} .slide-card.drag-over{border-color:var(--accent);opacity:.75;} .slide-order{font-size:.72rem;font-weight:800;color:var(--text-fa);font-family:var(--font-mono);text-align:center;} .drag-handle{color:var(--text-fa);cursor:grab;display:flex;flex-direction:column;gap:3px;align-items:center;margin-top:4px;} .drag-handle span{display:block;width:12px;height:2px;background:currentColor;border-radius:2px;}
+    .slide-thumb-wrap{width:112px;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#0f172a;position:relative;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;} .slide-thumb{width:100%;height:100%;object-fit:cover;display:block;} .slide-main{display:flex;flex-direction:column;gap:.5rem;min-width:0;} .slide-title{font-weight:800;font-size:.88rem;} .slide-meta{display:flex;gap:.4rem;flex-wrap:wrap;} .badge{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:.18rem .55rem;border-radius:999px;background:#f3f4f6;color:#374151;font-size:.74rem;font-weight:700;border:1px solid #e5e7eb;} .badge.warn{background:#fffbeb;color:#b45309;border-color:#fde68a;} .trim-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;} .trim-row label{font-size:.75rem;color:var(--text-mu);font-weight:700;}
+    .scene-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;display:flex;flex-direction:column;gap:.65rem;} .scene-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;} .scene-title{font-size:.92rem;font-weight:800;} .scene-actions{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;justify-content:flex-end;} .scene-details{display:none;border-top:1px dashed var(--border);padding-top:.7rem;} .scene-card.is-open .scene-details{display:block;} .copy-status{font-size:.75rem;color:var(--text-mu);}
+    .preview-container,.save-section{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-sm);} .preview-container{padding:.75rem;display:flex;flex-direction:column;gap:.6rem;flex:1;min-height:0;} .preview-header{display:flex;align-items:center;justify-content:space-between;} .preview-header h2,.save-section h2{margin:0;font-size:1.05rem;} .preview-stage-outer{flex:1;display:flex;align-items:center;justify-content:center;background:#ece9e3;background-image:radial-gradient(circle,#c5bdb2 1px,transparent 1px);background-size:18px 18px;border:1px solid var(--border);border-radius:var(--r-md);padding:12px;overflow:hidden;direction:ltr;min-width:0;box-sizing:border-box;} .preview-stage-shell{position:relative;width:100%;aspect-ratio:16/9;max-height:100%;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.18);} #preview-exact-root,#preview-exact-root>div{width:100%;height:100%;direction:ltr;}
+    .preview-controls{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;} .preview-seek{flex:1;min-width:120px;accent-color:var(--accent);} .save-section{padding:1rem;display:flex;flex-direction:column;gap:.75rem;} .status-row,.progress-meta,.render-actions{display:flex;align-items:center;justify-content:space-between;gap:.75rem;} .render-actions{justify-content:flex-start;flex-wrap:wrap;} .progress-track{width:100%;height:8px;background:var(--border);border-radius:999px;overflow:hidden;} .progress-fill{height:100%;width:0%;background:var(--accent);transition:width .24s ease;} .render-result{min-height:24px;font-size:.88rem;color:var(--text-mu);word-break:break-word;}
+    details.advanced{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;} details.advanced summary{cursor:pointer;font-weight:800;color:var(--text);}
+    @media(max-width:1180px){.main-content{flex-direction:column}.grid-2,.grid-3,.trim-row{grid-template-columns:1fr}.slide-card{grid-template-columns:24px 96px 1fr 38px}.slide-thumb-wrap{width:96px}}
+  </style>
+  <link rel="stylesheet" href="../../shared/unified-header.css" />
+</head>
+<body>
+
+    <header class="paper-top-bar unified-laqtat-header">
+      <div class="paper-logo-section">
+        <img id="brand-logo" class="paper-brand-logo-image" alt="Infograph" />
+        <div class="paper-project-actions" aria-label="إدارة المشروع">
+          <button id="project-open-btn" class="paper-project-icon-btn" type="button" title="فتح مشروع" aria-label="فتح مشروع">
+            <i data-lucide="folder-open" style="width: 21px; height: 21px;"></i>
+          </button>
+          <button id="project-save-btn" class="paper-project-icon-btn" type="button" title="حفظ المشروع" aria-label="حفظ المشروع">
+            <i data-lucide="save" style="width: 21px; height: 21px;"></i>
+            <span class="paper-project-status-dot" aria-hidden="true"></span>
+          </button>
+          <span id="project-save-status" class="paper-project-save-status">مشروع جديد</span>
+        </div>
+      </div>
+
+      <div class="paper-top-bar-btns">
+        <div class="paper-nav-pills-wrap">
+          <a href="../../renderer/index.html" class="paper-nav-pill">الأنفوجراف</a>
+          <a href="../../motadawel/renderer/index.html" class="paper-nav-pill">المتداول</a>
+          <a href="#" class="paper-nav-pill paper-nav-pill-active">شخصيات</a>
+          <a href="../../laqtat/renderer/index.html" class="paper-nav-pill">لقطات</a>
+        </div>
+
+        <button id="settings-btn" class="paper-project-icon-btn paper-settings-btn" type="button" title="الإعدادات" aria-label="الإعدادات">
+          <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+    </header>
+  <div class="v2-root">
+    <div class="top-bar-btns">
+        <div class="nav-pills-wrap">
+          <a href="../../renderer/index.html" class="nav-pill">الأنفوجراف</a>
+          <a href="../../motadawel/renderer/index.html" class="nav-pill">المتداول</a>
+          <a href="../../laqtat/renderer/index.html" class="nav-pill" style="text-decoration: none;">لقطات</a>
+          <a href="./index.html" class="nav-pill nav-pill-active">شخصيات</a>
+        </div>
+      </div>
+      <div class="project-actions-wrap">
+        <span id="project-save-status" class="project-save-status">مشروع جديد</span>
+        <div class="project-actions">
+          <button id="project-open-btn" class="project-icon-btn" type="button" title="فتح مشروع"><span class="project-status-dot"></span><i data-lucide="folder-open"></i></button>
+          <button id="project-save-btn" class="project-icon-btn" type="button" title="حفظ المشروع"><span class="project-status-dot"></span><i data-lucide="save"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <section class="right-panel">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-target="tab-content-slides"><i data-lucide="images"></i><span>الشرائح</span></button>
+          <button class="tab-btn" data-target="tab-content-audio"><i data-lucide="music-4"></i><span>الصوتيات</span></button>
+          <button class="tab-btn" data-target="tab-content-generate"><i data-lucide="scroll-text"></i><span>محتوى</span></button>
+        </div>
+        <div class="tab-content">
+          <div id="tab-content-slides" class="tab-panel active">
+            <div class="setting-group">
+              <div class="setting-label"><span>الشرائح</span><span id="slides-count" class="muted-text">0 شريحة</span></div>
+              <button id="pick-slides-btn" class="btn-primary" type="button"><i data-lucide="plus"></i> إرفاق صور/فيديوهات</button>
+            </div>
+            <div id="slides-list" class="slides-list"></div>
+            <div id="empty-state" class="empty-state"><i data-lucide="image-plus"></i><strong>أضف صورًا أو فيديوهات</strong><span>سيتم رندرها بدون أي نصوص على الشاشة</span></div>
+          </div>
+
+          <div id="tab-content-audio" class="tab-panel">
+            <div class="setting-group">
+              <div class="grid-2">
+                <label><span class="setting-label">الموسيقى الخلفية</span><select id="music-select"></select></label>
+                <label><span class="setting-label">شاشة النهاية</span><select id="endpage-select"></select></label>
+              </div>
+              <div class="grid-2" style="margin-top:.75rem;">
+                <label><span class="setting-label">مستوى الموسيقى <span id="music-volume-value">50%</span></span><input id="music-volume-input" class="number-input" type="range" min="0" max="100" step="1" value="50" /></label>
+                <label><span class="setting-label">مستوى التعليق <span id="voiceover-volume-value">100%</span></span><input id="voiceover-volume-input" class="number-input" type="range" min="0" max="100" step="1" value="100" /></label>
+              </div>
+              <div id="endpage-duration-hint" class="muted-text" style="margin-top:.6rem;"></div>
+            </div>
+            <div class="setting-group">
+              <div class="setting-label"><span>التعليق الصوتي الرئيسي</span><span id="voiceover-meta" class="muted-text">لا يوجد</span></div>
+              <div class="render-actions">
+                <button id="pick-voiceover-btn" class="btn-secondary" type="button"><i data-lucide="file-audio"></i> إرفاق صوت خارجي</button>
+                <button id="clear-voiceover-btn" class="btn-secondary btn-danger" type="button"><i data-lucide="x"></i> حذف الصوت</button>
+              </div>
+              <div id="voiceover-filename" class="muted-text" style="margin-top:.55rem;">لم يتم اختيار ملف</div>
+            </div>
+          </div>
+
+          <div id="tab-content-generate" class="tab-panel">
+            <div class="setting-group">
+              <label><span class="setting-label">النص الرئيسي / سكريبت السيرة</span><textarea id="main-script-input" class="textarea-v2" style="min-height:180px" placeholder="ألصق هنا سكريبت السيرة أو النص الوثائقي..."></textarea></label>
+              <div class="grid-3" style="margin-top:.75rem;">
+                <label><span class="setting-label">عدد المشاهد</span><select id="scene-count-select"><option value="8">8</option><option value="12" selected>12</option><option value="16">16</option><option value="24">24</option><option value="custom">مخصص</option></select></label>
+                <label id="custom-scene-count-wrap" class="ui-hidden"><span class="setting-label">عدد مخصص</span><input id="custom-scene-count-input" class="number-input" type="number" min="1" max="60" value="12" /></label>
+                <label><span class="setting-label">الأسلوب البصري</span><select id="visual-style-select"></select></label>
+              </div>
+              <div class="grid-3" style="margin-top:.75rem;">
+                <label><span class="setting-label">لغة الصوت</span><select id="voice-dialect-select"><option value="msa">فصحى</option><option value="egyptian">عامية مصرية</option></select></label>
+                <label class="checkbox-row" style="display:flex;align-items:center;gap:.5rem;margin-top:1.8rem;"><input id="diacritics-checkbox" type="checkbox" /> <span>مع تشكيل نهاية الكلمات</span></label>
+                <div style="display:flex;align-items:end;gap:.5rem;flex-wrap:wrap;"><button id="generate-main-voiceover-btn" class="btn-secondary" type="button"><i data-lucide="mic"></i> توليد صوت النص الكامل</button></div>
+              </div>
+              <div id="script-stats" class="muted-text" style="margin-top:.6rem;"></div>
+              <div id="main-voiceover-status" class="muted-text" style="margin-top:.4rem;"></div>
+            </div>
+
+            <details class="advanced">
+              <summary>التعليمات المتقدمة</summary>
+              <div class="grid-2" style="margin-top:.75rem;">
+                <label><span class="setting-label">وصف الشخصية الثابت</span><textarea id="character-reference-input" class="textarea-v2"></textarea></label>
+                <label><span class="setting-label">تعليمات عامة لكل البرومبتات</span><textarea id="global-rules-input" class="textarea-v2"></textarea></label>
+              </div>
+              <div class="grid-2" style="margin-top:.75rem;">
+                <label><span class="setting-label">تعليمات خاصة بمشاهد السجن</span><textarea id="prison-rules-input" class="textarea-v2"></textarea></label>
+                <label><span class="setting-label">تعليمات خاصة بالزمن</span><textarea id="time-rules-input" class="textarea-v2"></textarea></label>
+              </div>
+            </details>
+
+            <div class="setting-group">
+              <div class="render-actions">
+                <button id="generate-scenes-btn" class="btn-primary" type="button"><i data-lucide="sparkles"></i> تقسيم المشاهد</button>
+                <span id="content-status" class="muted-text"></span>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <div class="setting-label"><span>قائمة المشاهد</span><span id="scenes-summary" class="muted-text"></span></div>
+              <div id="scenes-list" class="scene-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="left-panel">
+        <div class="preview-container">
+          <div class="preview-header"><h2>المعاينة</h2><span id="runtime-summary" class="muted-text"></span></div>
+          <div id="preview-stage-shell" class="preview-stage-outer"><div class="preview-stage-shell"><div id="preview-exact-root"></div></div></div>
+          <div class="preview-controls">
+            <button id="preview-play-btn" class="btn-secondary" type="button"><i data-lucide="play"></i></button>
+            <button id="preview-restart-btn" class="btn-secondary" type="button"><i data-lucide="rotate-ccw"></i></button>
+            <button id="preview-mute-btn" class="btn-secondary" type="button"><i data-lucide="volume-x"></i></button>
+            <input id="preview-seek" class="preview-seek" type="range" min="0" max="1000" value="0" />
+            <span id="preview-time-inline" class="muted-text">0:00 / 0:00</span>
+            <button id="preview-fullscreen-btn" class="btn-secondary" type="button"><i data-lucide="maximize"></i></button>
+          </div>
+        </div>
+
+        <div class="save-section">
+          <div class="status-row"><div><h2 id="status-title">جاهز</h2><div id="status-text" class="muted-text">أضف الشرائح ثم ابدأ الرندر</div></div><button id="open-output-btn" class="btn-secondary" type="button"><i data-lucide="folder-open"></i> مجلد الإخراج</button></div>
+          <div class="progress-meta"><span id="progress-label" class="muted-text">في الانتظار</span><span id="progress-percent" class="muted-text">0%</span></div>
+          <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          <div class="render-actions">
+            <button id="render-btn" class="btn-primary" type="button"><i data-lucide="film"></i> رندر الفيديو</button>
+            <button id="cancel-render-btn" class="btn-secondary btn-danger" type="button" style="display:none"><i data-lucide="square"></i> إيقاف</button>
+            <label style="display:flex;align-items:center;gap:.45rem;font-weight:700;color:#f59e0b;"><input id="turbo-render-checkbox" type="checkbox" checked /> Turbo</label>
+          </div>
+          <div id="render-result" class="render-result"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="./personality-presets.js"></script>
+  <script src="./prompt-templates.js"></script>
+  <script src="./generated/preview-player.js"></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>

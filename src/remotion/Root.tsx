@@ -1,0 +1,108 @@
+import React from 'react';
+import { Composition } from 'remotion';
+import { MainComposition } from './MainComposition';
+import { CompositionProps } from './types';
+import { PersonalitiesComposition } from './personalities/PersonalitiesComposition';
+import { PersonalitiesCompositionProps } from './personalities/types';
+import { getTotalSlidesDurationMs, msToFrames } from './personalities/timeline';
+
+// Default props — used by Remotion Studio / CLI preview only
+// In production the render API always passes the full inputProps
+const defaultProps: CompositionProps = {
+  slides: [
+    { id: '1', imageUrl: 'https://via.placeholder.com/1920x1080/1a1d24/e2e8f0?text=Slide+1', text: 'مرحباً، هذه الانطلاقة' },
+    { id: '2', imageUrl: 'https://via.placeholder.com/1920x1080/2a2d34/e2e8f0?text=Slide+2', text: 'شريحة ثانية جميلة' },
+  ],
+  overlay:    null,
+  music:      null,
+  endPage:    null,
+  slideDurationInSeconds: 5,
+  effects:    [],
+  endPageDurationFrames: 0,
+  textBottomOffset: 160,
+  textFontSize:     65,
+  textPreset:       'orange',
+  textAnimationType: 'live-reveal-dot',
+  parallaxEnabled: true,
+  textHorizontalOffset: 0,
+};
+
+const personalitiesDefaultProps: PersonalitiesCompositionProps = {
+  slides: [
+    { id: 'p1', mediaUrl: 'https://via.placeholder.com/1920x1080/1a1d24/e2e8f0?text=Personality+1', mediaType: 'image', durationMs: 8000 },
+    { id: 'p2', mediaUrl: 'https://via.placeholder.com/1920x1080/2a2d34/e2e8f0?text=Personality+2', mediaType: 'image', durationMs: 8000 },
+  ],
+  mainVoiceover: null,
+  mainVoiceoverDurationMs: 0,
+  voiceover: null,
+  voiceoverDurationMs: 0,
+  music: null,
+  musicVolume: 50,
+  voiceoverVolume: 100,
+  finalDurationMs: 16000,
+  timelineDurationMs: 16000,
+  endPage: null,
+  endPageDurationFrames: 0,
+};
+
+export const RemotionRoot: React.FC = () => {
+  return (
+    <>
+      <Composition
+        id="InfographicVideo"
+        component={MainComposition}
+        durationInFrames={150}   // overridden by calculateMetadata
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={defaultProps}
+        calculateMetadata={({ props }) => {
+          const fps = 30;
+          const framesPerSlide = Math.floor(props.slideDurationInSeconds * fps);
+          const overlapFrames  = 30;
+          const validLength    = props.slides.filter(s => s.imageUrl).length;
+
+          // Use the actual detected end-page duration passed from the UI
+          const endPageFrames  = props.endPageDurationFrames ?? 0;
+          const EP_FADE_FRAMES = 60; // 2 seconds overlap at 30 fps
+
+          let totalDuration = framesPerSlide; // minimum: 1 slide
+          if (validLength > 0) {
+            const slideEndFrame = (validLength * (framesPerSlide - overlapFrames)) + overlapFrames;
+            totalDuration = endPageFrames > 0 
+              ? slideEndFrame + endPageFrames - EP_FADE_FRAMES
+              : slideEndFrame;
+          }
+
+          console.log(`[calculateMetadata] slides=${validLength}, framesPerSlide=${framesPerSlide}, endPageFrames=${endPageFrames}, total=${totalDuration}`);
+
+          return {
+            durationInFrames: Math.max(framesPerSlide, totalDuration),
+            props,
+          };
+        }}
+      />
+      <Composition
+        id="PersonalitiesVideo"
+        component={PersonalitiesComposition}
+        durationInFrames={240}
+        fps={30}
+        width={1920}
+        height={1080}
+        defaultProps={personalitiesDefaultProps}
+        calculateMetadata={({ props }) => {
+          const fps = 30;
+          const audioMs = Number(props.mainVoiceoverDurationMs || props.voiceoverDurationMs || 0);
+          const slidesMs = getTotalSlidesDurationMs(props.slides);
+          const finalMs = audioMs > 0 ? audioMs : slidesMs;
+          const durationInFrames = msToFrames(finalMs, fps);
+          console.log(`[Personalities calculateMetadata] audioMs=${audioMs}, slidesMs=${slidesMs}, finalMs=${finalMs}, frames=${durationInFrames}`);
+          return {
+            durationInFrames: Math.max(fps, durationInFrames),
+            props: { ...props, finalDurationMs: finalMs, timelineDurationMs: slidesMs },
+          };
+        }}
+      />
+    </>
+  );
+};
