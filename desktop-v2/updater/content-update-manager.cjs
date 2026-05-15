@@ -3,11 +3,12 @@ const path = require('path');
 const { sha256 } = require('./hash.cjs');
 const { downloadFile } = require('./download.cjs');
 const { validateManifest } = require('./manifest-schema.cjs');
-const { createBackup } = require('./rollback.cjs');
+const { createBackup, restoreBackup } = require('./rollback.cjs');
 
 const RUNTIME_UPDATES_ROOT = 'runtime-updates';
 const STATE_FILE = 'update-state.json';
 const MANIFESTS_DIR = 'manifests';
+const LOCK_FILE = '.updater.lock';
 
 function getUpdatesDir(app) {
   return path.join(app.getPath('userData'), RUNTIME_UPDATES_ROOT);
@@ -17,15 +18,47 @@ function getStatePath(updatesDir) {
   return path.join(updatesDir, STATE_FILE);
 }
 
-function getManifestsDir(updatesDir) {
-  return path.join(updatesDir, MANIFESTS_DIR);
+function getLockPath(updatesDir) {
+  return path.join(updatesDir, LOCK_FILE);
+}
+
+function acquireLock(updatesDir) {
+  const lockPath = getLockPath(updatesDir);
+  fs.mkdirSync(updatesDir, { recursive: true });
+  try {
+    const fd = fs.openSync(lockPath, 'wx');
+    fs.writeSync(fd, String(process.pid));
+    fs.closeSync(fd);
+    return true;
+  } catch (e) {
+    if (e.code === 'EEXIST') {
+      const stats = fs.statSync(lockPath);
+      const staleMs = Date.now() - stats.mtimeMs;
+      if (staleMs > 300000) {
+        fs.rmSync(lockPath, { force: true });
+        return acquireLock(updatesDir);
+      }
+      return false;
+    }
+    return false;
+  }
+}
+
+function releaseLock(updatesDir) {
+  try {
+    fs.rmSync(getLockPath(updatesDir), { force: true });
+  } catch {}
 }
 
 function loadState(updatesDir) {
   const statePath = getStatePath(updatesDir);
   try {
     if (fs.existsSync(statePath)) {
-      return JSON.parse(fs.readFileSync(statePath, 'utf-8'));
+      const raw = fs.readFileSync(statePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
     }
   } catch (e) {
     // ignore corrupt state
@@ -39,12 +72,19 @@ function loadState(updatesDir) {
     bundlesVersion: '1.0.0',
     installedFiles: [],
     failedUpdates: [],
+    updateHistory: [],
   };
 }
 
 function saveState(updatesDir, state) {
-  fs.mkdirSync(updatesDir, { recursive: true });
-  fs.writeFileSync(getStatePath(updatesDir), JSON.stringify(state, null, 2), 'utf-8');
+  try {
+    fs.mkdirSync(updatesDir, { recursive: true });
+    const tmpPath = getStatePath(updatesDir) + '.tmp';
+    fs.writeFileSync(tmpPath, JSON.stringify(state, null, 2), 'utf-8');
+    fs.renameSync(tmpPath, getStatePath(updatesDir));
+  } catch (e) {
+    // state save failure must never block the app
+  }
 }
 
 function getRuntimePath(updatesDir, relativePath) {
@@ -52,20 +92,27 @@ function getRuntimePath(updatesDir, relativePath) {
 }
 
 function resolveWithOverlay(updatesDir, relativePath, bundledFallbackPath) {
+  if (!relativePath) return bundledFallbackPath;
   const runtimePath = getRuntimePath(updatesDir, relativePath);
-  if (fs.existsSync(runtimePath)) {
-    return runtimePath;
-  }
+  try {
+    if (fs.existsSync(runtimePath)) {
+      return runtimePath;
+    }
+  } catch {}
   return bundledFallbackPath;
 }
 
 class ContentUpdateManager {
   constructor(app, manifestUrl) {
     this.app = app;
-    this.manifestUrl = manifestUrl || 'http://127.0.0.1:8089/content-updates/update-manifest.json';
+    this.manifestUrl = manifestUrl;
     this.updatesDir = getUpdatesDir(app);
     this.state = loadState(this.updatesDir);
     this._onStatus = null;
+    this._latestManifest = null;
+    this._changedFiles = [];
+    this._pendingFiles = [];
+    this._isApplying = false;
   }
 
   setStatusCallback(cb) {
@@ -77,10 +124,16 @@ class ContentUpdateManager {
   }
 
   async check() {
+    if (!this.manifestUrl) {
+      const msg = 'لم يتم تعيين رابط manifest التحديثات';
+      this._emit({ phase: 'error', message: msg });
+      return { success: false, error: msg };
+    }
+
     this._emit({ phase: 'checking', message: 'جاري فحص تحديثات المحتوى...' });
     const { downloadFile: dl } = require('./download.cjs');
     const tmpDir = path.join(this.updatesDir, '.tmp');
-    fs.mkdirSync(tmpDir, { recursive: true });
+    try { fs.mkdirSync(tmpDir, { recursive: true }); } catch {}
     const tmpManifest = path.join(tmpDir, 'remote-manifest.json');
 
     try {
@@ -92,10 +145,11 @@ class ContentUpdateManager {
 
     let remoteManifest;
     try {
-      remoteManifest = JSON.parse(fs.readFileSync(tmpManifest, 'utf-8'));
+      const raw = fs.readFileSync(tmpManifest, 'utf-8');
+      remoteManifest = JSON.parse(raw);
     } catch (e) {
       this._emit({ phase: 'error', message: 'manifest غير صالح', error: e.message });
-      return { success: false, error: 'Invalid manifest' };
+      return { success: false, error: 'Invalid manifest: ' + e.message };
     }
 
     const validation = validateManifest(remoteManifest);
@@ -119,16 +173,16 @@ class ContentUpdateManager {
     for (const f of remoteManifest.files) {
       const localPath = getRuntimePath(this.updatesDir, f.path);
       let needsUpdate = true;
-      if (fs.existsSync(localPath)) {
-        try {
+      try {
+        if (fs.existsSync(localPath)) {
           const localHash = await sha256(localPath);
           needsUpdate = localHash !== f.sha256;
-        } catch (e) {
-          needsUpdate = true;
         }
+      } catch (e) {
+        needsUpdate = true;
       }
       if (needsUpdate) {
-        changedFiles.push(f);
+        changedFiles.push({ ...f });
       }
     }
 
@@ -138,6 +192,8 @@ class ContentUpdateManager {
     this._changedFiles = changedFiles;
 
     if (changedFiles.length === 0) {
+      this.state.lastCheckedAt = new Date().toISOString();
+      saveState(this.updatesDir, this.state);
       this._emit({ phase: 'up-to-date', message: 'جميع الملفات محدثة', changedFiles: [], totalSize: 0 });
       return { success: true, upToDate: true, changedFiles: [], totalSize: 0 };
     }
@@ -159,7 +215,7 @@ class ContentUpdateManager {
     }
 
     const tmpDir = path.join(this.updatesDir, '.tmp');
-    fs.mkdirSync(tmpDir, { recursive: true });
+    try { fs.mkdirSync(tmpDir, { recursive: true }); } catch {}
     this._pendingFiles = [];
     let downloaded = 0;
     const total = this._changedFiles.length;
@@ -191,7 +247,7 @@ class ContentUpdateManager {
 
         const actualSize = fs.statSync(tmpFile).size;
         if (f.size && actualSize !== f.size) {
-          throw new Error(`Size mismatch: expected ${f.size}, got ${actualSize}`);
+          throw new Error(`Size mismatch for ${f.path}: expected ${f.size}, got ${actualSize}`);
         }
 
         const actualHash = await sha256(tmpFile);
@@ -203,10 +259,13 @@ class ContentUpdateManager {
         downloaded++;
       } catch (e) {
         this._emit({ phase: 'error', message: `فشل تنزيل ${f.path}`, error: e.message });
+        this._changedFiles = [];
+        this._pendingFiles = [];
         return { success: false, error: e.message, downloaded };
       }
     }
 
+    this._changedFiles = [];
     this._emit({ phase: 'download-complete', message: `تم تنزيل ${downloaded} ملفات بنجاح`, downloaded });
     return { success: true, downloaded };
   }
@@ -217,83 +276,148 @@ class ContentUpdateManager {
       return { success: true, applied: 0 };
     }
 
+    if (!acquireLock(this.updatesDir)) {
+      const msg = 'تحديث قيد التطبيق بالفعل. حاول مرة أخرى بعد قليل.';
+      this._emit({ phase: 'error', message: msg });
+      return { success: false, error: msg };
+    }
+
+    if (this._isApplying) {
+      releaseLock(this.updatesDir);
+      this._emit({ phase: 'error', message: 'تحديث قيد التطبيق بالفعل' });
+      return { success: false, error: 'Already applying' };
+    }
+    this._isApplying = true;
+
+    const appliedCount = this._pendingFiles.length;
     let needsRestart = false;
+    const updateRecord = {
+      updateId: this._latestManifest ? this._latestManifest.updateId : 'unknown-' + Date.now(),
+      appliedAt: new Date().toISOString(),
+      files: [],
+    };
 
-    for (const { file: f, tmpFile } of this._pendingFiles) {
-      this._emit({ phase: 'applying', message: `تطبيق ${f.path}` });
+    try {
+      for (const { file: f, tmpFile } of this._pendingFiles) {
+        this._emit({ phase: 'applying', message: `تطبيق ${f.path}` });
 
-      createBackup(this.updatesDir, f.path);
+        createBackup(this.updatesDir, f.path);
 
-      const targetPath = getRuntimePath(this.updatesDir, f.path);
-      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-      fs.copyFileSync(tmpFile, targetPath);
+        const targetPath = getRuntimePath(this.updatesDir, f.path);
+        try { fs.mkdirSync(path.dirname(targetPath), { recursive: true }); } catch {}
+        fs.copyFileSync(tmpFile, targetPath);
 
-      const existing = this.state.installedFiles.find(e => e.path === f.path);
-      if (existing) {
-        existing.sha256 = f.sha256;
-        existing.appliedAt = new Date().toISOString();
-      } else {
-        this.state.installedFiles.push({
+        const existing = this.state.installedFiles.find(e => e.path === f.path);
+        if (existing) {
+          existing.sha256 = f.sha256;
+          existing.appliedAt = new Date().toISOString();
+        } else {
+          this.state.installedFiles.push({
+            path: f.path,
+            sha256: f.sha256,
+            category: f.category || 'unknown',
+            appliedAt: new Date().toISOString(),
+          });
+        }
+
+        updateRecord.files.push({
           path: f.path,
           sha256: f.sha256,
           category: f.category || 'unknown',
-          appliedAt: new Date().toISOString(),
+          restartRequired: !!f.restartRequired,
         });
+
+        if (f.restartRequired) {
+          needsRestart = true;
+        }
       }
 
-      if (f.restartRequired) {
-        needsRestart = true;
+      if (this._latestManifest) {
+        this.state.lastAppliedUpdateId = this._latestManifest.updateId;
+        this.state.lastCheckedAt = new Date().toISOString();
+        if (this._latestManifest.assetsVersion) this.state.assetsVersion = this._latestManifest.assetsVersion;
+        if (this._latestManifest.templatesVersion) this.state.templatesVersion = this._latestManifest.templatesVersion;
+        if (this._latestManifest.promptsVersion) this.state.promptsVersion = this._latestManifest.promptsVersion;
+        if (this._latestManifest.bundlesVersion) this.state.bundlesVersion = this._latestManifest.bundlesVersion;
       }
+
+      if (!this.state.updateHistory) this.state.updateHistory = [];
+      this.state.updateHistory.push(updateRecord);
+      if (this.state.updateHistory.length > 20) {
+        this.state.updateHistory = this.state.updateHistory.slice(-20);
+      }
+
+      saveState(this.updatesDir, this.state);
+      this._cleanupTmp();
+      this._pendingFiles = [];
+
+      if (needsRestart) {
+        this._emit({ phase: 'restart-required', message: 'تتطلب بعض الملفات إعادة تشغيل التطبيق' });
+      } else {
+        this._emit({ phase: 'applied', message: `تم تطبيق ${appliedCount} تحديثات بنجاح` });
+      }
+
+      return { success: true, applied: appliedCount, needsRestart };
+    } catch (e) {
+      this._emit({ phase: 'error', message: 'فشل تطبيق التحديثات', error: e.message });
+      return { success: false, error: e.message, applied: 0 };
+    } finally {
+      this._isApplying = false;
+      releaseLock(this.updatesDir);
     }
-
-    if (this._latestManifest) {
-      this.state.lastAppliedUpdateId = this._latestManifest.updateId;
-      this.state.lastCheckedAt = new Date().toISOString();
-      if (this._latestManifest.assetsVersion) this.state.assetsVersion = this._latestManifest.assetsVersion;
-      if (this._latestManifest.templatesVersion) this.state.templatesVersion = this._latestManifest.templatesVersion;
-      if (this._latestManifest.promptsVersion) this.state.promptsVersion = this._latestManifest.promptsVersion;
-      if (this._latestManifest.bundlesVersion) this.state.bundlesVersion = this._latestManifest.bundlesVersion;
-    }
-
-    saveState(this.updatesDir, this.state);
-
-    this._cleanupTmp();
-    this._pendingFiles = [];
-
-    if (needsRestart) {
-      this._emit({ phase: 'restart-required', message: 'تتطلب بعض الملفات إعادة تشغيل التطبيق' });
-    } else {
-      this._emit({ phase: 'applied', message: 'تم تطبيق التحديثات بنجاح' });
-    }
-
-    return { success: true, applied: this._pendingFiles.length, needsRestart };
   }
 
   getStatus() {
     return {
       ...this.state,
       updatesDir: this.updatesDir,
+      isApplying: this._isApplying,
     };
   }
 
   async rollbackLast() {
-    const lastUpdateId = this.state.lastAppliedUpdateId;
-    if (!lastUpdateId) {
+    if (!this.state.updateHistory || this.state.updateHistory.length === 0) {
+      if (this.state.installedFiles && this.state.installedFiles.length > 0) {
+        return await this._rollbackLegacy();
+      }
       this._emit({ phase: 'error', message: 'لا يوجد تحديث سابق للتراجع عنه' });
       return { success: false, error: 'No previous update to rollback' };
     }
 
-    const manifestDir = getManifestsDir(this.updatesDir);
+    const lastUpdate = this.state.updateHistory.pop();
+    let restored = 0;
+
+    for (const file of lastUpdate.files) {
+      const result = restoreBackup(this.updatesDir, file.path);
+      if (result) {
+        restored++;
+        const idx = this.state.installedFiles.findIndex(e => e.path === file.path);
+        if (idx !== -1) {
+          this.state.installedFiles.splice(idx, 1);
+        }
+      }
+    }
+
+    this.state.lastAppliedUpdateId = this.state.updateHistory.length > 0
+      ? this.state.updateHistory[this.state.updateHistory.length - 1].updateId
+      : null;
+
+    saveState(this.updatesDir, this.state);
+
+    this._emit({ phase: 'rolled-back', message: `تم التراجع عن ${restored} ملفات` });
+    return { success: true, restored };
+  }
+
+  async _rollbackLegacy() {
     const backupDir = path.join(this.updatesDir, 'backups');
     if (!fs.existsSync(backupDir)) {
       this._emit({ phase: 'error', message: 'لا توجد نسخ احتياطية للتراجع' });
       return { success: false, error: 'No backups found' };
     }
 
-    const { restoreBackup } = require('./rollback.cjs');
     let restored = 0;
-    for (const entry of this.state.installedFiles) {
-      const result = restoreBackup(this.updatesDir, entry.path.replace(/[\\/]/g, '_'));
+    for (const entry of this.state.installedFiles || []) {
+      const result = restoreBackup(this.updatesDir, entry.path);
       if (result) restored++;
     }
 
@@ -311,16 +435,27 @@ class ContentUpdateManager {
 
   _getAppVersion() {
     try {
-      const p = path.join(this.app.isPackaged ? path.dirname(this.app.getPath('exe')) : __dirname, '..', '..', 'package.json');
-      return JSON.parse(fs.readFileSync(p, 'utf-8')).version || '1.0.0';
-    } catch {
-      return '1.0.0';
-    }
+      let pkgPath;
+      if (this.app.isPackaged) {
+        pkgPath = path.join(path.dirname(this.app.getPath('exe')), 'package.json');
+        if (!fs.existsSync(pkgPath)) {
+          pkgPath = path.join(this.app.getPath('userData'), '..', 'package.json');
+        }
+      } else {
+        pkgPath = path.join(__dirname, '..', '..', 'package.json');
+      }
+      if (!fs.existsSync(pkgPath)) pkgPath = path.join(__dirname, '..', '..', 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        return JSON.parse(fs.readFileSync(pkgPath, 'utf-8')).version || '1.0.0';
+      }
+    } catch {}
+    return '1.0.0';
   }
 
   _compareVersions(a, b) {
-    const pa = a.split('.').map(Number);
-    const pb = b.split('.').map(Number);
+    const clean = (v) => v.replace(/[^0-9.]/g, '').split('.').map(Number);
+    const pa = clean(a);
+    const pb = clean(b);
     for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
       const va = pa[i] || 0;
       const vb = pb[i] || 0;
