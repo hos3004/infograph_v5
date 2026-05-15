@@ -42,7 +42,6 @@ contextBridge.exposeInMainWorld('updateApi', {
   checkCoreUpdate: () => ipcRenderer.invoke('core-updater:check'),
   downloadCoreUpdate: () => ipcRenderer.invoke('core-updater:download'),
   installCoreUpdate: () => ipcRenderer.invoke('core-updater:install'),
-  getCoreStatus: () => ipcRenderer.invoke('core-updater:status'),
 
   checkContentUpdate: () => ipcRenderer.invoke('content-updater:check'),
   downloadContentUpdate: () => ipcRenderer.invoke('content-updater:download'),

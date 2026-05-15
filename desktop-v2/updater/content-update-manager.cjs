@@ -7,7 +7,6 @@ const { createBackup, restoreBackup } = require('./rollback.cjs');
 
 const RUNTIME_UPDATES_ROOT = 'runtime-updates';
 const STATE_FILE = 'update-state.json';
-const MANIFESTS_DIR = 'manifests';
 const LOCK_FILE = '.updater.lock';
 
 function getUpdatesDir(app) {
@@ -131,7 +130,6 @@ class ContentUpdateManager {
     }
 
     this._emit({ phase: 'checking', message: 'جاري فحص تحديثات المحتوى...' });
-    const { downloadFile: dl } = require('./download.cjs');
     const tmpDir = path.join(this.updatesDir, '.tmp');
     try { fs.mkdirSync(tmpDir, { recursive: true }); } catch {}
     const tmpManifest = path.join(tmpDir, 'remote-manifest.json');
