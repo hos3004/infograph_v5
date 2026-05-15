@@ -441,31 +441,30 @@
       margin-top: 0;
     }
     .template-card-grid .animation-preset-btn {
-      min-height: 56px;
-      padding: 0.5rem 0.55rem;
-      border-radius: 8px;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
       background: var(--surface);
       border-color: #e2dbd1;
       color: var(--text);
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       justify-content: center;
       align-items: center;
       gap: 0.25rem;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.76rem;
+      font-weight: 600;
       box-shadow: none;
+      white-space: nowrap;
     }
     .template-card-grid .animation-preset-btn:hover {
       border-color: var(--accent);
-      background: var(--accent-lt);
-      color: var(--accent-dk);
+      background: rgba(90, 143, 255, 0.08);
+      color: var(--accent);
     }
     .template-card-grid .animation-preset-btn.is-active {
-      background: #1f2022;
-      border-color: #1f2022;
-      color: #fff;
-      box-shadow: 0 0 0 2px rgba(90,154,106,0.25);
+      border-color: var(--accent);
+      background: rgba(90, 143, 255, 0.15);
+      color: var(--accent);
     }
 
     /* Preset chips (in content tab) */
