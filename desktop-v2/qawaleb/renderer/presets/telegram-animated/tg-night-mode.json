@@ -1,0 +1,28 @@
+{
+  "id": "tg-night-mode",
+  "label": "ليلي",
+  "description": "وضع ليلي عميق",
+  "colors": {
+    "background": "#05080f",
+    "header": "#0f1822",
+    "card": "#111b26",
+    "accent": "#6a9fd8",
+    "text": "#e8eef4",
+    "muted": "#6a7f94"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

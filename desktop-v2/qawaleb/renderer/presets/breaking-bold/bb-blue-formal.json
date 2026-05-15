@@ -1,0 +1,28 @@
+{
+  "id": "bb-blue-formal",
+  "label": "أزرق رسمي",
+  "description": "أزرق داكن مناسب للتقارير الرسمية",
+  "colors": {
+    "background": "#0a0f1a",
+    "surface": "#111827",
+    "accent": "#1e56a0",
+    "accentAlt": "#3b82f6",
+    "text": "#f6f4ef",
+    "muted": "#b0b8c8"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

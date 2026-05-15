@@ -1,0 +1,27 @@
+{
+  "id": "xa-light-mode",
+  "label": "وضع فاتح",
+  "description": "واجهة X الفاتحة النظيفة",
+  "colors": {
+    "background": "#e8ecf0",
+    "card": "#ffffff",
+    "accent": "#1d9bf0",
+    "border": "#cfd6dd",
+    "text": "#0f1419",
+    "muted": "#536471"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "dm-doc-green",
+  "label": "أخضر وثائقي",
+  "description": "الخضرة الطبيعية للتقارير الوثائقية",
+  "colors": {
+    "background": "#f6f4ef",
+    "line": "#d6d4cd",
+    "accent": "#1a4d3e",
+    "text": "#16161a",
+    "muted": "#7a7a7e"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": true,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

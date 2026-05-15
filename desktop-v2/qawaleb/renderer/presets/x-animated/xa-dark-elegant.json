@@ -1,0 +1,28 @@
+{
+  "id": "xa-dark-elegant",
+  "label": "داكن أنيق",
+  "description": "مظهر داكن بألوان ذهبية",
+  "colors": {
+    "background": "#000000",
+    "card": "#141414",
+    "accent": "#c09640",
+    "border": "#2a2a2a",
+    "text": "#f0ede8",
+    "muted": "#8a8a8a"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

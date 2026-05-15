@@ -1,0 +1,27 @@
+{
+  "id": "ig-pure-white",
+  "label": "أبيض نقي",
+  "description": "واجهة بيضاء نظيفة",
+  "colors": {
+    "background": "#ffffff",
+    "card": "#ffffff",
+    "accent": "#c13584",
+    "border": "#e0e0e0",
+    "text": "#1a1a1a",
+    "muted": "#8a8a8a"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 64,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust"
+  ]
+}

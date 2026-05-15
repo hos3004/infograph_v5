@@ -1,0 +1,31 @@
+{
+  "id": "pb-elegant-gold",
+  "label": "ذهبي فخم",
+  "description": "درجات ذهبية فاخرة على خلفية داكنة",
+  "colors": {
+    "background": "#1a1300",
+    "backgroundAlt": "#0f0b00",
+    "text": "#fff8e0",
+    "accent": "#d4a843"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": true,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "portraitScale": 1,
+  "portraitX": 0,
+  "portraitY": 0,
+  "portraitMonochrome": true,
+  "portraitSquare": false,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

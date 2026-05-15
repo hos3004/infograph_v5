@@ -1,0 +1,29 @@
+{
+  "id": "se-yellow-energy",
+  "label": "أصفر حيوي",
+  "description": "الطاقة والحيوية بالأصفر",
+  "colors": {
+    "background": "#0a0a0a",
+    "surface": "#222222",
+    "accent": "#f5d000",
+    "accentAlt": "#e10600",
+    "text": "#ffffff",
+    "muted": "#cfcfcf"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "light-leak",
+    "bokeh"
+  ]
+}

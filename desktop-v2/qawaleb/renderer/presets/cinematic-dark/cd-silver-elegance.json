@@ -1,0 +1,26 @@
+{
+  "id": "cd-silver-elegance",
+  "label": "فضي جريء",
+  "description": "فضي أنيق على خلفية داكنة",
+  "colors": {
+    "background": "#121214",
+    "accent": "#b8bcc4",
+    "text": "#f5f5f5",
+    "muted": "#8a8a92",
+    "alert": "#e10600"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 64,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "dust"
+  ]
+}

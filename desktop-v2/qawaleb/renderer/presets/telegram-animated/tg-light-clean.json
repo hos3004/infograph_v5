@@ -1,0 +1,27 @@
+{
+  "id": "tg-light-clean",
+  "label": "فاتح",
+  "description": "واجهة تلجرام الفاتحة",
+  "colors": {
+    "background": "#eef2f5",
+    "header": "#ffffff",
+    "card": "#ffffff",
+    "accent": "#4f8ac9",
+    "text": "#0a0a0a",
+    "muted": "#707070"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust"
+  ]
+}

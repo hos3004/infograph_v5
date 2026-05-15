@@ -1,0 +1,28 @@
+{
+  "id": "ee-deep-navy",
+  "label": "كحلي كلاسيكي",
+  "description": "مظهر جريء بألوان كحلية",
+  "colors": {
+    "background": "#0d1b2a",
+    "surface": "#1b2838",
+    "accent": "#c9a84c",
+    "accentDark": "#a8882e",
+    "text": "#f0ede8",
+    "muted": "#8e8e96"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

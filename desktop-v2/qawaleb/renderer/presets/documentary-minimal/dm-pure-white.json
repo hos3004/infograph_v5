@@ -1,0 +1,27 @@
+{
+  "id": "dm-pure-white",
+  "label": "أبيض نقي",
+  "description": "مظهر نظيف بأبيض ناصع",
+  "colors": {
+    "background": "#ffffff",
+    "line": "#e8e8ec",
+    "accent": "#2a2a3a",
+    "text": "#0a0a0a",
+    "muted": "#707070"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 64,
+  "quoteMark": true,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "ee-warm-gold",
+  "label": "ذهبي دافئ",
+  "description": "ألوان دافئة بلمسات ذهبية",
+  "colors": {
+    "background": "#f3eee2",
+    "surface": "#ebe4d2",
+    "accent": "#b08d57",
+    "accentDark": "#8a6a3a",
+    "text": "#10182b",
+    "muted": "#7a6e58"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

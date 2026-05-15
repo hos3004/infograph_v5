@@ -1,0 +1,27 @@
+{
+  "id": "cd-night-blue",
+  "label": "أزرق ليلي",
+  "description": "درجات زرقاء داكنة ليلية",
+  "colors": {
+    "background": "#0a0e1a",
+    "accent": "#3a7bbd",
+    "text": "#e8ecf4",
+    "muted": "#8892a8",
+    "alert": "#e10600"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 63,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

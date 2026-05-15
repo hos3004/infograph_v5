@@ -1,0 +1,27 @@
+{
+  "id": "fb-clean-white",
+  "label": "أبيض نقي",
+  "description": "مظهر أبيض نظيف وبسيط",
+  "colors": {
+    "background": "#f0f2f5",
+    "card": "#ffffff",
+    "accent": "#1a6ed8",
+    "border": "#dadde1",
+    "text": "#1c1e21",
+    "muted": "#606770"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 64,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "pb-classic-red",
+  "label": "أحمر كلاسيكي",
+  "description": "التصميم الكلاسيكي بالأحمر المباشر",
+  "colors": {
+    "background": "#d80b14",
+    "backgroundAlt": "#b8050d",
+    "text": "#ffffff",
+    "accent": "#ffd21e"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": true,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "portraitScale": 1,
+  "portraitX": 0,
+  "portraitY": 0,
+  "portraitMonochrome": true,
+  "portraitSquare": false,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

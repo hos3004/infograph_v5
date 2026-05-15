@@ -1,0 +1,28 @@
+{
+  "id": "xa-twitter-blue",
+  "label": "أزرق تويتر",
+  "description": "أزرق X الكلاسيكي",
+  "colors": {
+    "background": "#000000",
+    "card": "#192734",
+    "accent": "#1d9bf0",
+    "border": "#38444d",
+    "text": "#ffffff",
+    "muted": "#8899a6"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

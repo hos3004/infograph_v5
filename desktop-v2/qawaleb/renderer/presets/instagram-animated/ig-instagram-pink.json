@@ -1,0 +1,28 @@
+{
+  "id": "ig-instagram-pink",
+  "label": "وردي إنستغرام",
+  "description": "الوردي المميز لإنستغرام",
+  "colors": {
+    "background": "#fafafa",
+    "card": "#ffffff",
+    "accent": "#e1306c",
+    "border": "#dbdbdb",
+    "text": "#262626",
+    "muted": "#8e8e8e"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

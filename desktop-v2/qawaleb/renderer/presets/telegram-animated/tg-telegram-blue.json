@@ -1,0 +1,28 @@
+{
+  "id": "tg-telegram-blue",
+  "label": "أزرق تلجرام",
+  "description": "أزرق تلجرام المميز",
+  "colors": {
+    "background": "#070b10",
+    "header": "#17212b",
+    "card": "#182533",
+    "accent": "#5288c1",
+    "text": "#ffffff",
+    "muted": "#7f91a4"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

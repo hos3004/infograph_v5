@@ -1,0 +1,28 @@
+{
+  "id": "ig-dark-elegant",
+  "label": "داكن أنيق",
+  "description": "مظهر داكن أنيق",
+  "colors": {
+    "background": "#121212",
+    "card": "#1e1e1e",
+    "accent": "#e1306c",
+    "border": "#2a2a2a",
+    "text": "#f5f5f5",
+    "muted": "#a0a0a0"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 63,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

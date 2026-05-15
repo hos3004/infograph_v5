@@ -1,0 +1,31 @@
+{
+  "id": "pb-dark-blue",
+  "label": "أزرق رسمي",
+  "description": "لون أزرق عميق لإطلالة رسمية",
+  "colors": {
+    "background": "#0a1628",
+    "backgroundAlt": "#060e1a",
+    "text": "#e8f0ff",
+    "accent": "#4a90d9"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 60,
+  "quoteMark": true,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 15,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "portraitScale": 1,
+  "portraitX": 0,
+  "portraitY": 0,
+  "portraitMonochrome": true,
+  "portraitSquare": false,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

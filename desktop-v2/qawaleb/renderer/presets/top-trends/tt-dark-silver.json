@@ -1,0 +1,27 @@
+{
+  "id": "tt-dark-silver",
+  "label": "داكن فضي",
+  "description": "درجات فضية على خلفية داكنة",
+  "colors": {
+    "background": "#0a0a0f",
+    "panel": "#18182a",
+    "accent": "#c0c0d0",
+    "accentAlt": "#8888aa",
+    "text": "#f0f0f5",
+    "muted": "#68687a"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 62,
+  "quoteMark": false,
+  "parallax": false,
+  "cinematicBarSize": 8,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh"
+  ]
+}

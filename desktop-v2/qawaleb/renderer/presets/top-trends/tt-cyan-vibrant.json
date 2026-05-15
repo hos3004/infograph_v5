@@ -1,0 +1,29 @@
+{
+  "id": "tt-cyan-vibrant",
+  "label": "سماوي حيوي",
+  "description": "سماوي نابض بالحياة",
+  "colors": {
+    "background": "#09090e",
+    "panel": "#161622",
+    "accent": "#00f0ff",
+    "accentAlt": "#ff0055",
+    "text": "#ffffff",
+    "muted": "#73738c"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh",
+    "light-leak"
+  ]
+}

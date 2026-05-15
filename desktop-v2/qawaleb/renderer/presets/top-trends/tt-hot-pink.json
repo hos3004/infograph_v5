@@ -1,0 +1,28 @@
+{
+  "id": "tt-hot-pink",
+  "label": "وردي ناري",
+  "description": "ألوان وردية جريئة",
+  "colors": {
+    "background": "#0e050a",
+    "panel": "#1e0a14",
+    "accent": "#ff2a6d",
+    "accentAlt": "#ff6a00",
+    "text": "#ffffff",
+    "muted": "#a06070"
+  },
+  "scale": 1.05,
+  "x": 0,
+  "y": 0,
+  "fontSize": 68,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust",
+    "light-leak"
+  ]
+}

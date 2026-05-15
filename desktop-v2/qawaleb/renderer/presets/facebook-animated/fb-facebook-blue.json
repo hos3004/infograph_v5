@@ -1,0 +1,28 @@
+{
+  "id": "fb-facebook-blue",
+  "label": "أزرق فيسبوك",
+  "description": "أزرق فيسبوك الكلاسيكي",
+  "colors": {
+    "background": "#ccd0d5",
+    "card": "#ffffff",
+    "accent": "#1877f2",
+    "border": "#ced0d4",
+    "text": "#050505",
+    "muted": "#65676b"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

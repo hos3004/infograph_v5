@@ -1,0 +1,26 @@
+{
+  "id": "dm-warm-natural",
+  "label": "دافئ طبيعي",
+  "description": "ألوان دافئة طبيعية",
+  "colors": {
+    "background": "#f5f0e6",
+    "line": "#e0d8c8",
+    "accent": "#8d6e3a",
+    "text": "#2a2018",
+    "muted": "#807060"
+  },
+  "scale": 0.95,
+  "x": 0,
+  "y": 0,
+  "fontSize": 63,
+  "quoteMark": true,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 12,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust"
+  ]
+}

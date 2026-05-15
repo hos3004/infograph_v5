@@ -1,0 +1,28 @@
+{
+  "id": "fb-dark-mode",
+  "label": "داكن",
+  "description": "وضع داكن لمنشورات فيسبوك",
+  "colors": {
+    "background": "#18191a",
+    "card": "#242526",
+    "accent": "#2d88ff",
+    "border": "#3e4042",
+    "text": "#e4e6eb",
+    "muted": "#b0b3b8"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 63,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 14,
+  "backgroundRadius": 48,
+  "backgroundFeather": 96,
+  "effects": [
+    "bokeh",
+    "light-leak"
+  ]
+}

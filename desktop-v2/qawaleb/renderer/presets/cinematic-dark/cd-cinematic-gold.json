@@ -1,0 +1,27 @@
+{
+  "id": "cd-cinematic-gold",
+  "label": "ذهب سينمائي",
+  "description": "الذهبي السينمائي الكلاسيكي",
+  "colors": {
+    "background": "#0d0d0d",
+    "accent": "#d9a14a",
+    "text": "#f5f3ee",
+    "muted": "#a8a39a",
+    "alert": "#e10600"
+  },
+  "scale": 1,
+  "x": 0,
+  "y": 0,
+  "fontSize": 65,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 10,
+  "backgroundBlur": 12,
+  "backgroundRadius": 42,
+  "backgroundFeather": 84,
+  "effects": [
+    "dust",
+    "bokeh"
+  ]
+}

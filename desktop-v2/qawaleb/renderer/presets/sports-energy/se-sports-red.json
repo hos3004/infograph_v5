@@ -1,0 +1,28 @@
+{
+  "id": "se-sports-red",
+  "label": "أحمر رياضي",
+  "description": "أحمر ناري للحماس الرياضي",
+  "colors": {
+    "background": "#0a0a0a",
+    "surface": "#1a1a1a",
+    "accent": "#e10600",
+    "accentAlt": "#ff4422",
+    "text": "#ffffff",
+    "muted": "#b0b0b0"
+  },
+  "scale": 1.05,
+  "x": 0,
+  "y": 0,
+  "fontSize": 68,
+  "quoteMark": false,
+  "parallax": true,
+  "cinematicBarSize": 6,
+  "backgroundOpacity": 8,
+  "backgroundBlur": 10,
+  "backgroundRadius": 36,
+  "backgroundFeather": 72,
+  "effects": [
+    "dust",
+    "light-leak"
+  ]
+}
