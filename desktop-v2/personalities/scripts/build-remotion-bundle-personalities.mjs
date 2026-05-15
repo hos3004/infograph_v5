@@ -9,7 +9,7 @@ import os from 'os';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..', '..', '..');
 const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2Build');
+const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2BuildSizeLab');
 const sourceDir = path.join(buildRoot, 'bundle-staging', 'remotion-bundle');
 const outDir = process.env.DESKTOP_V2_PERSONALITIES_BUNDLE_OUT_DIR || path.join(buildRoot, 'bundle-staging-personalities', 'remotion-bundle');
 

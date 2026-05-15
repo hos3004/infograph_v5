@@ -2,7 +2,7 @@ const os = require('os');
 const path = require('path');
 
 const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2Build');
+const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2BuildSizeLab');
 const bundleStagingDir = path.join(buildRoot, 'bundle-staging', 'remotion-bundle');
 const motadawelBundleStagingDir = path.join(buildRoot, 'bundle-staging-motadawel', 'remotion-bundle');
 const laqtatBundleStagingDir = path.join(buildRoot, 'bundle-staging-laqtat', 'remotion-bundle');
@@ -29,6 +29,26 @@ module.exports = {
     'desktop-v2/qawaleb/**/*',
     'desktop-v2/personalities/**/*',
     'package.json',
+    '!**/*.map',
+    '!**/*.ts.map',
+    '!**/*.js.map',
+    '!**/*.bak',
+    '!**/*.bak-*',
+    '!**/*.bak.*',
+    '!**/README*',
+    '!**/*.md',
+    '!**/*.ts',
+    '!**/*.tsx',
+    '!**/docs/**',
+    '!**/test/**',
+    '!**/tests/**',
+    '!**/screenshots/**',
+    '!**/*.zip',
+    '!**/*.rar',
+    '!**/*.7z',
+    '!node_modules/ffprobe-static/bin/darwin/**/*',
+    '!node_modules/ffprobe-static/bin/linux/**/*',
+    '!node_modules/ffprobe-static/bin/win32/ia32/**/*',
   ],
   extraMetadata: {
     main: 'desktop-v2/main.cjs',
@@ -37,32 +57,32 @@ module.exports = {
     {
       from: bundleStagingDir,
       to: 'desktop-v2/generated/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
     {
       from: motadawelBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-motadawel/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
     {
       from: laqtatBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-laqtat/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
     {
       from: sowarBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-sowar/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
     {
       from: personalitiesBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-personalities/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
     {
       from: qawalebBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-qawaleb/remotion-bundle',
-      filter: ['**/*'],
+      filter: ['**/*', '!**/*.map'],
     },
   ],
   extraFiles: [
@@ -74,7 +94,9 @@ module.exports = {
   asarUnpack: [
     'node_modules/@remotion/compositor-win32-x64-msvc/**/*',
     'node_modules/ffmpeg-static/**/*',
-    'node_modules/ffprobe-static/**/*',
+    'node_modules/ffprobe-static/bin/win32/x64/**/*',
+    'node_modules/ffprobe-static/index.js',
+    'node_modules/ffprobe-static/package.json',
   ],
   npmRebuild: false,
   win: {

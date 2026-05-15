@@ -11,7 +11,7 @@ const { createDesktopPaths } = require('../../shared/paths.cjs');
 const { prepareRemotionPublicDir } = require('../../shared/remotion-public.cjs');
 
 const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2Build');
+const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2BuildSizeLab');
 
 async function run() {
   const desktopPaths = createDesktopPaths({
