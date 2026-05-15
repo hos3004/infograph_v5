@@ -131,12 +131,12 @@ const TEMPLATE_COLOR_DEFAULTS: Record<QawalebTemplateId, Record<string, string>>
     muted: '#8e8e8e',
   },
   'top-trends': {
-    background: '#09090e',
-    panel: '#161622',
-    accent: '#00f0ff',
-    accentAlt: '#ff0055',
+    background: '#0a0a2e',
+    panel: '#1a2a6a',
+    accent: '#4fc3ff',
+    accentAlt: '#1a73e8',
     text: '#ffffff',
-    muted: '#73738c',
+    muted: '#8899bb',
   },
 };
 
@@ -2255,6 +2255,14 @@ const PointsBroadcastTemplate: React.FC<{ values: Record<string, string>; appear
   );
 };
 
+const cardImgs = ['i-t1-img', 'i-t2-img', 'i-t3-img'];
+const cardTags = ['#تكنولوجيا', '#اقتصاد', '#رياضة'];
+const cardMetas = [
+  { count: '١.٢ مليون تفاعل', dir: '▲ صاعد' },
+  { count: '٨٥٠ ألف تفاعل', dir: '▲ صاعد' },
+  { count: '٤٢٠ ألف تفاعل', dir: '▼ مستقر' },
+];
+
 const TopTrendsTemplate: React.FC<{ values: Record<string, string>; appearance: TemplateAppearance }> = ({
   values,
   appearance,
@@ -2263,50 +2271,59 @@ const TopTrendsTemplate: React.FC<{ values: Record<string, string>; appearance: 
   const palette = getTemplatePalette('top-trends', appearance);
 
   return (
-    <AbsoluteFill style={{ ...stageStyle, background: `radial-gradient(circle at 80% 20%, ${palette.panel} 0%, ${palette.background} 100%)`, color: palette.text, fontFamily: FONT_RTL_PRIMARY }}>
+    <AbsoluteFill style={{ ...stageStyle, background: `radial-gradient(circle at 30% 10%, ${palette.panel} 0%, ${palette.background} 50%, #05051a 100%)`, color: palette.text, fontFamily: FONT_RTL_PRIMARY }}>
       <div
         style={{
           ...absFill(),
           backgroundImage: `linear-gradient(${palette.panel} 1px, transparent 1px), linear-gradient(90deg, ${palette.panel} 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-          opacity: 0.3,
-          transform: `perspective(500px) rotateX(60deg) translateY(${interpolate(frame % 500, [0, 500], [0, 40])}px) scale(3)`,
+          backgroundSize: '50px 50px',
+          opacity: 0.15,
+          transform: `perspective(500px) rotateX(60deg) translateY(${interpolate(frame % 500, [0, 500], [0, 50])}px) scale(3)`,
         }}
       />
-      <div style={{ position: 'absolute', top: 80, right: 80, opacity: fade(frame, 5, 16), transform: `translateX(${shift(frame, 5, 16, 50)}px)` }}>
-        <div style={{ background: palette.accentAlt, padding: '8px 24px', fontWeight: 900, fontSize: scaleFont(appearance, 24), letterSpacing: 2, textTransform: 'uppercase', display: 'inline-block', clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)' }}>مؤشرات البحث</div>
-        <h1 style={{ fontSize: scaleFont(appearance, 72), fontWeight: 900, lineHeight: 1.1, marginTop: 10 }}>أبرز التريندات <span style={{ color: palette.accent }}>اليوم</span></h1>
+      <div style={{ position: 'absolute', top: 60, right: 80, opacity: fade(frame, 5, 16), transform: `translateX(${shift(frame, 5, 16, 50)}px)` }}>
+        <div style={{ background: palette.accentAlt, padding: '8px 28px', fontWeight: 900, fontSize: scaleFont(appearance, 22), letterSpacing: 2, textTransform: 'uppercase', display: 'inline-block', borderRadius: 4 }}>مؤشرات البحث</div>
+        <h1 style={{ fontSize: scaleFont(appearance, 68), fontWeight: 900, lineHeight: 1.1, marginTop: 8, textShadow: '0 10px 40px rgba(0,0,0,0.9)' }}>أبرز التريندات <span style={{ color: palette.accent }}>اليوم</span></h1>
       </div>
-      <div style={{ position: 'absolute', top: 280, left: 80, right: 80, display: 'flex', gap: 40 }}>
-        {[getValue(values, 'i-t1'), getValue(values, 'i-t2'), getValue(values, 'i-t3')].map((title, index) => (
+      <div style={{ position: 'absolute', top: 290, left: 60, right: 60, display: 'flex', gap: 30 }}>
+        {[getValue(values, 'i-t1'), getValue(values, 'i-t2'), getValue(values, 'i-t3')].map((title, index) => {
+          const imgUrl = getValue(values, cardImgs[index]);
+          return (
           <div
             key={index}
             style={{
               flex: 1,
-              background: `${palette.panel}cc`,
+              background: `linear-gradient(135deg, ${palette.panel}d9 0%, ${palette.background}e6 100%)`,
               border: `1px solid ${palette.accent}33`,
-              borderTop: `4px solid ${palette.accent}`,
-              padding: 40,
-              backdropFilter: 'blur(10px)',
+              borderRadius: 12,
+              padding: 28,
+              backdropFilter: 'blur(8px)',
               position: 'relative',
-              opacity: fade(frame, 15 + index * 5, 16),
-              transform: `translateY(${shift(frame, 15 + index * 5, 16, 80)}px)`,
-              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+              opacity: fade(frame, 15 + index * 5, 14),
+              transform: `translateY(${shift(frame, 15 + index * 5, 14, 80)}px)`,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
             }}
           >
-            <div style={{ fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 80), fontWeight: 700, color: 'transparent', WebkitTextStroke: '2px rgba(255,255,255,0.1)', position: 'absolute', top: -40, left: 20, lineHeight: 1 }}>
+            <div style={{ width: '100%', height: 180, borderRadius: 8, marginBottom: 16, background: `linear-gradient(135deg, ${palette.panel}, ${palette.background})`, overflow: 'hidden' }}>
+              {imgUrl ? <SafeImg src={imgUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
+            </div>
+            <div style={{ fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 90), fontWeight: 700, color: 'transparent', WebkitTextStroke: `2px ${palette.accent}26`, position: 'absolute', top: 12, left: 16, lineHeight: 1 }}>
               {`0${index + 1}`}
             </div>
-            <span style={{ color: palette.accent, fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 18), marginBottom: 20, display: 'block' }}>
-              {index === 0 ? '#تكنولوجيا' : index === 1 ? '#اقتصاد' : '#رياضة'}
+            <span style={{ color: palette.accent, fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 16), marginBottom: 10, display: 'block' }}>
+              {cardTags[index]}
             </span>
-            <div style={rtlTextStyle({ fontSize: scaleFont(appearance, 38), fontWeight: 900, lineHeight: 1.3, marginBottom: 20 })}>{title}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: palette.muted, fontSize: scaleFont(appearance, 18), borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 20, marginTop: 30 }}>
-              <span>{index === 0 ? '١.٢ مليون تفاعل' : index === 1 ? '٨٥٠ ألف تفاعل' : '٤٢٠ ألف تفاعل'}</span>
-              <span>{index === 2 ? '▼ مستقر' : '▲ صاعد'}</span>
+            <div style={rtlTextStyle({ fontSize: scaleFont(appearance, 34), fontWeight: 900, lineHeight: 1.3, marginBottom: 12, flex: 1 })}>{title}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: palette.muted, fontSize: scaleFont(appearance, 16), borderTop: `1px solid ${palette.accent}1a`, paddingTop: 12, marginTop: 8 }}>
+              <span>{cardMetas[index].count}</span>
+              <span>{cardMetas[index].dir}</span>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </AbsoluteFill>
   );

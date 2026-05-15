@@ -1,10 +1,10 @@
 {
   "id": "tt-hot-pink",
   "label": "وردي ناري",
-  "description": "ألوان وردية جريئة",
+  "description": "تدرجات زرقاء مع لمسات وردية جريئة",
   "colors": {
-    "background": "#0e050a",
-    "panel": "#1e0a14",
+    "background": "#0a0a2e",
+    "panel": "#1a1a5e",
     "accent": "#ff2a6d",
     "accentAlt": "#ff6a00",
     "text": "#ffffff",
@@ -21,8 +21,5 @@
   "backgroundBlur": 10,
   "backgroundRadius": 36,
   "backgroundFeather": 72,
-  "effects": [
-    "dust",
-    "light-leak"
-  ]
+  "effects": ["dust", "light-leak"]
 }

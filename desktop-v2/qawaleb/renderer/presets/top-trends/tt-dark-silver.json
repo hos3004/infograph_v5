@@ -1,14 +1,14 @@
 {
   "id": "tt-dark-silver",
   "label": "داكن فضي",
-  "description": "درجات فضية على خلفية داكنة",
+  "description": "تدرجات زرقاء داكنة مع لمسات فضية",
   "colors": {
-    "background": "#0a0a0f",
-    "panel": "#18182a",
+    "background": "#0a0a2e",
+    "panel": "#12124a",
     "accent": "#c0c0d0",
-    "accentAlt": "#8888aa",
+    "accentAlt": "#6a6a9a",
     "text": "#f0f0f5",
-    "muted": "#68687a"
+    "muted": "#68689a"
   },
   "scale": 0.95,
   "x": 0,
@@ -21,7 +21,5 @@
   "backgroundBlur": 14,
   "backgroundRadius": 48,
   "backgroundFeather": 96,
-  "effects": [
-    "bokeh"
-  ]
+  "effects": ["bokeh"]
 }

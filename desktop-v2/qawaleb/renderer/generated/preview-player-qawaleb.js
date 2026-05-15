@@ -14973,12 +14973,12 @@ Check that all your Remotion packages are on the same version. If your dependenc
       muted: "#8e8e8e"
     },
     "top-trends": {
-      background: "#09090e",
-      panel: "#161622",
-      accent: "#00f0ff",
-      accentAlt: "#ff0055",
+      background: "#0a0a2e",
+      panel: "#1a2a6a",
+      accent: "#4fc3ff",
+      accentAlt: "#1a73e8",
       text: "#ffffff",
-      muted: "#73738c"
+      muted: "#8899bb"
     }
   };
   if (typeof document !== "undefined" && !document.head.querySelector('[data-qawaleb-fonts="1"]')) {
@@ -16809,45 +16809,59 @@ Check that all your Remotion packages are on the same version. If your dependenc
       )
     );
   };
+  var cardImgs = ["i-t1-img", "i-t2-img", "i-t3-img"];
+  var cardTags = ["#\u062A\u0643\u0646\u0648\u0644\u0648\u062C\u064A\u0627", "#\u0627\u0642\u062A\u0635\u0627\u062F", "#\u0631\u064A\u0627\u0636\u0629"];
+  var cardMetas = [
+    { count: "\u0661.\u0662 \u0645\u0644\u064A\u0648\u0646 \u062A\u0641\u0627\u0639\u0644", dir: "\u25B2 \u0635\u0627\u0639\u062F" },
+    { count: "\u0668\u0665\u0660 \u0623\u0644\u0641 \u062A\u0641\u0627\u0639\u0644", dir: "\u25B2 \u0635\u0627\u0639\u062F" },
+    { count: "\u0664\u0662\u0660 \u0623\u0644\u0641 \u062A\u0641\u0627\u0639\u0644", dir: "\u25BC \u0645\u0633\u062A\u0642\u0631" }
+  ];
   var TopTrendsTemplate = ({
     values,
     appearance
   }) => {
     const frame = useCurrentFrame();
     const palette = getTemplatePalette("top-trends", appearance);
-    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, { style: { ...stageStyle, background: `radial-gradient(circle at 80% 20%, ${palette.panel} 0%, ${palette.background} 100%)`, color: palette.text, fontFamily: FONT_RTL_PRIMARY } }, /* @__PURE__ */ import_react3.default.createElement(
+    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, { style: { ...stageStyle, background: `radial-gradient(circle at 30% 10%, ${palette.panel} 0%, ${palette.background} 50%, #05051a 100%)`, color: palette.text, fontFamily: FONT_RTL_PRIMARY } }, /* @__PURE__ */ import_react3.default.createElement(
       "div",
       {
         style: {
           ...absFill(),
           backgroundImage: `linear-gradient(${palette.panel} 1px, transparent 1px), linear-gradient(90deg, ${palette.panel} 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-          opacity: 0.3,
-          transform: `perspective(500px) rotateX(60deg) translateY(${interpolate(frame % 500, [0, 500], [0, 40])}px) scale(3)`
+          backgroundSize: "50px 50px",
+          opacity: 0.15,
+          transform: `perspective(500px) rotateX(60deg) translateY(${interpolate(frame % 500, [0, 500], [0, 50])}px) scale(3)`
         }
       }
-    ), /* @__PURE__ */ import_react3.default.createElement("div", { style: { position: "absolute", top: 80, right: 80, opacity: fade(frame, 5, 16), transform: `translateX(${shift(frame, 5, 16, 50)}px)` } }, /* @__PURE__ */ import_react3.default.createElement("div", { style: { background: palette.accentAlt, padding: "8px 24px", fontWeight: 900, fontSize: scaleFont(appearance, 24), letterSpacing: 2, textTransform: "uppercase", display: "inline-block", clipPath: "polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)" } }, "\u0645\u0624\u0634\u0631\u0627\u062A \u0627\u0644\u0628\u062D\u062B"), /* @__PURE__ */ import_react3.default.createElement("h1", { style: { fontSize: scaleFont(appearance, 72), fontWeight: 900, lineHeight: 1.1, marginTop: 10 } }, "\u0623\u0628\u0631\u0632 \u0627\u0644\u062A\u0631\u064A\u0646\u062F\u0627\u062A ", /* @__PURE__ */ import_react3.default.createElement("span", { style: { color: palette.accent } }, "\u0627\u0644\u064A\u0648\u0645"))), /* @__PURE__ */ import_react3.default.createElement("div", { style: { position: "absolute", top: 280, left: 80, right: 80, display: "flex", gap: 40 } }, [getValue(values, "i-t1"), getValue(values, "i-t2"), getValue(values, "i-t3")].map((title, index) => /* @__PURE__ */ import_react3.default.createElement(
-      "div",
-      {
-        key: index,
-        style: {
-          flex: 1,
-          background: `${palette.panel}cc`,
-          border: `1px solid ${palette.accent}33`,
-          borderTop: `4px solid ${palette.accent}`,
-          padding: 40,
-          backdropFilter: "blur(10px)",
-          position: "relative",
-          opacity: fade(frame, 15 + index * 5, 16),
-          transform: `translateY(${shift(frame, 15 + index * 5, 16, 80)}px)`,
-          boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
-        }
-      },
-      /* @__PURE__ */ import_react3.default.createElement("div", { style: { fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 80), fontWeight: 700, color: "transparent", WebkitTextStroke: "2px rgba(255,255,255,0.1)", position: "absolute", top: -40, left: 20, lineHeight: 1 } }, `0${index + 1}`),
-      /* @__PURE__ */ import_react3.default.createElement("span", { style: { color: palette.accent, fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 18), marginBottom: 20, display: "block" } }, index === 0 ? "#\u062A\u0643\u0646\u0648\u0644\u0648\u062C\u064A\u0627" : index === 1 ? "#\u0627\u0642\u062A\u0635\u0627\u062F" : "#\u0631\u064A\u0627\u0636\u0629"),
-      /* @__PURE__ */ import_react3.default.createElement("div", { style: rtlTextStyle({ fontSize: scaleFont(appearance, 38), fontWeight: 900, lineHeight: 1.3, marginBottom: 20 }) }, title),
-      /* @__PURE__ */ import_react3.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", color: palette.muted, fontSize: scaleFont(appearance, 18), borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 20, marginTop: 30 } }, /* @__PURE__ */ import_react3.default.createElement("span", null, index === 0 ? "\u0661.\u0662 \u0645\u0644\u064A\u0648\u0646 \u062A\u0641\u0627\u0639\u0644" : index === 1 ? "\u0668\u0665\u0660 \u0623\u0644\u0641 \u062A\u0641\u0627\u0639\u0644" : "\u0664\u0662\u0660 \u0623\u0644\u0641 \u062A\u0641\u0627\u0639\u0644"), /* @__PURE__ */ import_react3.default.createElement("span", null, index === 2 ? "\u25BC \u0645\u0633\u062A\u0642\u0631" : "\u25B2 \u0635\u0627\u0639\u062F"))
-    ))));
+    ), /* @__PURE__ */ import_react3.default.createElement("div", { style: { position: "absolute", top: 60, right: 80, opacity: fade(frame, 5, 16), transform: `translateX(${shift(frame, 5, 16, 50)}px)` } }, /* @__PURE__ */ import_react3.default.createElement("div", { style: { background: palette.accentAlt, padding: "8px 28px", fontWeight: 900, fontSize: scaleFont(appearance, 22), letterSpacing: 2, textTransform: "uppercase", display: "inline-block", borderRadius: 4 } }, "\u0645\u0624\u0634\u0631\u0627\u062A \u0627\u0644\u0628\u062D\u062B"), /* @__PURE__ */ import_react3.default.createElement("h1", { style: { fontSize: scaleFont(appearance, 68), fontWeight: 900, lineHeight: 1.1, marginTop: 8, textShadow: "0 10px 40px rgba(0,0,0,0.9)" } }, "\u0623\u0628\u0631\u0632 \u0627\u0644\u062A\u0631\u064A\u0646\u062F\u0627\u062A ", /* @__PURE__ */ import_react3.default.createElement("span", { style: { color: palette.accent } }, "\u0627\u0644\u064A\u0648\u0645"))), /* @__PURE__ */ import_react3.default.createElement("div", { style: { position: "absolute", top: 290, left: 60, right: 60, display: "flex", gap: 30 } }, [getValue(values, "i-t1"), getValue(values, "i-t2"), getValue(values, "i-t3")].map((title, index) => {
+      const imgUrl = getValue(values, cardImgs[index]);
+      return /* @__PURE__ */ import_react3.default.createElement(
+        "div",
+        {
+          key: index,
+          style: {
+            flex: 1,
+            background: `linear-gradient(135deg, ${palette.panel}d9 0%, ${palette.background}e6 100%)`,
+            border: `1px solid ${palette.accent}33`,
+            borderRadius: 12,
+            padding: 28,
+            backdropFilter: "blur(8px)",
+            position: "relative",
+            opacity: fade(frame, 15 + index * 5, 14),
+            transform: `translateY(${shift(frame, 15 + index * 5, 14, 80)}px)`,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden"
+          }
+        },
+        /* @__PURE__ */ import_react3.default.createElement("div", { style: { width: "100%", height: 180, borderRadius: 8, marginBottom: 16, background: `linear-gradient(135deg, ${palette.panel}, ${palette.background})`, overflow: "hidden" } }, imgUrl ? /* @__PURE__ */ import_react3.default.createElement(SafeImg, { src: imgUrl, style: { width: "100%", height: "100%", objectFit: "cover" } }) : null),
+        /* @__PURE__ */ import_react3.default.createElement("div", { style: { fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 90), fontWeight: 700, color: "transparent", WebkitTextStroke: `2px ${palette.accent}26`, position: "absolute", top: 12, left: 16, lineHeight: 1 } }, `0${index + 1}`),
+        /* @__PURE__ */ import_react3.default.createElement("span", { style: { color: palette.accent, fontFamily: FONT_MONO, fontSize: scaleFont(appearance, 16), marginBottom: 10, display: "block" } }, cardTags[index]),
+        /* @__PURE__ */ import_react3.default.createElement("div", { style: rtlTextStyle({ fontSize: scaleFont(appearance, 34), fontWeight: 900, lineHeight: 1.3, marginBottom: 12, flex: 1 }) }, title),
+        /* @__PURE__ */ import_react3.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", color: palette.muted, fontSize: scaleFont(appearance, 16), borderTop: `1px solid ${palette.accent}1a`, paddingTop: 12, marginTop: 8 } }, /* @__PURE__ */ import_react3.default.createElement("span", null, cardMetas[index].count), /* @__PURE__ */ import_react3.default.createElement("span", null, cardMetas[index].dir))
+      );
+    })));
   };
   var QawalebTemplateRenderer = ({ templateId, values, appearance }) => {
     const resolvedAppearance = resolveAppearance(appearance);

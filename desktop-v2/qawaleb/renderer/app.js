@@ -119,12 +119,12 @@ const TEMPLATE_COLOR_CONTROL_DEFS = {
     { key: 'muted', label: 'لون النص الثانوي', default: '#8e8e8e' },
   ],
   'top-trends': [
-    { key: 'background', label: 'الخلفية', default: '#09090e' },
-    { key: 'panel', label: 'بطاقات التريند', default: '#161622' },
-    { key: 'accent', label: 'السماوي الأساسي', default: '#00f0ff' },
-    { key: 'accentAlt', label: 'الوردي الثانوي', default: '#ff0055' },
+    { key: 'background', label: 'الخلفية', default: '#0a0a2e' },
+    { key: 'panel', label: 'بطاقات التريند', default: '#1a2a6a' },
+    { key: 'accent', label: 'السماوي الأساسي', default: '#4fc3ff' },
+    { key: 'accentAlt', label: 'الأزرق الثانوي', default: '#1a73e8' },
     { key: 'text', label: 'لون النص الرئيسي', default: '#ffffff' },
-    { key: 'muted', label: 'لون النص الثانوي', default: '#73738c' },
+    { key: 'muted', label: 'لون النص الثانوي', default: '#8899bb' },
   ],
 };
 

@@ -775,14 +775,14 @@ window.QAWALEB_TEMPLATE_PRESETS_EXT = {
     {
       "id": "tt-cyan-vibrant",
       "label": "سماوي حيوي",
-      "description": "سماوي نابض بالحياة",
+      "description": "تدرجات زرقاء سماوية نابضة بالحياة",
       "colors": {
-        "background": "#09090e",
-        "panel": "#161622",
-        "accent": "#00f0ff",
-        "accentAlt": "#ff0055",
+        "background": "#0a0a2e",
+        "panel": "#1a2a6a",
+        "accent": "#4fc3ff",
+        "accentAlt": "#1a73e8",
         "text": "#ffffff",
-        "muted": "#73738c"
+        "muted": "#8899bb"
       },
       "scale": 1,
       "x": 0,
@@ -797,21 +797,20 @@ window.QAWALEB_TEMPLATE_PRESETS_EXT = {
       "backgroundFeather": 84,
       "effects": [
         "dust",
-        "bokeh",
-        "light-leak"
+        "bokeh"
       ]
     },
     {
       "id": "tt-dark-silver",
       "label": "داكن فضي",
-      "description": "درجات فضية على خلفية داكنة",
+      "description": "تدرجات زرقاء داكنة مع لمسات فضية",
       "colors": {
-        "background": "#0a0a0f",
-        "panel": "#18182a",
+        "background": "#0a0a2e",
+        "panel": "#12124a",
         "accent": "#c0c0d0",
-        "accentAlt": "#8888aa",
+        "accentAlt": "#6a6a9a",
         "text": "#f0f0f5",
-        "muted": "#68687a"
+        "muted": "#68689a"
       },
       "scale": 0.95,
       "x": 0,
@@ -831,10 +830,10 @@ window.QAWALEB_TEMPLATE_PRESETS_EXT = {
     {
       "id": "tt-hot-pink",
       "label": "وردي ناري",
-      "description": "ألوان وردية جريئة",
+      "description": "تدرجات زرقاء مع لمسات وردية جريئة",
       "colors": {
-        "background": "#0e050a",
-        "panel": "#1e0a14",
+        "background": "#0a0a2e",
+        "panel": "#1a1a5e",
         "accent": "#ff2a6d",
         "accentAlt": "#ff6a00",
         "text": "#ffffff",
