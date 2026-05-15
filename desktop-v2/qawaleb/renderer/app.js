@@ -605,8 +605,8 @@ function getTemplateColorDefinitions(templateId = state.selectedTemplateId) {
   return TEMPLATE_COLOR_CONTROL_DEFS[templateId] || [];
 }
 
-function getTemplateImageFields(preset = getTemplatePreset()) {
-  return preset?.fields?.filter((field) => isTemplateImageField(field)) || [];
+function getTemplateImageField(preset = getTemplatePreset()) {
+  return preset?.fields?.find((field) => isTemplateImageField(field)) || null;
 }
 
 function templateSupportsPortraitControls(templateId = state.selectedTemplateId) {
@@ -907,13 +907,13 @@ function renderTemplateImageControls() {
   const section = elements.templateImageControlsSection;
   const container = elements.templateImageControlsCard;
   const preset = getTemplatePreset();
-  const imageFields = getTemplateImageFields(preset);
+  const imageField = getTemplateImageField(preset);
 
   if (!section || !container) {
     return;
   }
 
-  if (!preset || imageFields.length === 0) {
+  if (!preset || !imageField) {
     section.style.display = 'none';
     container.innerHTML = '';
     return;
@@ -922,49 +922,31 @@ function renderTemplateImageControls() {
   section.style.display = '';
   container.innerHTML = '';
 
-  if (imageFields.length === 1) {
-    renderSingleImageControl(container, preset, imageFields[0]);
-  } else {
-    imageFields.forEach(function(field) {
-      renderSingleImageControl(container, preset, field, true);
-    });
-  }
-}
-
-function renderSingleImageControl(container, preset, imageField, compact) {
   const localPath = sanitizeTemplateImageValue(state.templateValues?.[imageField.id] ?? '');
+  const supportsPortraitControls = templateSupportsPortraitControls(preset.id);
 
-  const card = document.createElement('div');
-  card.style.cssText = compact
-    ? 'margin-bottom: 1.2rem; border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.85rem; background: var(--surface);'
-    : '';
-
-  if (compact) {
-    card.innerHTML = '<div style="margin-bottom:0.5rem;font-weight:600;font-size:0.9rem;">' + (imageField.label?.replace('رابط ', '').trim() || 'صورة') + '</div>';
-  } else {
-    const title = document.createElement('label');
-    title.className = 'template-field-label';
-    title.textContent = imageField.label?.replace('رابط ', '').trim() || 'صورة القالب';
-    container.appendChild(title);
-  }
+  const title = document.createElement('label');
+  title.className = 'template-field-label';
+  title.textContent = imageField.label?.replace('رابط ', '').trim() || 'صورة القالب';
+  container.appendChild(title);
 
   const previewBox = document.createElement('div');
   previewBox.style.border = '1px solid var(--border)';
   previewBox.style.background = 'var(--surface)';
   previewBox.style.borderRadius = 'var(--r-md)';
-  previewBox.style.minHeight = compact ? '140px' : '220px';
+  previewBox.style.minHeight = '220px';
   previewBox.style.display = 'flex';
   previewBox.style.alignItems = 'center';
   previewBox.style.justifyContent = 'center';
   previewBox.style.overflow = 'hidden';
-  previewBox.style.marginBottom = '0.7rem';
+  previewBox.style.marginBottom = '0.85rem';
 
   if (localPath) {
     const img = document.createElement('img');
     img.src = window.desktopApi.toFileUrl(localPath);
     img.alt = imageField.label || 'Template image';
     img.style.width = '100%';
-    img.style.maxHeight = compact ? '180px' : '280px';
+    img.style.maxHeight = '280px';
     img.style.objectFit = 'cover';
     img.style.display = 'block';
     previewBox.appendChild(img);
@@ -973,37 +955,50 @@ function renderSingleImageControl(container, preset, imageField, compact) {
     empty.className = 'muted-text';
     empty.style.padding = '1rem';
     empty.style.textAlign = 'center';
-    empty.textContent = 'لم يتم اختيار صورة';
+    empty.textContent = 'اختر صورة من الجهاز لاستخدامها داخل القالب.';
     previewBox.appendChild(empty);
   }
-  card.appendChild(previewBox);
+  container.appendChild(previewBox);
+
+  const actions = document.createElement('div');
+  actions.style.display = 'flex';
+  actions.style.alignItems = 'center';
+  actions.style.justifyContent = 'space-between';
+  actions.style.gap = '0.75rem';
+  actions.style.flexWrap = 'wrap';
+  actions.style.marginBottom = '0.9rem';
 
   const fileLabel = document.createElement('div');
   fileLabel.className = 'muted-text';
-  fileLabel.style.fontSize = '0.8rem';
-  fileLabel.style.marginBottom = '0.5rem';
+  fileLabel.style.flex = '1';
+  fileLabel.style.minWidth = '0';
   fileLabel.style.overflow = 'hidden';
   fileLabel.style.textOverflow = 'ellipsis';
   fileLabel.style.whiteSpace = 'nowrap';
-  fileLabel.textContent = localPath ? prettifyPath(localPath) : '';
+  fileLabel.textContent = localPath ? prettifyPath(localPath) : 'لم يتم اختيار صورة';
+  fileLabel.title = localPath || '';
 
   const buttonsWrap = document.createElement('div');
   buttonsWrap.style.display = 'flex';
   buttonsWrap.style.gap = '0.5rem';
+  buttonsWrap.style.flexWrap = 'wrap';
 
   const pickBtn = document.createElement('button');
   pickBtn.type = 'button';
   pickBtn.className = 'btn-secondary';
-  pickBtn.textContent = localPath ? 'استبدال' : 'اختيار صورة';
-  pickBtn.style.fontSize = '0.8rem';
-  pickBtn.addEventListener('click', async function() {
+  pickBtn.textContent = localPath ? 'استبدال الصورة' : 'اختيار صورة';
+  pickBtn.addEventListener('click', async () => {
     const pickedImage = await (window.desktopApi.pickTemplateImage?.() || window.desktopApi.pickSlideImage());
-    if (!pickedImage) { return; }
+    if (!pickedImage) {
+      return;
+    }
+
     const nextPath = sanitizeTemplateImageValue(pickedImage.imagePath || pickedImage.path || '');
     if (!nextPath || !isSupportedSlideImage(nextPath)) {
       setStatus('تنبيه', 'امتداد الصورة غير مدعوم. استخدم PNG أو JPG أو JPEG أو WEBP.');
       return;
     }
+
     state.templateValues[imageField.id] = nextPath;
     ensureTemplateSlide();
     markProjectDirty();
@@ -1014,9 +1009,8 @@ function renderSingleImageControl(container, preset, imageField, compact) {
   clearBtn.type = 'button';
   clearBtn.className = 'btn-blue-outline';
   clearBtn.textContent = 'إزالة';
-  clearBtn.style.fontSize = '0.8rem';
   clearBtn.disabled = !localPath;
-  clearBtn.addEventListener('click', function() {
+  clearBtn.addEventListener('click', () => {
     state.templateValues[imageField.id] = '';
     ensureTemplateSlide();
     markProjectDirty();
@@ -1025,10 +1019,9 @@ function renderSingleImageControl(container, preset, imageField, compact) {
 
   buttonsWrap.appendChild(pickBtn);
   buttonsWrap.appendChild(clearBtn);
-  card.appendChild(fileLabel);
-  card.appendChild(buttonsWrap);
-  container.appendChild(card);
-}
+  actions.appendChild(fileLabel);
+  actions.appendChild(buttonsWrap);
+  container.appendChild(actions);
 
   const hint = document.createElement('span');
   hint.className = 'template-field-hint';
