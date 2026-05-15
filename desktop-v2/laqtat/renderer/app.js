@@ -576,16 +576,18 @@ function renderBlurRegionsList() {
         ${sliderFieldMarkup({ id: region.id, field: 'radius', label: 'دائرية الحواف', min: 0, max: 240, step: 1, value: region.radius ?? 12 })}
       </div>
       <div class="editor-grid-3">
-        ${sliderFieldMarkup({ id: region.id, field: 'feather', label: '\u0646\u0639\u0648\u0645\u0629 \u0627\u0644\u062d\u062f\u0648\u062f', min: 0, max: 80, step: 1, value: region.feather ?? 0 })}
+        ${sliderFieldMarkup({ id: region.id, field: 'feather', label: 'نعومة الحواف', min: 0, max: 80, step: 1, value: region.feather ?? 0 })}
       </div>
-      <label class="checkbox-row">
-        <input type="checkbox" data-field="alwaysOn" data-id="${region.id}" ${region.alwaysOn !== false ? 'checked' : ''} />
-        يعمل طول الوقت
-      </label>
-      <label class="checkbox-row">
-        <input type="checkbox" data-field="motionEnabled" data-id="${region.id}" ${region.motionEnabled === true ? 'checked' : ''} />
-        حركة يدوية من البداية للنهاية
-      </label>
+      <div class="inline-row" style="flex-wrap:wrap; gap:0.75rem;">
+        <label class="checkbox-row">
+          <input type="checkbox" data-field="alwaysOn" data-id="${region.id}" ${region.alwaysOn !== false ? 'checked' : ''} />
+          يعمل طول الوقت
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" data-field="motionEnabled" data-id="${region.id}" ${region.motionEnabled === true ? 'checked' : ''} />
+          حركة يدوية
+        </label>
+      </div>
       <div class="editor-grid motion-fields" style="${region.motionEnabled === true ? '' : 'display:none;'}" data-motion-fields="${region.id}">
         ${sliderFieldMarkup({ id: region.id, field: 'endX', label: 'موضع النهاية X', min: 0, max: 1920, step: 1, value: region.endX ?? region.x })}
         ${sliderFieldMarkup({ id: region.id, field: 'endY', label: 'موضع النهاية Y', min: 0, max: 1080, step: 1, value: region.endY ?? region.y })}
