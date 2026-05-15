@@ -1478,45 +1478,48 @@ function renderPresetChips(templateId) {
 }
 
 function applyPreset(templateId, presetId) {
-  const presets = getPresetsForTemplate(templateId);
-  const preset = presets.find((p) => p.id === presetId);
-  if (!preset) return;
+  try {
+    const presets = getPresetsForTemplate(templateId);
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) return;
 
-  if (preset.colors) {
-    state.templateColors = normalizeTemplateColors(templateId, preset.colors);
-  }
-  if (preset.scale !== undefined) state.templateScale = preset.scale;
-  if (preset.x !== undefined) state.templateX = preset.x;
-  if (preset.y !== undefined) state.templateY = preset.y;
-  if (preset.fontSize !== undefined) state.textFontSize = preset.fontSize;
-  if (preset.quoteMark !== undefined) state.showQuoteMark = preset.quoteMark;
-  if (preset.parallax !== undefined) state.parallaxEnabled = preset.parallax;
-  if (preset.cinematicBarSize !== undefined) state.cinematicBarSize = preset.cinematicBarSize;
-  if (preset.backgroundOpacity !== undefined) state.backgroundOpacity = preset.backgroundOpacity;
-  if (preset.backgroundBlur !== undefined) state.backgroundBlur = preset.backgroundBlur;
-  if (preset.backgroundRadius !== undefined) state.backgroundRadius = preset.backgroundRadius;
-  if (preset.backgroundFeather !== undefined) state.backgroundFeather = preset.backgroundFeather;
-  if (preset.portraitScale !== undefined) state.portraitScale = preset.portraitScale;
-  if (preset.portraitX !== undefined) state.portraitX = preset.portraitX;
-  if (preset.portraitY !== undefined) state.portraitY = preset.portraitY;
-  if (preset.portraitMonochrome !== undefined) state.portraitMonochrome = preset.portraitMonochrome;
-  if (preset.portraitSquare !== undefined) state.portraitSquare = preset.portraitSquare;
-  if (preset.effects) state.effects = [...preset.effects];
+    if (preset.colors) {
+      state.templateColors = normalizeTemplateColors(templateId, preset.colors);
+    }
+    if (preset.scale !== undefined) state.templateScale = preset.scale;
+    if (preset.x !== undefined) state.templateX = preset.x;
+    if (preset.y !== undefined) state.templateY = preset.y;
+    if (preset.fontSize !== undefined) state.textFontSize = preset.fontSize;
+    if (preset.quoteMark !== undefined) state.showQuoteMark = preset.quoteMark;
+    if (preset.parallax !== undefined) state.parallaxEnabled = preset.parallax;
+    if (preset.cinematicBarSize !== undefined) state.cinematicBarSize = preset.cinematicBarSize;
+    if (preset.backgroundOpacity !== undefined) state.backgroundOpacity = preset.backgroundOpacity;
+    if (preset.backgroundBlur !== undefined) state.backgroundBlur = preset.backgroundBlur;
+    if (preset.backgroundRadius !== undefined) state.backgroundRadius = preset.backgroundRadius;
+    if (preset.backgroundFeather !== undefined) state.backgroundFeather = preset.backgroundFeather;
+    if (preset.portraitScale !== undefined) state.portraitScale = preset.portraitScale;
+    if (preset.portraitX !== undefined) state.portraitX = preset.portraitX;
+    if (preset.portraitY !== undefined) state.portraitY = preset.portraitY;
+    if (preset.portraitMonochrome !== undefined) state.portraitMonochrome = preset.portraitMonochrome;
+    if (preset.portraitSquare !== undefined) state.portraitSquare = preset.portraitSquare;
+    if (preset.effects) state.effects = [...preset.effects];
 
-  syncTextSettingsUi();
-  renderTemplateColorControls();
-  [elements.templateScaleInput, elements.templateXInput, elements.templateYInput,
-   elements.fontSizeInput, elements.portraitScaleInput, elements.portraitXInput,
-   elements.portraitYInput, elements.barSizeInput].filter(Boolean).forEach(updateRangeVisual);
-  syncEffectCheckboxes();
-  renderPreviewFrame();
-  markProjectDirty();
+    syncTextSettingsUi();
+    [elements.templateScaleInput, elements.templateXInput, elements.templateYInput,
+     elements.fontSizeInput, elements.portraitScaleInput, elements.portraitXInput,
+     elements.portraitYInput, elements.barSizeInput].filter(Boolean).forEach(updateRangeVisual);
+    syncEffectCheckboxes();
+    renderPreviewFrame();
+    markProjectDirty();
 
-  const container = elements.templatePresetsContainer;
-  if (container) {
-    container.querySelectorAll('.preset-chip').forEach((chip) => {
-      chip.classList.toggle('is-active', chip.dataset.presetId === presetId);
-    });
+    const container = elements.templatePresetsContainer;
+    if (container) {
+      container.querySelectorAll('.preset-chip').forEach((chip) => {
+        chip.classList.toggle('is-active', chip.dataset.presetId === presetId);
+      });
+    }
+  } catch (err) {
+    console.error('[applyPreset]', err);
   }
 }
 
