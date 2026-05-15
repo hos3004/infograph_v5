@@ -361,7 +361,7 @@ function updateTemplateRuntimeSummary() {
   if (elements.previewSummary) {
     elements.previewSummary.textContent = preset
       ? `القالب الحالي: ${preset.label} | المدة التجريبية: ${durationSeconds} ثانية`
-      : 'اختر قالبًا، ثم عدّل البيانات من التبويب المقابل.';
+      : 'اختر قالبًا من تبويب "محتوى"، ثم عدّل من "تعديل" أو "صوت" أو "عرض".';
   }
 }
 
@@ -526,7 +526,7 @@ function setProgress(progress, message) {
 }
 
 function getActiveTabId() {
-  return document.querySelector('.tab-btn.active')?.dataset.target || 'tab-content-slides';
+  return document.querySelector('.tab-btn.active')?.dataset.target || 'tab-content-content';
 }
 
 function activateTab(tabId) {
@@ -537,9 +537,10 @@ function activateTab(tabId) {
 
   tabs.forEach((tab) => tab.classList.toggle('active', tab === targetTab));
   const displayModes = {
-    'tab-content-slides': 'flex',
-    'tab-content-text': 'block',
+    'tab-content-content': 'flex',
+    'tab-content-edit': 'block',
     'tab-content-audio': 'block',
+    'tab-content-display': 'block',
   };
   Object.entries(displayModes).forEach(([id, display]) => {
     const panel = document.getElementById(id);
@@ -1659,7 +1660,7 @@ async function applyOpenedProject(project, filePath) {
     await ensureEndPageDuration();
     updateVoiceoverMeta();
     renderSlides();
-    activateTab(ui.activeTab || 'tab-content-slides');
+    activateTab(ui.activeTab || 'tab-content-content');
     setStatus('المشروع', 'تم فتح المشروع بنجاح');
   } finally {
     isApplyingProjectData = false;

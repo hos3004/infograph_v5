@@ -370,19 +370,19 @@
     .parallax-toggle { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--text-mu); cursor: pointer; font-size: 0.82rem; }
     .parallax-toggle input { accent-color: var(--accent); }
 
-    /* Text tab, adapted from the provided design while preserving existing control IDs. */
-    #tab-content-text.text-design-panel {
+    /* ─── Edit & Content Tab Shared Styles ──────────────── */
+    .edit-panel {
       padding: 1rem;
       background: var(--surface-r);
     }
-    #tab-content-text .text-design-section {
+    .edit-section {
       background: #fbfaf7;
       border: 1px solid #e5ded4;
       border-radius: 12px;
       padding: 1.05rem 1rem;
       margin-bottom: 1rem;
     }
-    #tab-content-text .text-section-title {
+    .text-section-title {
       display: block;
       margin: 0 0 0.9rem;
       color: var(--text-mu);
@@ -390,26 +390,25 @@
       font-weight: 800;
       text-align: right;
     }
-    #tab-content-text .text-slider-control {
+    .ctrl-slider {
       display: flex;
       flex-direction: column;
       gap: 0.45rem;
       margin-top: 1rem;
     }
-    #tab-content-text .text-slider-control:first-of-type { margin-top: 0; }
-    #tab-content-text .text-slider-head {
+    .ctrl-slider:first-of-type { margin-top: 0; }
+    .ctrl-slider-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
     }
-    #tab-content-text .text-slider-head label,
-    #tab-content-text .text-color-label {
+    .ctrl-slider-head label {
       color: var(--text);
       font-size: 0.88rem;
       font-weight: 700;
     }
-    #tab-content-text .value-chip {
+    .value-chip {
       min-width: 58px;
       padding: 0.18rem 0.5rem;
       border-radius: 6px;
@@ -422,26 +421,28 @@
       text-align: center;
       direction: ltr;
     }
-    #tab-content-text .value-chip[data-unit="%"]::after { content: "%"; }
-    #tab-content-text .range-input {
+    .value-chip[data-unit="%"]::after { content: "%"; }
+    .edit-panel .range-input {
       background: linear-gradient(90deg, #1e1f20 var(--range-fill), #e9e4dc var(--range-fill));
       height: 4px;
       margin: 0.28rem 0 0;
     }
-    #tab-content-text .range-input::-webkit-slider-thumb {
+    .edit-panel .range-input::-webkit-slider-thumb {
       width: 18px;
       height: 18px;
       border-color: #1e1f20;
       box-shadow: 0 0 0 3px #fbfaf7;
     }
-    #tab-content-text .text-animation-grid {
+
+    /* Template Card Grid (in content tab) */
+    .template-card-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 0.6rem;
-      margin-top: 0.65rem;
+      margin-top: 0;
     }
-    #tab-content-text .animation-preset-btn {
-      min-height: 70px;
-      padding: 0.62rem 0.55rem;
+    .template-card-grid .animation-preset-btn {
+      min-height: 56px;
+      padding: 0.5rem 0.55rem;
       border-radius: 8px;
       background: var(--surface);
       border-color: #e2dbd1;
@@ -449,37 +450,26 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 0.5rem;
-      font-size: 0;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.82rem;
+      font-weight: 700;
       box-shadow: none;
     }
-    #tab-content-text .animation-preset-btn::before {
-      content: "";
-      display: block;
-      width: 100%;
-      height: 22px;
-      border-radius: 4px;
-      background:
-        linear-gradient(90deg, transparent 0 18%, rgba(91,185,105,0.9) 18% 20%, transparent 20% 100%) center / 100% 100% no-repeat,
-        #eeeae3;
+    .template-card-grid .animation-preset-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-lt);
+      color: var(--accent-dk);
     }
-    #tab-content-text .animation-preset-btn::after {
-      content: attr(data-template-label);
-      font-size: 0.76rem;
-      font-weight: 800;
-      line-height: 1.1;
-      color: currentColor;
-    }
-    #tab-content-text .animation-preset-btn.is-active {
+    .template-card-grid .animation-preset-btn.is-active {
       background: #1f2022;
       border-color: #1f2022;
       color: #fff;
-      box-shadow: none;
+      box-shadow: 0 0 0 2px rgba(90,154,106,0.25);
     }
-    #tab-content-text .animation-preset-btn.is-active::before {
-      background: #363638;
-    }
-    #tab-content-text .text-switch-row {
+
+    /* Toggle switch rows (shared) */
+    .text-switch-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -489,8 +479,8 @@
       font-size: 0.88rem;
       font-weight: 700;
     }
-    #tab-content-text .text-switch-row span { order: 1; }
-    #tab-content-text .text-switch-row input {
+    .text-switch-row span { order: 1; }
+    .text-switch-row input {
       order: 2;
       appearance: none;
       width: 46px;
@@ -505,49 +495,25 @@
       transition: background 0.2s;
       accent-color: var(--accent);
     }
-    #tab-content-text .text-switch-row input:checked {
+    .text-switch-row input:checked {
       background:
         radial-gradient(circle at 33px 50%, #fff 0 9px, transparent 9.5px),
         #58ba6c;
     }
-    #tab-content-text .text-color-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
-    }
-    #tab-content-text .color-presets {
-      gap: 0.6rem;
-      justify-content: flex-start;
-    }
-    #tab-content-text .preset-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 9px;
-      border: 2px solid transparent;
-    }
-    #tab-content-text .preset-btn.is-active {
-      border-color: #fff;
-      box-shadow: 0 0 0 2px #1f2022, 0 2px 8px rgba(0,0,0,0.12);
-    }
-    #tab-content-text .preset-dark { background: #111827; }
-    #tab-content-text .preset-gold { background: #b87612; }
-    #tab-content-text .preset-blue { background: #1d4aa8; }
-    #tab-content-text .preset-red { background: #a90f16; }
-    #tab-content-text .preset-orange { background: #ef7200; }
-    #tab-content-text .template-color-note {
+
+    /* Color controls */
+    .template-color-note {
       color: var(--text-mu);
       font-size: 0.8rem;
       line-height: 1.7;
       margin: 0 0 0.9rem;
     }
-    #tab-content-text .template-color-grid {
+    .template-color-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 0.75rem;
     }
-    #tab-content-text .template-color-item {
+    .template-color-item {
       border: 1px solid #e5ded4;
       border-radius: 10px;
       padding: 0.8rem;
@@ -557,20 +523,20 @@
       gap: 0.55rem;
       min-width: 0;
     }
-    #tab-content-text .template-color-item.full-span {
+    .template-color-item.full-span {
       grid-column: 1 / -1;
     }
-    #tab-content-text .template-color-item label {
+    .template-color-item label {
       color: var(--text);
       font-size: 0.84rem;
       font-weight: 700;
     }
-    #tab-content-text .template-color-row {
+    .template-color-row {
       display: flex;
       align-items: center;
       gap: 0.6rem;
     }
-    #tab-content-text .template-color-swatch {
+    .template-color-swatch {
       width: 42px;
       height: 42px;
       border: 1px solid #d8d1c6;
@@ -581,21 +547,21 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    #tab-content-text .template-color-swatch::-webkit-color-swatch-wrapper {
+    .template-color-swatch::-webkit-color-swatch-wrapper {
       padding: 0;
     }
-    #tab-content-text .template-color-swatch::-webkit-color-swatch {
+    .template-color-swatch::-webkit-color-swatch {
       border: none;
       border-radius: 9px;
     }
-    #tab-content-text .template-color-hex {
+    .template-color-hex {
       flex: 1;
       direction: ltr;
       text-align: left;
       font-family: var(--font-mono);
       font-size: 0.8rem;
     }
-    #tab-content-text .template-color-empty {
+    .template-color-empty {
       color: var(--text-fa);
       font-size: 0.8rem;
       padding: 1rem;
@@ -770,84 +736,79 @@
       <!-- ─── RIGHT PANEL — TABS ──────────────────────────── -->
       <div class="right-panel panel-left" style="flex: 1;">
         <div class="tabs-header">
-          <button class="tab-btn active" data-target="tab-content-slides">
-            <i data-lucide="layout-list" style="width: 15px; height: 15px;"></i> بيانات
+          <button class="tab-btn active" data-target="tab-content-content">
+            <i data-lucide="layout-list" style="width: 15px; height: 15px;"></i> محتوى
           </button>
-          <button class="tab-btn" data-target="tab-content-text">
-            <i data-lucide="layout-template" style="width: 15px; height: 15px;"></i> قوالب
+          <button class="tab-btn" data-target="tab-content-edit">
+            <i data-lucide="sliders" style="width: 15px; height: 15px;"></i> تعديل
           </button>
           <button class="tab-btn" data-target="tab-content-audio">
-            <i data-lucide="music" style="width: 15px; height: 15px;"></i> الصوتيات
+            <i data-lucide="music" style="width: 15px; height: 15px;"></i> صوت
+          </button>
+          <button class="tab-btn" data-target="tab-content-display">
+            <i data-lucide="monitor" style="width: 15px; height: 15px;"></i> عرض
           </button>
           <div class="tabs-indicator" id="tabs-indicator"></div>
         </div>
 
         <div class="tab-content">
 
-          <!-- ══ TAB: DATA ════════════════════════════════════ -->
-          <div id="tab-content-slides" style="display: flex; flex-direction: column; flex: 1; height: 100%; min-height: 0; overflow: hidden;">
-            <div class="setting-group prop-section slides-section" style="border: none; padding: 0.75rem; flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0.5rem; overflow: hidden; background: transparent;">
+          <!-- ══ TAB: CONTENT (محتوى) ═════════════════════════　-->
+          <div id="tab-content-content" class="tab-content-panel" style="display: flex; flex-direction: column; flex: 1; height: 100%; min-height: 0; overflow: hidden;">
+
+            <!-- Template Selection -->
+            <section class="edit-section" aria-labelledby="content-template-title" style="flex-shrink: 0;">
+              <h3 id="content-template-title" class="text-section-title">اختيار القالب</h3>
+              <p class="template-template-note" style="margin-bottom: 0.85rem;">اختيار القالب يحدد الحقول التي ستظهر في الأسفل.</p>
+              <div id="text-animation-buttons" class="animation-preset-grid template-card-grid" role="radiogroup" aria-label="قوالب الأخبار"></div>
+            </section>
+
+            <!-- Template Fields -->
+            <section class="edit-section" style="flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; margin-top: 0.75rem;">
               <label class="setting-label" style="flex-shrink: 0;">
-                <span>بيانات القالب (<span id="slides-count">0</span>)</span>
+                <span>حقول القالب (<span id="slides-count">0</span>)</span>
                 <span id="selected-template-badge" class="template-active-badge">خبر عاجل</span>
               </label>
-              <p id="template-description" class="template-template-note">اختر قالبًا من تبويب "قوالب" لتظهر حقوله هنا.</p>
+              <p id="template-description" class="template-template-note">اختر قالبًا من الأعلى لتظهر حقوله هنا.</p>
               <div id="slides-list" class="template-fields-grid" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0;">
               </div>
-            </div>
+            </section>
 
-            <div style="display: flex; gap: 0.75rem; border-top: 1px solid var(--border); padding: 0.75rem; align-items: flex-end;">
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 0.35rem;">
-                <label class="setting-label" style="font-size: 0.78rem; margin: 0;">شاشة الختام</label>
-                <select id="endpage-select" class="input-v2" style="font-size: 0.8rem; padding: 0.45rem;"></select>
-              </div>
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 0.35rem;">
-                <label class="setting-label" style="font-size: 0.78rem; margin: 0;">الإطار</label>
-                <select id="frame-select" class="input-v2" style="font-size: 0.8rem; padding: 0.45rem;"></select>
-              </div>
-              <div style="width: 78px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.35rem;">
-                <label class="setting-label" style="font-size: 0.78rem; margin: 0; text-align: center;">المدة (ث)</label>
-                <input id="slide-duration-input" type="number" class="input-v2 modern-input" value="20" min="5" max="120"
-                  style="text-align: center; font-size: 0.88rem; padding: 0.42rem;" />
-              </div>
-            </div>
-            <div style="padding: 0 0.75rem; margin-bottom: 0.75rem;">
-              <span id="endpage-duration-hint" class="muted-text" style="display: block;"></span>
-            </div>
-            <select id="overlay-select" style="display: none;"></select>
           </div>
 
-          <!-- ══ TAB: TEMPLATES ═══════════════════════════════ -->
-          <div id="tab-content-text" class="text-design-panel" style="display: none; overflow-y: auto;">
-            <section class="text-design-section" aria-labelledby="text-position-title">
-              <h3 id="text-position-title" class="text-section-title">الموضع والحجم</h3>
+          <!-- ══ TAB: EDIT (تعديل) ═════════════════════════════ -->
+          <div id="tab-content-edit" class="edit-panel" style="display: none; overflow-y: auto;">
 
-              <div class="text-slider-control">
-                <div class="text-slider-head">
+            <!-- Position & Size -->
+            <section class="edit-section" aria-labelledby="edit-position-title">
+              <h3 id="edit-position-title" class="text-section-title">الموضع والحجم</h3>
+
+              <div class="ctrl-slider">
+                <div class="ctrl-slider-head">
                   <label for="template-scale-input">تكبير وتصغير القالب</label>
                   <span id="template-scale-value" class="value-chip">100%</span>
                 </div>
                 <input id="template-scale-input" type="range" class="range-input" min="70" max="150" step="1" value="100" />
               </div>
 
-              <div class="text-slider-control">
-                <div class="text-slider-head">
+              <div class="ctrl-slider">
+                <div class="ctrl-slider-head">
                   <label for="template-x-input">تحريك القالب يمينًا ويسارًا</label>
                   <span id="template-x-value" class="value-chip">0px</span>
                 </div>
                 <input id="template-x-input" type="range" class="range-input" min="-420" max="420" step="5" value="0" />
               </div>
 
-              <div class="text-slider-control">
-                <div class="text-slider-head">
+              <div class="ctrl-slider">
+                <div class="ctrl-slider-head">
                   <label for="template-y-input">تحريك القالب أعلى وأسفل</label>
                   <span id="template-y-value" class="value-chip">0px</span>
                 </div>
                 <input id="template-y-input" type="range" class="range-input" min="-260" max="260" step="5" value="0" />
               </div>
 
-              <div class="text-slider-control">
-                <div class="text-slider-head">
+              <div class="ctrl-slider">
+                <div class="ctrl-slider-head">
                   <label for="font-size-input">حجم الخط</label>
                   <span id="font-size-value" class="value-chip">65px</span>
                 </div>
@@ -858,41 +819,40 @@
                 <input id="quote-mark-visible-checkbox" type="checkbox" checked />
                 <span>إظهار علامة الاقتباس فوق العنوان</span>
               </label>
-            </section>
 
-            <section id="template-image-controls-section" class="text-design-section" aria-labelledby="template-image-title" style="display: none;">
-              <h3 id="template-image-title" class="text-section-title">الصورة</h3>
-              <div id="template-image-controls-card" class="template-field-card full-span"></div>
-            </section>
-
-            <section id="template-background-controls-section" class="text-design-section" aria-labelledby="template-background-title">
-              <h3 id="template-background-title" class="text-section-title">الخلفية</h3>
-              <div id="template-background-controls-card" class="template-field-card full-span"></div>
-            </section>
-
-            <section class="text-design-section" aria-labelledby="text-motion-title">
-              <h3 id="text-motion-title" class="text-section-title">القوالب</h3>
-              <p class="template-template-note" style="margin-bottom: 0.85rem;">اختيار القالب هنا يحدد الحقول التي ستظهر في تبويب "بيانات".</p>
-              <div id="text-animation-buttons" class="animation-preset-grid text-animation-grid" role="radiogroup" aria-label="قوالب الأخبار"></div>
-              <label class="parallax-toggle text-switch-row">
+              <label class="parallax-toggle text-switch-row" style="margin-top: 0.5rem;">
                 <input id="parallax-enabled-checkbox" type="checkbox" checked />
                 <span>عمق سينمائي (Parallax)</span>
               </label>
             </section>
 
-            <section class="text-design-section" aria-labelledby="text-style-title">
-              <h3 id="text-style-title" class="text-section-title">ألوان القالب</h3>
+            <!-- Image Controls -->
+            <section id="template-image-controls-section" class="edit-section" aria-labelledby="edit-image-title" style="display: none;">
+              <h3 id="edit-image-title" class="text-section-title">الصورة</h3>
+              <p class="template-template-note">صورة داخل القالب — اختر صورة من الجهاز.</p>
+              <div id="template-image-controls-card" class="template-field-card full-span"></div>
+            </section>
+
+            <!-- Background Controls -->
+            <section id="template-background-controls-section" class="edit-section" aria-labelledby="edit-background-title">
+              <h3 id="edit-background-title" class="text-section-title">الخلفية</h3>
+              <div id="template-background-controls-card" class="template-field-card full-span"></div>
+            </section>
+
+            <!-- Template Colors -->
+            <section class="edit-section" aria-labelledby="edit-colors-title">
+              <h3 id="edit-colors-title" class="text-section-title">ألوان القالب</h3>
               <p class="template-color-note">تختلف الألوان المتاحة حسب القالب الحالي، ويمكن تغيير الألوان الأساسية نفسها لتنعكس في المعاينة والرندر النهائي.</p>
               <div id="template-color-controls" class="template-color-grid"></div>
-
               <select id="text-preset-select" style="display: none;">
                 <option value="dark">Dark</option><option value="gold">Gold</option>
                 <option value="blue">Blue</option><option value="red">Red</option><option value="orange">Orange</option>
               </select>
             </section>
+
           </div>
 
-          <!-- ══ TAB: AUDIO ═══════════════════════════════════ -->
+          <!-- ══ TAB: AUDIO (صوت) ══════════════════════════════ -->
           <div id="tab-content-audio" style="display: none; overflow-y: auto;">
             <div class="setting-group prop-field">
               <label class="setting-label" style="margin-bottom: 0.75rem;">
@@ -923,6 +883,37 @@
             </div>
           </div>
 
+          <!-- ══ TAB: DISPLAY (عرض) ═══════════════════════════ -->
+          <div id="tab-content-display" style="display: none; overflow-y: auto;">
+
+            <section class="edit-section" aria-labelledby="display-output-title">
+              <h3 id="display-output-title" class="text-section-title">إعدادات المخرجات</h3>
+
+              <div style="display: flex; gap: 0.75rem; align-items: flex-end; margin-bottom: 0.5rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.35rem;">
+                  <label class="setting-label" style="font-size: 0.78rem; margin: 0;">شاشة الختام</label>
+                  <select id="endpage-select" class="input-v2" style="font-size: 0.8rem; padding: 0.45rem;"></select>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.35rem;">
+                  <label class="setting-label" style="font-size: 0.78rem; margin: 0;">الإطار</label>
+                  <select id="frame-select" class="input-v2" style="font-size: 0.8rem; padding: 0.45rem;"></select>
+                </div>
+                <div style="width: 100px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.35rem;">
+                  <label class="setting-label" style="font-size: 0.78rem; margin: 0; text-align: center;">المدة (ث)</label>
+                  <input id="slide-duration-input" type="number" class="input-v2 modern-input" value="20" min="5" max="120"
+                    style="text-align: center; font-size: 0.88rem; padding: 0.42rem;" />
+                </div>
+              </div>
+
+              <div style="margin-bottom: 0.75rem;">
+                <span id="endpage-duration-hint" class="muted-text" style="display: block;"></span>
+              </div>
+            </section>
+
+            <select id="overlay-select" style="display: none;"></select>
+
+          </div>
+
         </div><!-- end tab-content wrapper -->
       </div><!-- end right-panel -->
 
@@ -939,7 +930,7 @@
               <div id="preview-exact-root" style="position:absolute; inset:0; width:100%; height:100%; direction:ltr;"></div>
             </div>
           </div>
-          <div id="preview-summary" class="muted-text">اختر قالبًا، ثم عدّل البيانات من التبويب المقابل.</div>
+          <div id="preview-summary" class="muted-text">اختر قالبًا من تبويب "محتوى"، ثم عدّل من "تعديل" أو "صوت" أو "عرض".</div>
           <div style="display:none;" aria-hidden="true">
             <button id="preview-fullscreen-btn" type="button"></button>
             <button id="preview-play-btn" type="button"></button>
@@ -949,36 +940,42 @@
             <input id="preview-seek" type="range" min="0" max="1000" value="0" />
           </div>
 
-          <!-- Piano Effects Keys -->
-          <div class="piano-effects-bar">
-            <label class="piano-key-label" title="غبار">
-              <input type="checkbox" value="dust" class="effect-checkbox" checked />
-              <span class="piano-key-content">غبار</span>
-            </label>
-            <label class="piano-key-label" title="إضاءة">
-              <input type="checkbox" value="light-leak" class="effect-checkbox" checked />
-              <span class="piano-key-content">إضاءة</span>
-            </label>
-            <label class="piano-key-label" title="بريق">
-              <input type="checkbox" value="bokeh" class="effect-checkbox" checked />
-              <span class="piano-key-content">بريق</span>
-            </label>
-            <label class="piano-key-label" title="خطوط شاشة">
-              <input type="checkbox" value="scanlines" class="effect-checkbox" />
-              <span class="piano-key-content">شبكة</span>
-            </label>
-            <label class="piano-key-label" title="تحبيب">
-              <input type="checkbox" value="grain" class="effect-checkbox" />
-              <span class="piano-key-content">حبيبات</span>
-            </label>
-            <label class="piano-key-label" title="تظليل">
-              <input type="checkbox" value="vignette" class="effect-checkbox" />
-              <span class="piano-key-content">تظليل</span>
-            </label>
-            <label class="piano-key-label" title="إطار سينمائي">
-              <input type="checkbox" value="cinematic-bars" id="cinematic-bars-checkbox" class="effect-checkbox" />
-              <span class="piano-key-content">سينمائي</span>
-            </label>
+          <!-- Effects Toggle Bar -->
+          <div style="margin-top: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <i data-lucide="sparkles" style="width: 14px; height: 14px; color: var(--text-mu);"></i>
+              <span class="muted-text" style="font-size: 0.76rem; font-weight: 700;">مؤثرات بصرية</span>
+            </div>
+            <div class="piano-effects-bar">
+              <label class="piano-key-label" title="غبار — مؤثر غبار خفيف على الشاشة">
+                <input type="checkbox" value="dust" class="effect-checkbox" checked />
+                <span class="piano-key-content">غبار</span>
+              </label>
+              <label class="piano-key-label" title="إضاءة — تسريب ضوئي عبر العدسة">
+                <input type="checkbox" value="light-leak" class="effect-checkbox" checked />
+                <span class="piano-key-content">إضاءة</span>
+              </label>
+              <label class="piano-key-label" title="بريق — بوكيه ضوئي متحرك">
+                <input type="checkbox" value="bokeh" class="effect-checkbox" checked />
+                <span class="piano-key-content">بريق</span>
+              </label>
+              <label class="piano-key-label" title="شبكة — خطوط مسح الشاشة (Scanlines)">
+                <input type="checkbox" value="scanlines" class="effect-checkbox" />
+                <span class="piano-key-content">شبكة</span>
+              </label>
+              <label class="piano-key-label" title="حبيبات — تحبيب سينمائي (Film Grain)">
+                <input type="checkbox" value="grain" class="effect-checkbox" />
+                <span class="piano-key-content">حبيبات</span>
+              </label>
+              <label class="piano-key-label" title="تظليل — تعتيم الأطراف (Vignette)">
+                <input type="checkbox" value="vignette" class="effect-checkbox" />
+                <span class="piano-key-content">تظليل</span>
+              </label>
+              <label class="piano-key-label" title="سينمائي — إطار سينمائي عريض (Cinematic Bars)">
+                <input type="checkbox" value="cinematic-bars" id="cinematic-bars-checkbox" class="effect-checkbox" />
+                <span class="piano-key-content">سينمائي</span>
+              </label>
+            </div>
           </div>
         </div><!-- end preview-container -->
 
@@ -1358,14 +1355,16 @@
       // ── Tab Switcher ──────────────────────────────────────
       const tabs = document.querySelectorAll('.tab-btn');
       const panels = {
-        'tab-content-slides':   document.getElementById('tab-content-slides'),
-        'tab-content-text':     document.getElementById('tab-content-text'),
+        'tab-content-content':  document.getElementById('tab-content-content'),
+        'tab-content-edit':     document.getElementById('tab-content-edit'),
         'tab-content-audio':    document.getElementById('tab-content-audio'),
+        'tab-content-display':  document.getElementById('tab-content-display'),
       };
       const panelDisplayMode = {
-        'tab-content-slides':   'flex',
-        'tab-content-text':     'block',
+        'tab-content-content':  'flex',
+        'tab-content-edit':     'block',
         'tab-content-audio':    'block',
+        'tab-content-display':  'block',
       };
 
       const showTabPanel = (target) => {
@@ -1373,7 +1372,7 @@
           if (!panel) return;
           panel.style.display = id === target ? panelDisplayMode[id] : 'none';
         });
-        if (target === 'tab-content-slides') {
+        if (target === 'tab-content-content') {
           requestAnimationFrame(() => {
             const slidesList = document.getElementById('slides-list');
             if (slidesList) {
