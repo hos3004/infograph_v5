@@ -1473,11 +1473,16 @@ function renderPresetChips(templateId) {
     chip.dataset.presetId = preset.id;
     chip.textContent = preset.label;
     chip.title = preset.description || preset.label;
+    chip.addEventListener('click', () => applyPreset(templateId, preset.id));
     container.appendChild(chip);
   });
 }
 
+let _applyingPreset = false;
+
 function applyPreset(templateId, presetId) {
+  if (_applyingPreset) return;
+  _applyingPreset = true;
   try {
     const presets = getPresetsForTemplate(templateId);
     const preset = presets.find((p) => p.id === presetId);
@@ -1520,6 +1525,8 @@ function applyPreset(templateId, presetId) {
     }
   } catch (err) {
     console.error('[applyPreset]', err);
+  } finally {
+    _applyingPreset = false;
   }
 }
 
@@ -2021,14 +2028,6 @@ function syncTextSettingsUi() {
       button.setAttribute('aria-checked', active ? 'true' : 'false');
     });
   }
-if (elements.templatePresetsContainer) {
-  elements.templatePresetsContainer.addEventListener('click', (event) => {
-    const chip = event.target.closest('.preset-chip');
-    if (!chip) return;
-    applyPreset(state.selectedTemplateId, chip.dataset.presetId);
-  });
-}
-
 if (elements.parallaxCheckbox) {
     elements.parallaxCheckbox.checked = state.parallaxEnabled !== false;
   }
