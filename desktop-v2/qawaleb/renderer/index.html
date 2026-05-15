@@ -468,6 +468,35 @@
       box-shadow: 0 0 0 2px rgba(90,154,106,0.25);
     }
 
+    /* Preset chips (in content tab) */
+    .presets-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+    .presets-chip-grid .preset-chip {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border, #3a3a3a);
+      background: var(--surface, #1e1e1e);
+      color: var(--text, #e0e0e0);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .presets-chip-grid .preset-chip:hover {
+      border-color: var(--accent, #5a8fff);
+      background: rgba(90, 143, 255, 0.08);
+    }
+    .presets-chip-grid .preset-chip.is-active {
+      border-color: var(--accent, #5a8fff);
+      background: rgba(90, 143, 255, 0.15);
+      color: var(--accent, #5a8fff);
+    }
+
     /* Toggle switch rows (shared) */
     .text-switch-row {
       display: flex;
@@ -761,6 +790,15 @@
               <h3 id="content-template-title" class="text-section-title">اختيار القالب</h3>
               <p class="template-template-note" style="margin-bottom: 0.85rem;">اختيار القالب يحدد الحقول التي ستظهر في الأسفل.</p>
               <div id="text-animation-buttons" class="animation-preset-grid template-card-grid" role="radiogroup" aria-label="قوالب الأخبار"></div>
+            </section>
+
+            <!-- Preset Selection -->
+            <section class="edit-section" aria-labelledby="content-presets-title" style="flex-shrink: 0; margin-top: 0.25rem;">
+              <h3 id="content-presets-title" class="text-section-title" style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem;">
+                <span data-lucide="palette" style="width: 0.9rem; height: 0.9rem;"></span>
+                إعدادات جاهزة
+              </h3>
+              <div id="template-presets-container" class="presets-chip-grid" role="radiogroup" aria-label="الإعدادات الجاهزة للقالب"></div>
             </section>
 
             <!-- Template Fields -->
@@ -1334,6 +1372,7 @@
   </div><!-- end v2-root -->
 
   <script src="./templates-registry.js"></script>
+  <script src="./templates-presets.js"></script>
   <script src="./generated/preview-player-qawaleb.js"></script>
   <script src="./app.js" defer></script>
   <script>

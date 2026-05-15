@@ -283,6 +283,7 @@ const elements = {
   barSizeInput: document.getElementById('bar-size-input'),
   barSizeValue: document.getElementById('bar-size-value'),
   textAnimationButtons: document.getElementById('text-animation-buttons'),
+  templatePresetsContainer: document.getElementById('template-presets-container'),
   parallaxCheckbox: document.getElementById('parallax-enabled-checkbox'),
   animationRadios: Array.from(document.querySelectorAll('.animation-radio')),
   effectCheckboxes: Array.from(document.querySelectorAll('.effect-checkbox')),
@@ -1447,6 +1448,82 @@ function applyTemplateSelection(templateId, { preserveExisting = true } = {}) {
   state.templateColors = normalizeTemplateColors(preset.id, previousColors);
   state.textAnimationType = preset.animationPreset || state.textAnimationType || 'motion-blur';
   ensureTemplateSlide();
+  renderPresetChips(templateId);
+}
+
+// ── Template Presets ──────────────────────────────────────────
+
+function getPresetsForTemplate(templateId) {
+  return window.QAWALEB_TEMPLATE_PRESETS_EXT?.[templateId] || [];
+}
+
+function renderPresetChips(templateId) {
+  const container = elements.templatePresetsContainer;
+  if (!container) return;
+  const presets = getPresetsForTemplate(templateId);
+  if (!presets.length) {
+    container.innerHTML = '<span class="presets-none" style="opacity:0.5;font-size:0.78rem;">—</span>';
+    return;
+  }
+  container.innerHTML = '';
+  presets.forEach((preset) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'preset-chip';
+    chip.dataset.presetId = preset.id;
+    chip.textContent = preset.label;
+    chip.title = preset.description || preset.label;
+    container.appendChild(chip);
+  });
+}
+
+function applyPreset(templateId, presetId) {
+  const presets = getPresetsForTemplate(templateId);
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) return;
+
+  if (preset.colors) {
+    state.templateColors = normalizeTemplateColors(templateId, preset.colors);
+  }
+  if (preset.scale !== undefined) state.templateScale = preset.scale;
+  if (preset.x !== undefined) state.templateX = preset.x;
+  if (preset.y !== undefined) state.templateY = preset.y;
+  if (preset.fontSize !== undefined) state.textFontSize = preset.fontSize;
+  if (preset.quoteMark !== undefined) state.showQuoteMark = preset.quoteMark;
+  if (preset.parallax !== undefined) state.parallaxEnabled = preset.parallax;
+  if (preset.cinematicBarSize !== undefined) state.cinematicBarSize = preset.cinematicBarSize;
+  if (preset.backgroundOpacity !== undefined) state.backgroundOpacity = preset.backgroundOpacity;
+  if (preset.backgroundBlur !== undefined) state.backgroundBlur = preset.backgroundBlur;
+  if (preset.backgroundRadius !== undefined) state.backgroundRadius = preset.backgroundRadius;
+  if (preset.backgroundFeather !== undefined) state.backgroundFeather = preset.backgroundFeather;
+  if (preset.portraitScale !== undefined) state.portraitScale = preset.portraitScale;
+  if (preset.portraitX !== undefined) state.portraitX = preset.portraitX;
+  if (preset.portraitY !== undefined) state.portraitY = preset.portraitY;
+  if (preset.portraitMonochrome !== undefined) state.portraitMonochrome = preset.portraitMonochrome;
+  if (preset.portraitSquare !== undefined) state.portraitSquare = preset.portraitSquare;
+  if (preset.effects) state.effects = [...preset.effects];
+
+  syncTextSettingsUi();
+  renderTemplateColorControls();
+  [elements.templateScaleInput, elements.templateXInput, elements.templateYInput,
+   elements.fontSizeInput, elements.portraitScaleInput, elements.portraitXInput,
+   elements.portraitYInput, elements.barSizeInput].filter(Boolean).forEach(updateRangeVisual);
+  syncEffectCheckboxes();
+  renderPreviewFrame();
+  markProjectDirty();
+
+  const container = elements.templatePresetsContainer;
+  if (container) {
+    container.querySelectorAll('.preset-chip').forEach((chip) => {
+      chip.classList.toggle('is-active', chip.dataset.presetId === presetId);
+    });
+  }
+}
+
+function syncEffectCheckboxes() {
+  elements.effectCheckboxes.forEach((cb) => {
+    cb.checked = state.effects.includes(cb.dataset.effect);
+  });
 }
 
 function buildInfographProjectData() {
@@ -1941,7 +2018,15 @@ function syncTextSettingsUi() {
       button.setAttribute('aria-checked', active ? 'true' : 'false');
     });
   }
-  if (elements.parallaxCheckbox) {
+if (elements.templatePresetsContainer) {
+  elements.templatePresetsContainer.addEventListener('click', (event) => {
+    const chip = event.target.closest('.preset-chip');
+    if (!chip) return;
+    applyPreset(state.selectedTemplateId, chip.dataset.presetId);
+  });
+}
+
+if (elements.parallaxCheckbox) {
     elements.parallaxCheckbox.checked = state.parallaxEnabled !== false;
   }
 
