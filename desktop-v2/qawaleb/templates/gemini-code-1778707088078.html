@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>التريند · Top 3 Trends</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #09090e; --panel: #161622; --accent: #00f0ff; --accent2: #ff0055; --text: #fff; --muted: #73738c; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #000; overflow: hidden; font-family: "Cairo", sans-serif; color: var(--text); }
+  .viewport { position: fixed; inset: 0; display: grid; place-items: center; background: #000; }
+  .stage { width: 1920px; height: 1080px; position: relative; overflow: hidden; background: radial-gradient(circle at 80% 20%, #161622 0%, var(--bg) 100%); }
+  
+  /* Grid & Glow */
+  .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(var(--panel) 1px, transparent 1px), linear-gradient(90deg, var(--panel) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.3; transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(3); animation: gridMove 20s linear infinite; }
+  @keyframes gridMove { from { transform: perspective(500px) rotateX(60deg) translateY(0) scale(3); } to { transform: perspective(500px) rotateX(60deg) translateY(40px) scale(3); } }
+  
+  /* Header */
+  .header { position: absolute; top: 80px; right: 80px; opacity: 0; transform: translateX(50px); }
+  .header .badge { background: var(--accent2); padding: 8px 24px; font-weight: 900; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; display: inline-block; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+  .header h1 { font-size: 72px; font-weight: 900; line-height: 1.1; margin-top: 10px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+  .header h1 span { color: var(--accent); }
+
+  /* Trend Cards Layout */
+  .trends-container { position: absolute; top: 280px; left: 80px; right: 80px; display: flex; gap: 40px; }
+  .trend-card { flex: 1; background: rgba(22, 22, 34, 0.8); border: 1px solid rgba(0, 240, 255, 0.2); border-top: 4px solid var(--accent); padding: 40px; backdrop-filter: blur(10px); position: relative; opacity: 0; transform: translateY(80px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  
+  .trend-card .num { font-family: "Roboto Mono"; font-size: 80px; font-weight: 700; color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,0.1); position: absolute; top: -40px; left: 20px; line-height: 1; }
+  .trend-card .tag { color: var(--accent); font-family: "Roboto Mono"; font-size: 18px; margin-bottom: 20px; display: block; }
+  .trend-card .title { font-size: 38px; font-weight: 900; line-height: 1.3; margin-bottom: 20px; color: #fff; }
+  .trend-card .meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 18px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 30px; }
+  
+  /* Animations */
+  .playing .header { animation: slideIn 0.8s 0.2s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .playing .trend-card:nth-child(1) { animation: riseUp 0.8s 0.6s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .playing .trend-card:nth-child(2) { animation: riseUp 0.8s 0.8s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .playing .trend-card:nth-child(3) { animation: riseUp 0.8s 1.0s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+  
+  @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+  @keyframes riseUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* Minimal Controls (Hidden visually to save space, but functional) */
+  .controls { position: fixed; left: 24px; bottom: 24px; z-index: 50; background: rgba(20,20,20,.95); padding: 14px; border-radius: 14px; width: 420px; color: #fff; font-size: 14px; border: 1px solid #333; }
+  .controls input { width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 8px; margin-bottom: 8px; border-radius: 4px; }
+  .btn { background: var(--accent2); color: #fff; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%; }
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="stage" id="stage">
+    <div class="grid-bg"></div>
+    <div class="header">
+      <div class="badge">مؤشرات البحث</div>
+      <h1>أبرز التريندات <span>اليوم</span></h1>
+    </div>
+    
+    <div class="trends-container">
+      <div class="trend-card">
+        <div class="num">01</div>
+        <span class="tag" id="tag1">#تكنولوجيا</span>
+        <div class="title" id="t1"></div>
+        <div class="meta"><span id="m1">١.٢ مليون تفاعل</span><span>▲ صاعد</span></div>
+      </div>
+      <div class="trend-card">
+        <div class="num">02</div>
+        <span class="tag" id="tag2">#اقتصاد</span>
+        <div class="title" id="t2"></div>
+        <div class="meta"><span id="m2">٨٥٠ ألف تفاعل</span><span>▲ صاعد</span></div>
+      </div>
+      <div class="trend-card">
+        <div class="num">03</div>
+        <span class="tag" id="tag3">#رياضة</span>
+        <div class="title" id="t3"></div>
+        <div class="meta"><span id="m3">٤٢٠ ألف تفاعل</span><span>▼ مستقر</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <h3>لوحة التحكم — Trends</h3>
+  <input id="i-t1" value="إطلاق نموذج ذكاء اصطناعي جديد يثير الجدل" placeholder="تريند 1" />
+  <input id="i-t2" value="أسعار الذهب تسجل رقماً قياسياً تاريخياً" placeholder="تريند 2" />
+  <input id="i-t3" value="قرعة دوري الأبطال ومواجهات نارية مرتقبة" placeholder="تريند 3" />
+  <button class="btn" onclick="play()">▶ تشغيل الأنيميشن</button>
+</div>
+
+<script>
+  function fit() { document.getElementById('stage').style.transform = `scale(${Math.min(innerWidth/1920, innerHeight/1080)})`; }
+  window.addEventListener('resize', fit); fit();
+  
+  function play() {
+    document.getElementById('t1').innerText = document.getElementById('i-t1').value;
+    document.getElementById('t2').innerText = document.getElementById('i-t2').value;
+    document.getElementById('t3').innerText = document.getElementById('i-t3').value;
+    const stage = document.getElementById('stage');
+    stage.classList.remove('playing'); void stage.offsetWidth; stage.classList.add('playing');
+  }
+  setTimeout(play, 200);
+</script>
+  <script src="./template-bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>تغريدة متحركة · X Animated</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #15202b; --card: #192734; --text: #fff; --muted: #8899a6; --blue: #1d9bf0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #000; overflow: hidden; font-family: "Tajawal", sans-serif; }
+  .viewport { position: fixed; inset: 0; display: grid; place-items: center; perspective: 1200px;}
+  .stage { width: 1920px; height: 1080px; position: relative; background: radial-gradient(circle at center, #1e2f3f 0%, #000 100%); overflow: hidden;}
+  
+  /* Ambient Background Logo */
+  .bg-logo { position: absolute; font-size: 1000px; color: rgba(255,255,255,0.03); font-family: sans-serif; top: -100px; left: -100px; line-height: 1; animation: bgPan 30s linear infinite alternate; pointer-events: none;}
+  @keyframes bgPan { 0% { transform: translate(0, 0) rotate(-10deg); } 100% { transform: translate(-100px, 100px) rotate(-5deg); } }
+
+  /* Entrance Wrapper */
+  .entrance-wrapper { position: absolute; top: 50%; left: 50%; opacity: 0; transform: translate(-50%, -50%) translateZ(-500px) rotateX(20deg); transform-style: preserve-3d;}
+  
+  /* Continuous Float Wrapper */
+  .float-wrapper { transform-style: preserve-3d; }
+  
+  .tweet-card { width: 1000px; background: var(--card); border: 1px solid #38444d; border-radius: 24px; padding: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 20px;}
+  
+  /* Staggered Elements inside Card */
+  .anim-item { opacity: 0; transform: translateY(20px); }
+
+  .user-info { display: flex; align-items: center; gap: 20px; }
+  .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+  .name-block { display: flex; flex-direction: column; }
+  .name { font-size: 28px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .verified { width: 24px; height: 24px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .verified::after { content: "✓"; color: #fff; font-size: 14px; font-weight: bold; }
+  .handle { font-size: 22px; color: var(--muted); }
+  .logo-x { margin-right: auto; font-size: 40px; color: #fff; font-family: sans-serif;}
+
+  .tweet-text { font-size: 38px; line-height: 1.5; color: var(--text); }
+  
+  .tweet-image { width: 100%; height: 450px; border-radius: 16px; overflow: hidden; border: 1px solid #38444d; }
+  .tweet-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .tweet-meta { font-size: 22px; color: var(--muted); border-bottom: 1px solid #38444d; padding-bottom: 15px; margin-top: 10px; }
+  .stats { display: flex; gap: 40px; color: var(--text); font-size: 24px; font-weight: 700; padding-top: 10px;}
+  .stats span { color: var(--muted); font-weight: 400; margin-right: 5px;}
+
+  /* --- Activation Classes --- */
+  .playing .entrance-wrapper { animation: cardEnter 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .playing .float-wrapper { animation: continuousFloat 12s ease-in-out infinite 1.2s; }
+  
+  /* Staggering children */
+  .playing .item-1 { animation: itemFadeUp 0.8s 0.6s forwards; }
+  .playing .item-2 { animation: itemFadeUp 0.8s 0.8s forwards; }
+  .playing .item-3 { animation: itemFadeUp 0.8s 1.0s forwards; }
+  .playing .item-4 { animation: itemFadeUp 0.8s 1.2s forwards; }
+  .playing .item-5 { animation: itemFadeUp 0.8s 1.4s forwards; }
+
+  @keyframes cardEnter { to { opacity: 1; transform: translate(-50%, -50%) translateZ(0) rotateX(0); } }
+  @keyframes continuousFloat { 
+    0% { transform: translateY(0) rotateX(0) rotateY(0); } 
+    25% { transform: translateY(-15px) rotateX(2deg) rotateY(-2deg); }
+    50% { transform: translateY(0) rotateX(0) rotateY(2deg); }
+    75% { transform: translateY(15px) rotateX(-2deg) rotateY(0); }
+    100% { transform: translateY(0) rotateX(0) rotateY(0); }
+  }
+  @keyframes itemFadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .controls { position: fixed; left: 24px; bottom: 24px; z-index: 50; background: #111; padding: 15px; border-radius: 12px; color: #fff; width: 420px; border: 1px solid #333;}
+  .controls input, .controls textarea { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 8px; margin-bottom: 8px; border-radius: 6px; font-family: inherit;}
+  .btn { background: var(--blue); color: #fff; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="stage" id="stage">
+    <div class="bg-logo">𝕏</div>
+    
+    <div class="entrance-wrapper">
+      <div class="float-wrapper">
+        <div class="tweet-card">
+          <div class="user-info anim-item item-1">
+            <img class="avatar" id="avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200" />
+            <div class="name-block">
+              <div class="name"><span id="name"></span><span class="verified"></span></div>
+              <div class="handle" id="handle"></div>
+            </div>
+            <div class="logo-x">𝕏</div>
+          </div>
+          <div class="tweet-text anim-item item-2" id="text"></div>
+          <div class="tweet-image anim-item item-3"><img id="photo" src="" /></div>
+          <div class="tweet-meta anim-item item-4"><span id="time">12:17 AM</span> • May 14, 2026 • <b style="color:#fff">1.5M</b> Views</div>
+          <div class="stats anim-item item-5">
+            <div>22K <span>Reposts</span></div>
+            <div>15K <span>Quotes</span></div>
+            <div>110K <span>Likes</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="controls">
+  <input id="i-name" value="نايف الخبير" />
+  <input id="i-handle" value="@NaifExpert" />
+  <textarea id="i-text" rows="2">نظرة سريعة على التحديث الجديد لبرامج الإنتاج المرئي، قفزة نوعية في دمج الذكاء الاصطناعي مع واجهات المستخدم. #تقنية</textarea>
+  <input id="i-img" value="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&q=80" />
+  <button class="btn" onclick="play()">▶ عرض بانيميشن كامل</button>
+</div>
+<script>
+  function fit() { document.getElementById('stage').style.transform = `scale(${Math.min(innerWidth/1920, innerHeight/1080)})`; }
+  window.addEventListener('resize', fit); fit();
+  function play() {
+    document.getElementById('name').innerText = document.getElementById('i-name').value;
+    document.getElementById('handle').innerText = document.getElementById('i-handle').value;
+    document.getElementById('text').innerText = document.getElementById('i-text').value;
+    document.getElementById('photo').src = document.getElementById('i-img').value;
+    const stage = document.getElementById('stage');
+    stage.classList.remove('playing'); void stage.offsetWidth; stage.classList.add('playing');
+  }
+  setTimeout(play, 200);
+</script>
+  <script src="./template-bridge.js"></script>
+</body>
+</html>

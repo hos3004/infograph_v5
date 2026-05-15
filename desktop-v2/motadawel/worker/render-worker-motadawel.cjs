@@ -259,10 +259,10 @@ async function renderVideo(payload) {
       codec: 'h264',
       audioCodec: 'aac',
       muted: false,
+      imageFormat: 'jpeg',
+      jpegQuality: 100,
       ...(payload.turboMode ? {
         concurrency: require('os').cpus().length,
-        imageFormat: 'jpeg',
-        jpegQuality: 80,
       } : {}),
       outputLocation: outputPath,
       inputProps,

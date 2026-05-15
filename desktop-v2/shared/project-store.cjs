@@ -32,6 +32,13 @@ const PROJECT_CONFIGS = {
     displayName: 'Sowar',
     dialogName: 'Sowar Project',
   },
+  qawaleb: {
+    projectType: 'qawaleb',
+    extension: '.qwb',
+    extensionName: 'qwb',
+    displayName: 'Qawaleb',
+    dialogName: 'Qawaleb Project',
+  },
   personalities: {
     projectType: 'personalities',
     extension: '.chp',
@@ -50,6 +57,10 @@ function getProjectConfig(projectType) {
 }
 
 function inferProjectConfigFromUrl(url = '') {
+  if (/[\\/]qawaleb[\\/]renderer[\\/]|\/qawaleb\/renderer\//i.test(url)) {
+    return PROJECT_CONFIGS.qawaleb;
+  }
+
   if (/[\\/]sowar[\\/]renderer[\\/]|\/sowar\/renderer\//i.test(url)) {
     return PROJECT_CONFIGS.sowar;
   }

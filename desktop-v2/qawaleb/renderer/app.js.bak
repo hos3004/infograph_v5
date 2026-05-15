@@ -1,0 +1,3663 @@
+﻿
+const TEXT_PRESET_STYLES = {
+  dark: { bg: 'rgba(0, 0, 0, 0.68)', color: '#ffffff', border: 'rgba(255, 255, 255, 0.14)' },
+  gold: { bg: 'rgba(160, 90, 0, 0.88)', color: '#fff8e0', border: 'rgba(255, 220, 80, 0.35)' },
+  blue: { bg: 'rgba(0, 45, 130, 0.9)', color: '#e8f0ff', border: 'rgba(80, 140, 255, 0.35)' },
+  red: { bg: 'rgba(160, 10, 10, 0.88)', color: '#ffe8e8', border: 'rgba(255, 80, 80, 0.35)' },
+  orange: { bg: 'rgba(230, 90, 0, 0.95)', color: '#ffffff', border: 'rgba(255, 180, 60, 0.55)' },
+};
+
+const FPS = 25;
+const PROJECT_TYPE = 'qawaleb';
+const PROJECT_AUTOSAVE_DELAY_MS = 1600;
+const TRANSITION_OPTIONS = ['fade', 'light-leak', 'blur-wipe'];
+const TEXT_ANIMATION_OPTIONS = [
+  { value: 'live-reveal-dot', label: 'ÙƒØ´Ù Ø³ÙŠÙ†Ù…Ø§Ø¦ÙŠ Ø­ÙŠ + Ù†Ù‚Ø·Ø©' },
+  { value: 'broadcast-split', label: 'Ø£Ø³Ø·Ø± Ø¥Ø®Ø¨Ø§Ø±ÙŠØ© Ù…ØªØªØ§Ø¨Ø¹Ø©' },
+  { value: 'news-ledger', label: 'ØªÙ‚Ø±ÙŠØ± Ø¨ØµØ±ÙŠ / News Ledger' },
+  { value: 'number-hero', label: 'Ø¹Ø¯Ø§Ø¯ Ø¥Ø­ØµØ§Ø¦ÙŠ Ù…ØªØ­Ø±Ùƒ' },
+  { value: 'layered-title', label: 'Ù†Ø¸Ø§Ù… Ø¹Ù†ÙˆØ§Ù† Ø·Ø¨Ù‚ÙŠ' },
+  { value: 'morph-compare', label: 'Ù…Ù‚Ø§Ø±Ù†Ø© Ù…ØªØºÙŠØ±Ø©' },
+  { value: 'impact-shock', label: 'ØµØ¯Ù…Ø© Ø®ÙÙŠÙØ©' },
+  { value: 'word-by-word', label: 'ÙƒÙ„Ù…Ø© ÙƒÙ„Ù…Ø©' },
+  { value: 'timeline-marker', label: 'Ù…Ø¤Ø´Ø± Ø²Ù…Ù†ÙŠ' },
+  { value: 'cinematic-reveal', label: 'ÙƒØ´Ù Ø³ÙŠÙ†Ù…Ø§Ø¦ÙŠ Ø¨Ø³ÙŠØ·' },
+  { value: 'split-lines-stagger', label: 'Ø£Ø³Ø·Ø± Ù…ØªØ¹Ø§ÙƒØ³Ø©' },
+  { value: 'highlight-sweep', label: 'Ù„Ù…Ø¹Ø© Ø¹Ø§Ø¨Ø±Ø©' },
+  { value: 'kinetic-keyword', label: 'ÙƒÙ„Ù…Ø© Ø¨Ø·Ù„Ø©' },
+  { value: 'motion-blur', label: 'Ø­Ø±ÙƒØ© Ø¶Ø¨Ø§Ø¨ÙŠØ© Ù‚Ø¯ÙŠÙ…Ø©' },
+  { value: 'typewriter', label: 'ÙƒØªØ§Ø¨Ø© Typewriter Ù‚Ø¯ÙŠÙ…Ø©' },
+];
+const TEMPLATE_PRESETS = Array.isArray(window.QAWALEB_TEMPLATE_PRESETS) && window.QAWALEB_TEMPLATE_PRESETS.length
+  ? window.QAWALEB_TEMPLATE_PRESETS
+  : [];
+const DEFAULT_TEMPLATE_ID = TEMPLATE_PRESETS[0]?.id || 'breaking-bold';
+const TEMPLATE_SLIDE_ID = 'qawaleb-template-slide';
+const DEFAULT_TEMPLATE_FONT_SIZE = 65;
+const DEFAULT_TEMPLATE_SCALE = 1;
+
+const TEMPLATE_COLOR_CONTROL_DEFS = {
+  'breaking-bold': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#0a0a0a' },
+    { key: 'surface', label: 'Ø§Ù„Ø³Ø·Ø­ Ø§Ù„Ø¯Ø§ÙƒÙ†', default: '#111111' },
+    { key: 'accent', label: 'Ø§Ù„Ø£Ø­Ù…Ø± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#e10600' },
+    { key: 'accentAlt', label: 'Ø§Ù„Ø£Ø­Ù…Ø± Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#ff3322' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#f6f4ef' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#d8d6d1' },
+  ],
+  'editorial-elegant': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#f3eee2' },
+    { key: 'surface', label: 'Ø§Ù„Ø³Ø·Ø­ Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠ', default: '#ebe4d2' },
+    { key: 'accent', label: 'Ø§Ù„Ø°Ù‡Ø¨ÙŠ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#b08d57' },
+    { key: 'accentDark', label: 'Ø§Ù„Ø°Ù‡Ø¨ÙŠ Ø§Ù„Ø¯Ø§ÙƒÙ†', default: '#8a6a3a' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#10182b' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#7a6e58' },
+  ],
+  'cinematic-dark': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#0d0d0d' },
+    { key: 'accent', label: 'Ø§Ù„Ø°Ù‡Ø¨ÙŠ Ø§Ù„Ø³ÙŠÙ†Ù…Ø§Ø¦ÙŠ', default: '#d9a14a' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#f5f3ee' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#a8a39a' },
+    { key: 'alert', label: 'Ù„ÙˆÙ† Ø§Ù„Ù…Ø¤Ø´Ø± Ø§Ù„Ø­ÙŠ', default: '#e10600' },
+  ],
+  'sports-energy': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#0a0a0a' },
+    { key: 'surface', label: 'Ø³Ø·Ø­ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø©', default: '#222222' },
+    { key: 'accent', label: 'Ø§Ù„Ø£ØµÙØ± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#f5d000' },
+    { key: 'accentAlt', label: 'Ø§Ù„Ø£Ø­Ù…Ø± Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#e10600' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#ffffff' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#cfcfcf' },
+  ],
+  'documentary-minimal': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#f6f4ef' },
+    { key: 'line', label: 'Ø§Ù„Ø®Ø·ÙˆØ· ÙˆØ§Ù„ÙÙˆØ§ØµÙ„', default: '#d6d4cd' },
+    { key: 'accent', label: 'Ø§Ù„Ø£Ø®Ø¶Ø± Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#1a4d3e' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#16161a' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#7a7a7e' },
+  ],
+  'x-animated': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#000000' },
+    { key: 'card', label: 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…Ù†Ø´ÙˆØ±', default: '#192734' },
+    { key: 'accent', label: 'Ù„ÙˆÙ† Ø§Ù„ØªÙˆØ«ÙŠÙ‚', default: '#1d9bf0' },
+    { key: 'border', label: 'Ø§Ù„Ø¥Ø·Ø§Ø±Ø§Øª', default: '#38444d' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#ffffff' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#8899a6' },
+  ],
+  'facebook-animated': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#ccd0d5' },
+    { key: 'card', label: 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…Ù†Ø´ÙˆØ±', default: '#ffffff' },
+    { key: 'accent', label: 'Ø§Ù„Ø£Ø²Ø±Ù‚ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#1877f2' },
+    { key: 'border', label: 'Ø§Ù„ÙÙˆØ§ØµÙ„', default: '#ced0d4' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#050505' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#65676b' },
+  ],
+  'telegram-animated': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#070b10' },
+    { key: 'header', label: 'Ø´Ø±ÙŠØ· Ø§Ù„Ù‚Ù†Ø§Ø©', default: '#17212b' },
+    { key: 'card', label: 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø±Ø³Ø§Ù„Ø©', default: '#182533' },
+    { key: 'accent', label: 'Ø§Ù„Ø£Ø²Ø±Ù‚ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#5288c1' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#ffffff' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#7f91a4' },
+  ],
+  'instagram-animated': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#fafafa' },
+    { key: 'card', label: 'Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…Ù†Ø´ÙˆØ±', default: '#ffffff' },
+    { key: 'accent', label: 'Ø§Ù„Ù„ÙˆÙ† Ø§Ù„ÙˆØ±Ø¯ÙŠ', default: '#e1306c' },
+    { key: 'border', label: 'Ø§Ù„Ø¥Ø·Ø§Ø±Ø§Øª', default: '#dbdbdb' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#262626' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#8e8e8e' },
+  ],
+  'top-trends': [
+    { key: 'background', label: 'Ø§Ù„Ø®Ù„ÙÙŠØ©', default: '#09090e' },
+    { key: 'panel', label: 'Ø¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„ØªØ±ÙŠÙ†Ø¯', default: '#161622' },
+    { key: 'accent', label: 'Ø§Ù„Ø³Ù…Ø§ÙˆÙŠ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ', default: '#00f0ff' },
+    { key: 'accentAlt', label: 'Ø§Ù„ÙˆØ±Ø¯ÙŠ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#ff0055' },
+    { key: 'text', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ', default: '#ffffff' },
+    { key: 'muted', label: 'Ù„ÙˆÙ† Ø§Ù„Ù†Øµ Ø§Ù„Ø«Ø§Ù†ÙˆÙŠ', default: '#73738c' },
+  ],
+};
+
+const DEFAULT_SYSTEM_PROMPT = `Ø£Ù†Øª Ù…Ø­Ø±Ø± Ø¥Ø®Ø¨Ø§Ø±ÙŠ Ù…ØªØ®ØµØµ ÙÙŠ Ø¥Ù†ØªØ§Ø¬ Ø§Ù„Ø¥Ù†ÙÙˆØ¬Ø±Ø§Ù Ø§Ù„ØªÙ„ÙØ²ÙŠÙˆÙ†ÙŠ Ø¨Ø§Ù„Ù„ØºØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©.
+Ù…Ù‡Ù…ØªÙƒ: ØªØ­ÙˆÙŠÙ„ Ø£ÙŠ Ù…ÙˆØ¶ÙˆØ¹ Ø¥Ù„Ù‰ Ø´Ø±Ø§Ø¦Ø­ Ø¥Ù†ÙÙˆØ¬Ø±Ø§Ù Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ø¬Ø§Ù‡Ø²Ø© Ù„Ù„Ø¹Ø±Ø¶.
+Ø§Ù„Ù‚ÙˆØ§Ø¹Ø¯:
+- Ø£Ù†ØªØ¬ JSON ÙÙ‚Ø· Ø¨Ø¯ÙˆÙ† Ø£ÙŠ Ù†Øµ Ø®Ø§Ø±Ø¬Ù‡
+- ÙƒÙ„ Ø´Ø±ÙŠØ­Ø© ØªØ­ØªÙˆÙŠ Ø­Ù‚ÙŠÙ‚Ø© ÙˆØ§Ø­Ø¯Ø© ÙˆØ§Ø¶Ø­Ø© ÙˆÙ‚ÙˆÙŠØ©
+- Ø§Ø³ØªØ®Ø¯Ù… ØµÙŠØºØ©: ÙƒÙŠÙƒØ± ++ Ø¹Ù†ÙˆØ§Ù† ++ Ø¬Ø³Ù… ++ Ø®Ù„Ø§ØµØ© (Ù…ÙØµÙˆÙ„Ø© Ø¨Ù€ ++)
+- Ø§Ù„ÙƒÙŠÙƒØ±: 2-3 ÙƒÙ„Ù…Ø§Øª (ÙØ¦Ø© Ø£Ùˆ Ù…ÙˆØ¶ÙˆØ¹)
+- Ø§Ù„Ø¹Ù†ÙˆØ§Ù†: 5-8 ÙƒÙ„Ù…Ø§Øª (Ø§Ù„ÙÙƒØ±Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©)
+- Ø§Ù„Ø¬Ø³Ù…: 8-15 ÙƒÙ„Ù…Ø© (Ø§Ù„ØªÙØ§ØµÙŠÙ„ ÙˆØ§Ù„Ø¨ÙŠØ§Ù†Ø§Øª)
+- Ø§Ù„Ø®Ù„Ø§ØµØ©: 5-8 ÙƒÙ„Ù…Ø§Øª (Ø§Ù„Ø§Ø³ØªÙ†ØªØ§Ø¬ Ø£Ùˆ Ø§Ù„Ø¯Ø¹ÙˆØ© Ù„Ù„ØªÙÙƒÙŠØ±)
+- ØªØ¬Ù†Ø¨ Ø§Ù„ØªÙƒØ±Ø§Ø± Ø¨ÙŠÙ† Ø§Ù„Ø´Ø±Ø§Ø¦Ø­`;
+
+const DEFAULT_TTS_STYLE_PROMPT = 'Premium commercial. Dynamic pacingâ€”starts intrigued, ends punchy. Tone is polished, persuasive, and inviting.';
+
+const DEFAULT_SETTINGS = {
+  geminiApiKey: '',
+  ttsModel: 'gemini-2.5-flash-preview-tts',
+  ttsVoice: 'Charon',
+  ttsStylePrompt: DEFAULT_TTS_STYLE_PROMPT,
+  contentModel: 'gemini-2.5-flash',
+  contentSystemPrompt: DEFAULT_SYSTEM_PROMPT,
+};
+
+const state = {
+  assets: { overlays: [], music: [], endpage: [], frame_sewar: [] },
+  appVersion: '1.0.0',
+  project: {
+    currentProjectPath: '',
+    projectName: 'Qawaleb Project',
+    isDirty: false,
+    isSaving: false,
+    lastSavedAt: null,
+    autosaveEnabled: true,
+    createdAt: null,
+  },
+  placeholderPath: null,
+  slides: [],
+  overlay: '',
+  frame: '',
+  music: '',
+  voiceover: null,
+  voiceoverVolume: 100,
+  voiceoverDurationMs: 0,
+  endPage: 'endpage.mp4',
+  endPageDisabledByUser: false,
+  effects: ['dust', 'light-leak', 'bokeh'],
+  textPreset: 'orange',
+  textAnimationType: 'live-reveal-dot',
+  parallaxEnabled: true,
+  selectedTemplateId: DEFAULT_TEMPLATE_ID,
+  templateValues: {},
+  templateColors: {},
+  templateScale: DEFAULT_TEMPLATE_SCALE,
+  templateX: 0,
+  templateY: 0,
+  cinematicBarSize: 6,
+  textFontSize: DEFAULT_TEMPLATE_FONT_SIZE,
+  textBottomOffset: 160,
+  textHorizontalOffset: 0,
+  slideDurationInSeconds: 20,
+  endPageDurationFrames: 0,
+  endPageDurationSource: '',
+  isRendering: false,
+  isGeneratingVoiceovers: false,
+  lastRender: null,
+  selectedSlideId: null,
+  draggedSlideId: null,
+  dragOverSlideId: null,
+  replacingSlideImageId: null,
+  previewPlaying: false,
+  previewMuted: false,
+  previewPositionMs: 0,
+  previewRafId: null,
+  previewStartedAt: 0,
+  settings: { ...DEFAULT_SETTINGS },
+};
+
+const elements = {
+  brandLogo: document.getElementById('brand-logo'),
+  projectSaveBtn: document.getElementById('project-save-btn'),
+  projectOpenBtn: document.getElementById('project-open-btn'),
+  projectSaveStatus: document.getElementById('project-save-status'),
+  overlaySelect: document.getElementById('overlay-select'),
+  frameSelect: document.getElementById('frame-select'),
+  musicSelect: document.getElementById('music-select'),
+  musicVolumeInput: document.getElementById('music-volume-input'),
+  musicVolumeValue: document.getElementById('music-volume-value'),
+  pickVoiceoverBtn: document.getElementById('pick-voiceover-btn'),
+  clearVoiceoverBtn: document.getElementById('clear-voiceover-btn'),
+  voiceoverFilename: document.getElementById('voiceover-filename'),
+  voiceoverMeta: document.getElementById('voiceover-meta'),
+  voiceoverVolumeInput: document.getElementById('voiceover-volume-input'),
+  voiceoverVolumeValue: document.getElementById('voiceover-volume-value'),
+  endPageSelect: document.getElementById('endpage-select'),
+  endPageDurationHint: document.getElementById('endpage-duration-hint'),
+  textPresetSelect: document.getElementById('text-preset-select'),
+  textPresetButtons: Array.from(document.querySelectorAll('[data-preset]')),
+  templateScaleInput: document.getElementById('template-scale-input'),
+  templateScaleValue: document.getElementById('template-scale-value'),
+  templateXInput: document.getElementById('template-x-input'),
+  templateXValue: document.getElementById('template-x-value'),
+  templateYInput: document.getElementById('template-y-input'),
+  templateYValue: document.getElementById('template-y-value'),
+  fontSizeInput: document.getElementById('font-size-input'),
+  fontSizeValue: document.getElementById('font-size-value'),
+  bottomOffsetInput: document.getElementById('bottom-offset-input'),
+  bottomOffsetValue: document.getElementById('bottom-offset-value'),
+  horizontalOffsetInput: document.getElementById('horizontal-offset-input'),
+  horizontalOffsetValue: document.getElementById('horizontal-offset-value'),
+  templateColorControls: document.getElementById('template-color-controls'),
+  slideDurationInput: document.getElementById('slide-duration-input'),
+  refreshAssetsBtn: document.getElementById('refresh-assets-btn'),
+  renderBtn: document.getElementById('render-btn'),
+  cancelRenderBtn: document.getElementById('cancel-render-btn'),
+  openOutputBtn: document.getElementById('open-output-btn'),
+  navBtns: document.querySelectorAll('.paper-nav-pills-wrap a.paper-nav-pill'),
+  runtimeSummary: document.getElementById('runtime-summary'),
+  previewSummary: document.getElementById('preview-summary'),
+  slidesCount: document.getElementById('slides-count'),
+  slidesList: document.getElementById('slides-list'),
+  templateDescription: document.getElementById('template-description'),
+  selectedTemplateBadge: document.getElementById('selected-template-badge'),
+  statusTitle: document.getElementById('status-title'),
+  statusText: document.getElementById('status-text'),
+  progressLabel: document.getElementById('progress-label'),
+  progressPercent: document.getElementById('progress-percent'),
+  progressFill: document.getElementById('progress-fill'),
+  renderResult: document.getElementById('render-result'),
+  barSizeInput: document.getElementById('bar-size-input'),
+  barSizeValue: document.getElementById('bar-size-value'),
+  textAnimationButtons: document.getElementById('text-animation-buttons'),
+  parallaxCheckbox: document.getElementById('parallax-enabled-checkbox'),
+  animationRadios: Array.from(document.querySelectorAll('.animation-radio')),
+  effectCheckboxes: Array.from(document.querySelectorAll('.effect-checkbox')),
+  previewStageShell: document.getElementById('preview-stage-shell'),
+  previewStage: document.getElementById('preview-exact-root'),
+  previewPlayBtn: document.getElementById('preview-play-btn'),
+  previewMuteBtn: document.getElementById('preview-mute-btn'),
+  previewRestartBtn: document.getElementById('preview-restart-btn'),
+  previewFullscreenBtn: document.getElementById('preview-fullscreen-btn'),
+  previewSeek: document.getElementById('preview-seek'),
+  previewTimeInline: document.getElementById('preview-time-inline'),
+};
+
+const previewRefs = {
+  runtime: null,
+  slideLayers: [],
+  overlayLayer: null,
+  endPageLayer: null,
+  endPageVideo: null,
+  textGradient: null,
+  textWrap: null,
+  textBar: null,
+  effectLayer: null,
+  effectDust: null,
+  effectLeak: null,
+  effectBokeh: null,
+  lightLeakFlash: null,
+  musicAudio: null,
+  overlayVideo: null,
+  overlayImage: null,
+};
+
+const exactPreviewRef = {
+  iframe: null,
+  src: '',
+  templateId: '',
+  loaded: false,
+  signature: '',
+};
+
+let autosaveTimerId = null;
+let isApplyingProjectData = false;
+let projectChangeRevision = 0;
+
+function hasExactPreviewPlayer() {
+  const api = templatePreviewApi();
+  return Boolean(api && typeof api.mount === 'function' && typeof api.update === 'function');
+}
+
+function templatePreviewApi() {
+  return window.DesktopRemotionPreviewQawaleb || window.window?.DesktopRemotionPreviewQawaleb || null;
+}
+
+function isTemplatePreviewMode() {
+  return Boolean(TEMPLATE_PRESETS.length && getTemplatePreset());
+}
+
+function getTemplatePreviewDurationMs() {
+  return Math.max(1000, Number(state.slideDurationInSeconds || 20) * 1000);
+}
+
+function getTemplatePreviewDurationInFrames() {
+  return Math.max(25, Math.round((getTemplatePreviewDurationMs() / 1000) * FPS));
+}
+
+function updateTemplateRuntimeSummary() {
+  const preset = getTemplatePreset();
+  const durationSeconds = (getTemplatePreviewDurationMs() / 1000).toFixed(1);
+
+  if (elements.runtimeSummary) {
+    elements.runtimeSummary.textContent = preset ? `${durationSeconds}Ø«` : '';
+    elements.runtimeSummary.title = preset ? `Ø§Ù„Ù…Ø¯Ø© Ø§Ù„ØªÙ‚Ø±ÙŠØ¨ÙŠØ©: ${durationSeconds} Ø«Ø§Ù†ÙŠØ©` : '';
+  }
+
+  if (elements.previewSummary) {
+    elements.previewSummary.textContent = preset
+      ? `Ø§Ù„Ù‚Ø§Ù„Ø¨ Ø§Ù„Ø­Ø§Ù„ÙŠ: ${preset.label} | Ø§Ù„Ù…Ø¯Ø© Ø§Ù„ØªÙ‚Ø±ÙŠØ¨ÙŠØ©: ${durationSeconds} Ø«Ø§Ù†ÙŠØ©`
+      : 'Ø§Ø®ØªØ± Ù‚Ø§Ù„Ø¨Ù‹Ø§ØŒ Ø«Ù… Ø¹Ø¯Ù‘Ù„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ù† Ø§Ù„ØªØ¨ÙˆÙŠØ¨ Ø§Ù„Ù…Ù‚Ø§Ø¨Ù„.';
+  }
+}
+
+function normalizeTemplatePreviewValue(value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return value;
+  }
+
+  if (/^(https?:|data:|blob:|file:)/i.test(value)) {
+    return value;
+  }
+
+  if (/^[a-zA-Z]:[\\/]/.test(value) || value.startsWith('\\\\')) {
+    return window.desktopApi.toFileUrl(value);
+  }
+
+  return value;
+}
+
+function getTemplatePreviewSource(preset) {
+  return new URL(`../templates/${encodeURIComponent(preset.fileName)}`, window.location.href).href + '?embed=1';
+}
+
+function getTemplatePreviewSignature(preset) {
+  return JSON.stringify({
+    templateId: preset?.id || '',
+    values: state.templateValues,
+    colors: state.templateColors,
+    frame: state.frame || '',
+    templateScale: state.templateScale,
+    templateX: state.templateX,
+    templateY: state.templateY,
+    textFontSize: state.textFontSize,
+  });
+}
+
+function postTemplatePreviewMessage(message) {
+  const frameWindow = exactPreviewRef.iframe?.contentWindow;
+  if (!frameWindow) {
+    return false;
+  }
+
+  frameWindow.postMessage(message, '*');
+  return true;
+}
+
+function syncTemplatePreviewUi() {
+  const totalMs = getTemplatePreviewDurationMs();
+  state.previewPositionMs = clamp(state.previewPositionMs, 0, totalMs || 0);
+  updatePreviewPlayerUi({ totalMs });
+  syncPreviewButtonUi({ totalMs });
+}
+
+function syncTemplatePreviewContent(force = false) {
+  const preset = getTemplatePreset();
+  if (!preset || !exactPreviewRef.loaded) {
+    return false;
+  }
+
+  const signature = getTemplatePreviewSignature(preset);
+  if (!force && exactPreviewRef.signature === signature) {
+    return false;
+  }
+
+  postTemplatePreviewMessage({
+    type: 'qawaleb:update',
+    values: { ...state.templateValues },
+    autoplay: false,
+    timeMs: 0,
+  });
+
+  if (state.previewPositionMs > 0) {
+    postTemplatePreviewMessage({
+      type: 'qawaleb:seek',
+      timeMs: state.previewPositionMs,
+      playing: state.previewPlaying,
+    });
+  }
+
+  if (state.previewPlaying) {
+    postTemplatePreviewMessage({
+      type: 'qawaleb:set-playing',
+      playing: true,
+    });
+  }
+
+  exactPreviewRef.signature = signature;
+  return true;
+}
+
+function ensureDesktopQawalebFonts(arabicFontDataUrl, displayFontDataUrl) {
+  if ((!arabicFontDataUrl && !displayFontDataUrl) || document.head.querySelector('[data-desktop-font="QawalebFonts"]')) {
+    return;
+  }
+
+  const style = document.createElement('style');
+  style.setAttribute('data-desktop-font', 'QawalebFonts');
+  style.textContent = `
+    ${arabicFontDataUrl ? `
+    @font-face {
+      font-family: 'QawalebArabic';
+      src: url('${arabicFontDataUrl}') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }` : ''}
+    ${displayFontDataUrl ? `
+    @font-face {
+      font-family: 'QawalebDisplay';
+      src: url('${displayFontDataUrl}') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }` : ''}
+  `;
+  document.head.appendChild(style);
+}
+
+function formatAssetOptions(select, items, placeholder) {
+  select.innerHTML = '';
+
+  const emptyOption = document.createElement('option');
+  emptyOption.value = '';
+  emptyOption.textContent = placeholder;
+  select.appendChild(emptyOption);
+
+  items.forEach((item) => {
+    const option = document.createElement('option');
+    option.value = item.name;
+    option.textContent = item.name;
+    select.appendChild(option);
+  });
+}
+
+function prettifyPath(filePath) {
+  return filePath.split(/[/\\]/).pop() || filePath;
+}
+
+function setStatus(title, text) {
+  elements.statusTitle.textContent = title;
+  elements.statusText.textContent = text || '';
+  elements.statusText.style.display = text ? '' : 'none';
+}
+
+function setProgress(progress, message) {
+  const safeProgress = Math.max(0, Math.min(1, progress || 0));
+  elements.progressFill.style.width = `${safeProgress * 100}%`;
+  elements.progressPercent.textContent = `${Math.round(safeProgress * 100)}%`;
+  elements.progressLabel.textContent = message || 'Ø¬Ø§Ù‡Ø²';
+}
+
+function getActiveTabId() {
+  return document.querySelector('.tab-btn.active')?.dataset.target || 'tab-content-slides';
+}
+
+function activateTab(tabId) {
+  if (!tabId) return;
+  const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+  const targetTab = tabs.find((tab) => tab.dataset.target === tabId);
+  if (!targetTab) return;
+
+  tabs.forEach((tab) => tab.classList.toggle('active', tab === targetTab));
+  const displayModes = {
+    'tab-content-slides': 'flex',
+    'tab-content-text': 'block',
+    'tab-content-audio': 'block',
+  };
+  Object.entries(displayModes).forEach(([id, display]) => {
+    const panel = document.getElementById(id);
+    if (panel) panel.style.display = id === tabId ? display : 'none';
+  });
+}
+
+function updateProjectStatusUi(statusText) {
+  if (!elements.projectSaveBtn || !elements.projectSaveStatus) return;
+
+  elements.projectSaveBtn.classList.toggle('is-dirty', state.project.isDirty && !state.project.isSaving);
+  elements.projectSaveBtn.classList.toggle('is-saving', state.project.isSaving);
+  elements.projectSaveBtn.disabled = state.project.isSaving;
+
+  if (statusText) {
+    elements.projectSaveStatus.textContent = statusText;
+    return;
+  }
+
+  if (state.project.isSaving) {
+    elements.projectSaveStatus.textContent = 'Ø¬Ø§Ø±Ù Ø§Ù„Ø­ÙØ¸...';
+  } else if (state.project.isDirty) {
+    elements.projectSaveStatus.textContent = 'ØªØºÙŠÙŠØ±Ø§Øª ØºÙŠØ± Ù…Ø­ÙÙˆØ¸Ø©';
+  } else if (state.project.lastSavedAt) {
+    elements.projectSaveStatus.textContent = 'ØªÙ… Ø§Ù„Ø­ÙØ¸';
+  } else {
+    elements.projectSaveStatus.textContent = 'Ù…Ø´Ø±ÙˆØ¹ Ø¬Ø¯ÙŠØ¯';
+  }
+}
+
+function scheduleAutosave() {
+  window.clearTimeout(autosaveTimerId);
+  if (!state.project.autosaveEnabled || !state.project.currentProjectPath || !state.project.isDirty) {
+    return;
+  }
+
+  autosaveTimerId = window.setTimeout(() => {
+    saveCurrentProject({ autosave: true });
+  }, PROJECT_AUTOSAVE_DELAY_MS);
+}
+
+function markProjectDirty() {
+  if (isApplyingProjectData) {
+    return;
+  }
+  projectChangeRevision += 1;
+  state.project.isDirty = true;
+  updateProjectStatusUi();
+  scheduleAutosave();
+}
+
+function getTemplatePreset(templateId = state.selectedTemplateId) {
+  return TEMPLATE_PRESETS.find((preset) => preset.id === templateId) || TEMPLATE_PRESETS[0] || null;
+}
+
+function buildTemplateDefaults(preset) {
+  return { ...(preset?.defaults || {}) };
+}
+
+function getTemplateColorDefinitions(templateId = state.selectedTemplateId) {
+  return TEMPLATE_COLOR_CONTROL_DEFS[templateId] || [];
+}
+
+function normalizeHexColor(rawValue, fallback) {
+  if (typeof rawValue !== 'string') {
+    return fallback;
+  }
+
+  const value = rawValue.trim();
+  if (!value) {
+    return fallback;
+  }
+
+  if (/^#[0-9a-f]{6}$/i.test(value)) {
+    return value.toLowerCase();
+  }
+
+  if (/^#[0-9a-f]{3}$/i.test(value)) {
+    const [, r, g, b] = value;
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+
+  return fallback;
+}
+
+function buildTemplateColorDefaults(templateId = state.selectedTemplateId) {
+  return getTemplateColorDefinitions(templateId).reduce((accumulator, entry) => {
+    accumulator[entry.key] = entry.default;
+    return accumulator;
+  }, {});
+}
+
+function normalizeTemplateColors(templateId = state.selectedTemplateId, colors = {}) {
+  const defaults = buildTemplateColorDefaults(templateId);
+  const normalized = { ...defaults };
+
+  getTemplateColorDefinitions(templateId).forEach((entry) => {
+    normalized[entry.key] = normalizeHexColor(colors?.[entry.key], entry.default);
+  });
+
+  return normalized;
+}
+
+function isTemplateImageField(fieldOrId) {
+  const target = typeof fieldOrId === 'string' ? fieldOrId : fieldOrId?.id;
+  return /(img|image|avatar|photo)$/i.test(target || '');
+}
+
+function sanitizeTemplateImageValue(rawValue) {
+  if (typeof rawValue !== 'string') {
+    return '';
+  }
+
+  const value = rawValue.trim();
+  if (!value) {
+    return '';
+  }
+
+  if (value.startsWith('file://')) {
+    try {
+      const url = new URL(value);
+      const pathname = decodeURIComponent(url.pathname || '');
+      return pathname.replace(/^\/([A-Za-z]:)/, '$1');
+    } catch {
+      return '';
+    }
+  }
+
+  if (/^[a-zA-Z]:[\\/]/.test(value) || value.startsWith('\\\\')) {
+    return value;
+  }
+
+  return '';
+}
+
+function normalizeTemplateValues(preset, values = {}) {
+  const defaults = buildTemplateDefaults(preset);
+  const normalized = { ...defaults };
+  if (!preset) {
+    return normalized;
+  }
+
+  preset.fields.forEach((field) => {
+    const rawValue = values[field.id];
+    const nextValue = typeof rawValue === 'string' ? rawValue : (rawValue ?? defaults[field.id] ?? '');
+    normalized[field.id] = isTemplateImageField(field)
+      ? sanitizeTemplateImageValue(nextValue)
+      : nextValue;
+  });
+
+  return normalized;
+}
+
+function buildTemplateTextFromValues(preset, values) {
+  if (!preset) {
+    return '';
+  }
+
+  return preset.fields
+    .filter((field) => !/(img|image|avatar|photo)$/i.test(field.id))
+    .map((field) => String(values?.[field.id] || '').trim())
+    .filter(Boolean)
+    .slice(0, 6)
+    .join(' ++ ');
+}
+
+function ensureTemplateState() {
+  const preset = getTemplatePreset();
+  if (!preset) {
+    return null;
+  }
+
+  if (!state.selectedTemplateId || !getTemplatePreset(state.selectedTemplateId)) {
+    state.selectedTemplateId = preset.id;
+  }
+
+  state.templateValues = normalizeTemplateValues(preset, state.templateValues);
+  state.templateColors = normalizeTemplateColors(preset.id, state.templateColors);
+
+  if (!state.textAnimationType || state.textAnimationType === 'live-reveal-dot') {
+    state.textAnimationType = preset.animationPreset || state.textAnimationType || 'motion-blur';
+  }
+
+  return preset;
+}
+
+function ensureTemplateSlide() {
+  const preset = ensureTemplateState();
+  if (!preset) {
+    return null;
+  }
+
+  const text = buildTemplateTextFromValues(preset, state.templateValues);
+  const existingSlide = state.slides.find((slide) => slide.id === TEMPLATE_SLIDE_ID) || state.slides[0] || {};
+  const imagePath = existingSlide.imagePath || state.placeholderPath || '';
+  const fileUrl = imagePath
+    ? (existingSlide.fileUrl || window.desktopApi.toFileUrl(imagePath))
+    : '';
+
+  const templateSlide = {
+    ...existingSlide,
+    id: TEMPLATE_SLIDE_ID,
+    imagePath,
+    fileUrl,
+    text,
+    isMuted: true,
+    voiceoverPath: existingSlide.voiceoverPath || null,
+    voiceoverUrl: existingSlide.voiceoverUrl || (existingSlide.voiceoverPath ? window.desktopApi.toFileUrl(existingSlide.voiceoverPath) : null),
+    voiceoverDurationMs: Number(existingSlide.voiceoverDurationMs || 0),
+  };
+
+  state.slides = [templateSlide];
+  state.selectedSlideId = TEMPLATE_SLIDE_ID;
+  return templateSlide;
+}
+
+function buildTemplateFieldInput(field, value) {
+  const control = document.createElement(field.type === 'textarea' ? 'textarea' : 'input');
+  control.className = 'input-v2';
+  control.value = value;
+  control.placeholder = field.placeholder || '';
+  control.dir = 'rtl';
+  control.autocomplete = 'off';
+
+  if (field.type === 'textarea') {
+    control.rows = Number(field.rows || 3);
+    control.style.resize = 'vertical';
+    control.style.lineHeight = '1.6';
+    control.style.minHeight = `${Math.max(84, Number(field.rows || 3) * 24)}px`;
+  } else {
+    control.type = field.type || 'text';
+  }
+
+  control.addEventListener('input', (event) => {
+    state.templateValues[field.id] = event.target.value;
+    ensureTemplateSlide();
+    markProjectDirty();
+    renderPreviewFrame();
+  });
+
+  return control;
+}
+
+function buildTemplateImageFieldCard(field, value) {
+  const card = document.createElement('div');
+  card.className = 'template-field-card full-span';
+
+  const label = document.createElement('label');
+  label.className = 'template-field-label';
+  label.textContent = field.label?.replace('Ø±Ø§Ø¨Ø· ', '').replace('Ø§Ù„Ø±Ø§Ø¨Ø· ', '').trim() || 'Ø§Ù„ØµÙˆØ±Ø©';
+  card.appendChild(label);
+
+  const previewBox = document.createElement('div');
+  previewBox.style.border = '1px solid var(--border)';
+  previewBox.style.background = 'var(--surface)';
+  previewBox.style.borderRadius = 'var(--r-md)';
+  previewBox.style.minHeight = '190px';
+  previewBox.style.display = 'flex';
+  previewBox.style.alignItems = 'center';
+  previewBox.style.justifyContent = 'center';
+  previewBox.style.overflow = 'hidden';
+  previewBox.style.marginBottom = '0.75rem';
+
+  const localPath = sanitizeTemplateImageValue(value);
+  if (localPath) {
+    const img = document.createElement('img');
+    img.src = window.desktopApi.toFileUrl(localPath);
+    img.alt = field.label || 'Template image';
+    img.style.width = '100%';
+    img.style.maxHeight = '260px';
+    img.style.objectFit = 'cover';
+    img.style.display = 'block';
+    previewBox.appendChild(img);
+  } else {
+    const empty = document.createElement('div');
+    empty.className = 'muted-text';
+    empty.style.padding = '1rem';
+    empty.style.textAlign = 'center';
+    empty.textContent = 'Ø§Ø®ØªØ± ØµÙˆØ±Ø© Ù…Ù† Ø§Ù„Ø¬Ù‡Ø§Ø² Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…Ù‡Ø§ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù‚Ø§Ù„Ø¨.';
+    previewBox.appendChild(empty);
+  }
+
+  const actions = document.createElement('div');
+  actions.style.display = 'flex';
+  actions.style.alignItems = 'center';
+  actions.style.justifyContent = 'space-between';
+  actions.style.gap = '0.75rem';
+  actions.style.flexWrap = 'wrap';
+
+  const fileLabel = document.createElement('div');
+  fileLabel.className = 'muted-text';
+  fileLabel.textContent = localPath ? prettifyPath(localPath) : 'Ù„Ù… ÙŠØªÙ… Ø§Ø®ØªÙŠØ§Ø± ØµÙˆØ±Ø©';
+  fileLabel.title = localPath || '';
+
+  const buttonsWrap = document.createElement('div');
+  buttonsWrap.style.display = 'flex';
+  buttonsWrap.style.gap = '0.5rem';
+  buttonsWrap.style.flexWrap = 'wrap';
+
+  const pickBtn = document.createElement('button');
+  pickBtn.type = 'button';
+  pickBtn.className = 'btn-secondary';
+  pickBtn.textContent = localPath ? 'Ø§Ø³ØªØ¨Ø¯Ø§Ù„ Ø§Ù„ØµÙˆØ±Ø©' : 'Ø§Ø®ØªÙŠØ§Ø± ØµÙˆØ±Ø©';
+  pickBtn.addEventListener('click', async () => {
+    const pickedImage = await (window.desktopApi.pickTemplateImage?.() || window.desktopApi.pickSlideImage());
+    if (!pickedImage) {
+      return;
+    }
+
+    const nextPath = sanitizeTemplateImageValue(pickedImage.imagePath || pickedImage.path || '');
+    if (!nextPath || !isSupportedSlideImage(nextPath)) {
+      setStatus('ØªÙ†Ø¨ÙŠÙ‡', 'Ø§Ù…ØªØ¯Ø§Ø¯ Ø§Ù„ØµÙˆØ±Ø© ØºÙŠØ± Ù…Ø¯Ø¹ÙˆÙ…. Ø§Ø³ØªØ®Ø¯Ù… PNG Ø£Ùˆ JPG Ø£Ùˆ JPEG Ø£Ùˆ WEBP.');
+      return;
+    }
+
+    state.templateValues[field.id] = nextPath;
+    ensureTemplateSlide();
+    markProjectDirty();
+    renderSlides();
+  });
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'btn-blue-outline';
+  clearBtn.textContent = 'Ø¥Ø²Ø§Ù„Ø©';
+  clearBtn.disabled = !localPath;
+  clearBtn.addEventListener('click', () => {
+    state.templateValues[field.id] = '';
+    ensureTemplateSlide();
+    markProjectDirty();
+    renderSlides();
+  });
+
+  buttonsWrap.appendChild(pickBtn);
+  buttonsWrap.appendChild(clearBtn);
+  actions.appendChild(fileLabel);
+  actions.appendChild(buttonsWrap);
+
+  card.appendChild(previewBox);
+  card.appendChild(actions);
+
+  const hint = document.createElement('span');
+  hint.className = 'template-field-hint';
+  hint.textContent = 'Ø§Ù„Ù‚ÙˆØ§Ù„Ø¨ ØªØ³ØªØ®Ø¯Ù… ØµÙˆØ±Ù‹Ø§ Ù…Ø­Ù„ÙŠØ© Ù…Ù† Ø¯Ø§Ø®Ù„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ØŒ ÙˆÙ„ÙŠØ³ Ø±ÙˆØ§Ø¨Ø· Ø®Ø§Ø±Ø¬ÙŠØ©.';
+  card.appendChild(hint);
+
+  return card;
+}
+
+function buildTemplateFieldCard(field, value) {
+  if (isTemplateImageField(field)) {
+    return buildTemplateImageFieldCard(field, value);
+  }
+
+  const card = document.createElement('div');
+  card.className = 'template-field-card';
+  if (field.type === 'textarea') {
+    card.classList.add('full-span');
+  }
+
+  const label = document.createElement('label');
+  label.className = 'template-field-label';
+  label.textContent = field.label;
+  card.appendChild(label);
+  card.appendChild(buildTemplateFieldInput(field, value));
+
+  if (field.placeholder) {
+    const hint = document.createElement('span');
+    hint.className = 'template-field-hint';
+    hint.textContent = field.placeholder;
+    card.appendChild(hint);
+  }
+
+  return card;
+}
+
+function applyTemplateSelection(templateId, { preserveExisting = true } = {}) {
+  const preset = getTemplatePreset(templateId);
+  if (!preset) {
+    return;
+  }
+
+  const previousValues = preserveExisting ? state.templateValues : {};
+  const previousColors = preserveExisting ? state.templateColors : {};
+  state.selectedTemplateId = preset.id;
+  state.templateValues = normalizeTemplateValues(preset, previousValues);
+  state.templateColors = normalizeTemplateColors(preset.id, previousColors);
+  state.textAnimationType = preset.animationPreset || state.textAnimationType || 'motion-blur';
+  ensureTemplateSlide();
+}
+
+function buildInfographProjectData() {
+  ensureTemplateSlide();
+  return {
+    slides: state.slides.map((slide) => ({ ...slide })),
+    template: {
+      selectedTemplateId: state.selectedTemplateId,
+      values: { ...state.templateValues },
+    },
+    media: {
+      frame: state.frame || state.overlay || '',
+      overlay: state.overlay,
+      music: state.music,
+      voiceover: state.voiceover,
+      voiceoverDurationMs: state.voiceoverDurationMs,
+      voiceoverVolume: state.voiceoverVolume,
+      musicVolume: state.musicVolume,
+      endPage: state.endPage,
+      endPageDisabledByUser: state.endPageDisabledByUser,
+      endPageDurationFrames: state.endPageDurationFrames,
+      endPageDurationSource: state.endPageDurationSource,
+    },
+    appearance: {
+      templateScale: state.templateScale,
+      templateX: state.templateX,
+      templateY: state.templateY,
+      templateColors: { ...state.templateColors },
+      effects: [...state.effects],
+      textPreset: state.textPreset,
+      textAnimationType: state.textAnimationType,
+      parallaxEnabled: state.parallaxEnabled,
+      cinematicBarSize: state.cinematicBarSize,
+      textFontSize: state.textFontSize,
+      textBottomOffset: state.textBottomOffset,
+      textHorizontalOffset: state.textHorizontalOffset,
+    },
+    timing: {
+      slideDurationInSeconds: state.slideDurationInSeconds,
+    },
+    render: {
+      turboMode: document.getElementById('turbo-render-checkbox')?.checked || false,
+    },
+    ui: {
+      selectedSlideId: state.selectedSlideId,
+      activeTab: getActiveTabId(),
+    },
+    settings: {
+      ttsModel: state.settings.ttsModel,
+      ttsVoice: state.settings.ttsVoice,
+      ttsStylePrompt: state.settings.ttsStylePrompt,
+      contentModel: state.settings.contentModel,
+      contentSystemPrompt: state.settings.contentSystemPrompt,
+    },
+  };
+}
+
+function buildProjectPayload() {
+  return {
+    projectType: PROJECT_TYPE,
+    appVersion: state.appVersion,
+    currentProjectPath: state.project.currentProjectPath,
+    projectName: state.project.projectName,
+    createdAt: state.project.createdAt,
+    data: buildInfographProjectData(),
+  };
+}
+
+function applyProjectMeta(project, filePath) {
+  state.project.currentProjectPath = filePath || '';
+  state.project.projectName = project?.projectName || (filePath ? prettifyPath(filePath).replace(/\.qwb$/i, '') : 'Qawaleb Project');
+  state.project.createdAt = project?.createdAt || state.project.createdAt;
+  state.project.lastSavedAt = project?.updatedAt || new Date().toISOString();
+  state.project.isDirty = false;
+}
+
+async function saveCurrentProject({ forceSaveAs = false, autosave = false } = {}) {
+  if (state.project.isSaving) return;
+
+  window.clearTimeout(autosaveTimerId);
+  state.project.isSaving = true;
+  updateProjectStatusUi('Ø¬Ø§Ø±Ù Ø§Ù„Ø­ÙØ¸...');
+  let failed = false;
+
+  try {
+    const savingRevision = projectChangeRevision;
+    const payload = buildProjectPayload();
+    const result = forceSaveAs
+      ? await window.projectApi.saveProjectAs(payload)
+      : await window.projectApi.saveProject(payload);
+
+    if (!result?.success) {
+      throw new Error(result?.error || 'ÙØ´Ù„ Ø§Ù„Ø­ÙØ¸');
+    }
+    if (result.canceled) {
+      return;
+    }
+
+    applyProjectMeta(result.project, result.filePath);
+    if (projectChangeRevision !== savingRevision) {
+      state.project.isDirty = true;
+      scheduleAutosave();
+    }
+    updateProjectStatusUi('ØªÙ… Ø§Ù„Ø­ÙØ¸');
+  } catch (err) {
+    failed = true;
+    if (!autosave) {
+      setStatus('Ø®Ø·Ø£', err?.message || 'ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹');
+    }
+    updateProjectStatusUi('ÙØ´Ù„ Ø§Ù„Ø­ÙØ¸');
+  } finally {
+    state.project.isSaving = false;
+    updateProjectStatusUi(failed ? 'ÙØ´Ù„ Ø§Ù„Ø­ÙØ¸' : undefined);
+  }
+}
+
+function normalizeProjectSlides(slides) {
+  return (Array.isArray(slides) ? slides : []).map((slide, index) => {
+    const imagePath = slide.imagePath || '';
+    return {
+      ...slide,
+      id: slide.id || `slide-${Date.now()}-${index}`,
+      imagePath,
+      fileUrl: slide.fileUrl || (imagePath ? window.desktopApi.toFileUrl(imagePath) : ''),
+      text: slide.text || '',
+      isMuted: slide.isMuted !== false,
+      voiceoverUrl: slide.voiceoverUrl || (slide.voiceoverPath ? window.desktopApi.toFileUrl(slide.voiceoverPath) : null),
+      voiceoverDurationMs: Number(slide.voiceoverDurationMs || 0),
+    };
+  });
+}
+
+async function applyOpenedProject(project, filePath) {
+  const data = project.data || {};
+  const template = data.template || {};
+  const media = data.media || {};
+  const appearance = data.appearance || {};
+  const timing = data.timing || {};
+  const ui = data.ui || {};
+
+  isApplyingProjectData = true;
+  try {
+    state.slides = normalizeProjectSlides(data.slides);
+    state.selectedTemplateId = template.selectedTemplateId || DEFAULT_TEMPLATE_ID;
+    state.templateValues = template.values && typeof template.values === 'object'
+      ? { ...template.values }
+      : {};
+    state.frame = media.frame || media.overlay || '';
+    state.overlay = state.frame;
+    state.music = media.music || '';
+    state.voiceover = media.voiceover || null;
+    state.voiceoverDurationMs = Number(media.voiceoverDurationMs || 0);
+    state.voiceoverVolume = Number(media.voiceoverVolume || 100);
+    state.musicVolume = Number(media.musicVolume || 50);
+    state.endPage = media.endPage || '';
+    state.endPageDisabledByUser = Boolean(media.endPageDisabledByUser);
+    state.endPageDurationFrames = Number(media.endPageDurationFrames || 0);
+    state.endPageDurationSource = media.endPageDurationSource || '';
+    state.templateScale = Math.max(0.7, Math.min(1.5, Number(appearance.templateScale || DEFAULT_TEMPLATE_SCALE)));
+    state.templateX = Number(appearance.templateX || 0);
+    state.templateY = Number(appearance.templateY || 0);
+    state.templateColors = appearance.templateColors && typeof appearance.templateColors === 'object'
+      ? { ...appearance.templateColors }
+      : {};
+    state.effects = Array.isArray(appearance.effects) ? [...appearance.effects] : [];
+    state.textPreset = appearance.textPreset || state.textPreset;
+    state.textAnimationType = appearance.textAnimationType || state.textAnimationType;
+    state.parallaxEnabled = appearance.parallaxEnabled !== false;
+    state.cinematicBarSize = Number(appearance.cinematicBarSize || state.cinematicBarSize);
+    state.textFontSize = Number(appearance.textFontSize || state.textFontSize);
+    state.textBottomOffset = Number(appearance.textBottomOffset || state.textBottomOffset);
+    state.textHorizontalOffset = Number(appearance.textHorizontalOffset || 0);
+    state.slideDurationInSeconds = Number(timing.slideDurationInSeconds || 20);
+    state.selectedSlideId = ui.selectedSlideId || null;
+
+    if (data.settings && typeof data.settings === 'object') {
+      state.settings = { ...state.settings, ...data.settings, geminiApiKey: state.settings.geminiApiKey };
+      updatePromptInspector();
+    }
+
+    const turboCheckbox = document.getElementById('turbo-render-checkbox');
+    if (turboCheckbox && data.render) {
+      turboCheckbox.checked = Boolean(data.render.turboMode);
+    }
+
+    applyProjectMeta(project, filePath);
+    ensureTemplateSlide();
+    syncAssetControlsV2();
+    await ensureEndPageDuration();
+    updateVoiceoverMeta();
+    renderSlides();
+    activateTab(ui.activeTab || 'tab-content-slides');
+    setStatus('Ø§Ù„Ù…Ø´Ø±ÙˆØ¹', 'ØªÙ… ÙØªØ­ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø¨Ù†Ø¬Ø§Ø­');
+  } finally {
+    isApplyingProjectData = false;
+    projectChangeRevision = 0;
+    state.project.isDirty = false;
+    updateProjectStatusUi();
+  }
+}
+
+async function openProjectFromDisk() {
+  const result = await window.projectApi.openProject({
+    isDirty: state.project.isDirty,
+    project: buildProjectPayload(),
+  });
+
+  if (!result?.success) {
+    setStatus('Ø®Ø·Ø£', result?.error || 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹');
+    updateProjectStatusUi('ÙØ´Ù„ Ø§Ù„Ø­ÙØ¸');
+    return;
+  }
+  if (result.canceled) {
+    return;
+  }
+
+  await applyOpenedProject(result.project, result.filePath);
+}
+
+function buildBadge(label, tone = '') {
+  const badge = document.createElement('span');
+  badge.className = tone ? `badge subtle ${tone}` : 'badge subtle';
+  badge.textContent = label;
+  return badge;
+}
+
+function createButton(label, classNames, title) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = classNames;
+  button.textContent = label;
+  if (title) {
+    button.title = title;
+  }
+  return button;
+}
+
+function findAsset(items, fileName) {
+  return items.find((item) => item.name === fileName) || null;
+}
+
+function findFrameAsset() {
+  return findAsset(state.assets.frame_sewar || [], state.frame || state.overlay);
+}
+
+function findOverlayAsset() {
+  return findFrameAsset() || findAsset(state.assets.overlays, state.overlay);
+}
+
+function findMusicAsset() {
+  return findAsset(state.assets.music, state.music);
+}
+
+function findEndPageAsset() {
+  return findAsset(state.assets.endpage, state.endPage);
+}
+
+function updateEndPageDurationHint() {
+  if (!state.endPage) {
+    elements.endPageDurationHint.textContent = '';
+    return;
+  }
+
+  const seconds = state.endPageDurationFrames > 0
+    ? (state.endPageDurationFrames / FPS).toFixed(1)
+    : '5.0';
+
+  elements.endPageDurationHint.textContent = `Ù…Ø¯Ø© Ø´Ø§Ø´Ø© Ø§Ù„Ø®ØªØ§Ù…: ${seconds} Ø«Ø§Ù†ÙŠØ©`;
+}
+
+async function readAudioDurationMs(fileUrl) {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audio.src = fileUrl;
+    audio.onloadedmetadata = () => resolve(Math.ceil(audio.duration * 1000));
+    audio.onerror = () => resolve(0);
+  });
+}
+
+function updateVoiceoverMeta() {
+  if (!elements.voiceoverMeta) return;
+  if (!state.voiceover || state.voiceoverDurationMs === 0) {
+    elements.voiceoverMeta.textContent = '';
+    return;
+  }
+  
+  const durationSec = state.voiceoverDurationMs / 1000;
+  const slideDur = Number(state.slideDurationInSeconds) || 20;
+  const slidesNeeded = Math.ceil(durationSec / slideDur);
+  
+  elements.voiceoverMeta.textContent = `${durationSec.toFixed(1)}Ø« (~${slidesNeeded} Ù…Ø´Ù‡Ø¯)`;
+}
+
+function updateRangeVisual(input) {
+  const min = Number(input.min || 0);
+  const max = Number(input.max || 100);
+  const value = Number(input.value || min);
+  const ratio = max > min ? ((value - min) / (max - min)) * 100 : 0;
+  input.style.setProperty('--range-fill', `${ratio}%`);
+}
+
+function renderTemplateColorControls() {
+  const container = elements.templateColorControls;
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = '';
+  const colorDefinitions = getTemplateColorDefinitions();
+
+  if (!colorDefinitions.length) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'template-color-empty';
+    emptyState.textContent = 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ù„ÙˆØ§Ù† Ù‚Ø§Ø¨Ù„Ø© Ù„Ù„ØªØ®ØµÙŠØµ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø§Ù„Ø¨ Ø­Ø§Ù„ÙŠÙ‹Ø§.';
+    container.appendChild(emptyState);
+    return;
+  }
+
+  colorDefinitions.forEach((definition, index) => {
+    const item = document.createElement('div');
+    item.className = 'template-color-item';
+    if (colorDefinitions.length % 2 === 1 && index === colorDefinitions.length - 1) {
+      item.classList.add('full-span');
+    }
+
+    const label = document.createElement('label');
+    label.textContent = definition.label;
+
+    const row = document.createElement('div');
+    row.className = 'template-color-row';
+
+    const swatch = document.createElement('input');
+    swatch.type = 'color';
+    swatch.className = 'template-color-swatch';
+    swatch.value = normalizeHexColor(state.templateColors?.[definition.key], definition.default);
+
+    const hexInput = document.createElement('input');
+    hexInput.type = 'text';
+    hexInput.className = 'input-v2 template-color-hex';
+    hexInput.value = swatch.value;
+    hexInput.spellcheck = false;
+    hexInput.autocomplete = 'off';
+
+    const applyColor = (rawValue, { normalizeOnBlur = false } = {}) => {
+      const nextValue = normalizeHexColor(rawValue, definition.default);
+      state.templateColors[definition.key] = nextValue;
+      swatch.value = nextValue;
+      hexInput.value = normalizeOnBlur ? nextValue.toUpperCase() : rawValue;
+      ensureTemplateSlide();
+      markProjectDirty();
+      renderPreviewFrame();
+    };
+
+    swatch.addEventListener('input', (event) => {
+      applyColor(event.target.value, { normalizeOnBlur: true });
+    });
+
+    hexInput.addEventListener('change', (event) => {
+      applyColor(event.target.value, { normalizeOnBlur: true });
+    });
+
+    hexInput.addEventListener('blur', () => {
+      const nextValue = normalizeHexColor(hexInput.value, definition.default);
+      state.templateColors[definition.key] = nextValue;
+      swatch.value = nextValue;
+      hexInput.value = nextValue.toUpperCase();
+    });
+
+    row.appendChild(swatch);
+    row.appendChild(hexInput);
+    item.appendChild(label);
+    item.appendChild(row);
+    container.appendChild(item);
+  });
+}
+
+function renderTextAnimationButtons() {
+  const container = elements.textAnimationButtons;
+  if (!container || container.dataset.ready === 'true') {
+    return;
+  }
+
+  container.innerHTML = '';
+  TEMPLATE_PRESETS.forEach((preset) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'animation-preset-btn';
+    button.dataset.templatePreset = preset.id;
+    button.dataset.templateLabel = preset.label;
+    button.setAttribute('role', 'radio');
+    button.setAttribute('aria-checked', 'false');
+    button.title = preset.description || preset.label;
+    button.textContent = preset.label;
+    container.appendChild(button);
+  });
+  container.dataset.ready = 'true';
+}
+
+function syncTextSettingsUi() {
+  renderTextAnimationButtons();
+  renderTemplateColorControls();
+
+  elements.fontSizeValue.textContent = `${state.textFontSize}px`;
+  elements.fontSizeInput.value = String(state.textFontSize);
+  if (elements.textPresetSelect) {
+    elements.textPresetSelect.value = state.textPreset;
+  }
+
+  if (elements.templateScaleInput && elements.templateScaleValue) {
+    const scalePercent = Math.round(state.templateScale * 100);
+    elements.templateScaleInput.value = String(scalePercent);
+    elements.templateScaleValue.textContent = `${scalePercent}%`;
+    updateRangeVisual(elements.templateScaleInput);
+  }
+
+  if (elements.templateXInput && elements.templateXValue) {
+    elements.templateXInput.value = String(state.templateX);
+    elements.templateXValue.textContent = `${state.templateX > 0 ? '+' : ''}${state.templateX}px`;
+    updateRangeVisual(elements.templateXInput);
+  }
+
+  if (elements.templateYInput && elements.templateYValue) {
+    elements.templateYInput.value = String(state.templateY);
+    elements.templateYValue.textContent = `${state.templateY > 0 ? '+' : ''}${state.templateY}px`;
+    updateRangeVisual(elements.templateYInput);
+  }
+
+  [elements.fontSizeInput].filter(Boolean).forEach(updateRangeVisual);
+
+  elements.textPresetButtons.forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.preset === state.textPreset);
+  });
+
+  if (elements.barSizeInput && elements.barSizeValue) {
+    elements.barSizeInput.value = String(state.cinematicBarSize);
+    elements.barSizeValue.textContent = `${state.cinematicBarSize}%`;
+    updateRangeVisual(elements.barSizeInput);
+  }
+  if (elements.animationRadios) {
+    elements.animationRadios.forEach(r => { r.checked = r.value === state.textAnimationType; });
+  }
+  if (elements.textAnimationButtons) {
+    elements.textAnimationButtons.querySelectorAll('[data-template-preset]').forEach((button) => {
+      const active = button.dataset.templatePreset === state.selectedTemplateId;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-checked', active ? 'true' : 'false');
+    });
+  }
+  if (elements.parallaxCheckbox) {
+    elements.parallaxCheckbox.checked = state.parallaxEnabled !== false;
+  }
+}
+
+function isVideoFile(value) {
+  return /\.(mp4|mov|webm|m4v)$/i.test(value || '');
+}
+
+function isSupportedSlideImage(value) {
+  return /\.(png|jpe?g|webp)$/i.test(value || '');
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getTransitionType(index) {
+  if (index <= 0) {
+    return 'fade';
+  }
+
+  return TRANSITION_OPTIONS[(index - 1) % TRANSITION_OPTIONS.length];
+}
+
+function getPreviewTimeline() {
+  const slideCount = state.slides.length;
+  const slideDurationMs = Math.max(2000, Number(state.slideDurationInSeconds || 20) * 1000);
+  const overlapMs = slideCount > 1 ? Math.min(1000, Math.max(300, slideDurationMs - 500)) : 0;
+  const offsetMs = slideDurationMs - overlapMs;
+  const slideEndMs = slideCount > 0 ? ((slideCount - 1) * offsetMs) + slideDurationMs : 0;
+  const endPageMs = state.endPage && state.endPageDurationFrames > 0
+    ? Math.round((state.endPageDurationFrames / FPS) * 1000)
+    : 0;
+
+  return {
+    slideCount,
+    slideDurationMs,
+    overlapMs,
+    offsetMs,
+    slideEndMs,
+    endPageMs,
+    totalMs: slideEndMs + endPageMs,
+  };
+}
+
+function formatClock(totalMs) {
+  const totalSeconds = Math.max(0, Math.floor(totalMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function syncStateWithAssets() {
+  if (!findFrameAsset()) {
+    state.frame = '';
+    state.overlay = '';
+  }
+
+  if (!findOverlayAsset()) {
+    state.overlay = '';
+  }
+
+  if (!findMusicAsset()) {
+    state.music = '';
+  }
+
+  if (!findEndPageAsset()) {
+    if (!state.endPageDisabledByUser && state.assets.endpage.length > 0) {
+      state.endPage = state.assets.endpage[0].name;
+    } else {
+      state.endPage = '';
+      state.endPageDurationFrames = 0;
+      state.endPageDurationSource = '';
+    }
+  }
+}
+
+function syncSelectedSlide() {
+  ensureTemplateSlide();
+  if (state.slides.length === 0) {
+    state.selectedSlideId = null;
+    return;
+  }
+
+  if (!state.slides.some((slide) => slide.id === state.selectedSlideId)) {
+    state.selectedSlideId = state.slides[0].id;
+  }
+}
+
+function getSelectedSlideIndex() {
+  syncSelectedSlide();
+  return state.slides.findIndex((slide) => slide.id === state.selectedSlideId);
+}
+
+function clearDragState() {
+  state.draggedSlideId = null;
+  state.dragOverSlideId = null;
+}
+
+function updateDragOverClasses() {
+  if (!elements.slidesList) {
+    return;
+  }
+  Array.from(elements.slidesList.querySelectorAll('.slide-card')).forEach((card) => {
+    card.classList.toggle('drag-over', card.dataset.slideId === state.dragOverSlideId);
+  });
+}
+
+function buildExactPreviewInputProps() {
+  ensureTemplateSlide();
+  const overlayAsset = findOverlayAsset();
+  const musicAsset = findMusicAsset();
+  const endPageAsset = findEndPageAsset();
+
+  return {
+    slides: state.slides.map((slide) => ({
+      id: slide.id,
+      imageUrl: slide.fileUrl,
+      text: slide.text || '',
+      isMuted: slide.isMuted !== false,
+      voiceoverUrl: slide.voiceoverUrl || null,
+      voiceoverDurationMs: slide.voiceoverDurationMs || 0,
+    })),
+    overlay: overlayAsset ? overlayAsset.url : null,
+    music: musicAsset ? musicAsset.url : null,
+    voiceover: state.voiceover ? window.desktopApi.toFileUrl(state.voiceover) : null,
+    endPage: endPageAsset ? endPageAsset.url : null,
+    slideDurationInSeconds: Number(state.slideDurationInSeconds || 20),
+    effects: [...state.effects],
+    endPageDurationFrames: Number(state.endPageDurationFrames || 0),
+    textBottomOffset: Number(state.textBottomOffset || 160),
+    textFontSize: Number(state.textFontSize || 46),
+    textPreset: state.textPreset,
+    textAnimationType: state.textAnimationType || 'motion-blur',
+    textHorizontalOffset: Number(state.textHorizontalOffset || 0),
+    parallaxEnabled: state.parallaxEnabled !== false,
+    cinematicBarSize: Number(state.cinematicBarSize || 6),
+    musicVolume: Number(state.musicVolume),
+    voiceoverVolume: Number(state.voiceoverVolume),
+  };
+}
+
+function buildTemplatePreviewInputProps() {
+  const musicAsset = findMusicAsset();
+  const frameAsset = findFrameAsset();
+
+  return {
+    templateId: getTemplatePreset()?.id || DEFAULT_TEMPLATE_ID,
+    templateValues: Object.fromEntries(
+      Object.entries(state.templateValues || {}).map(([key, value]) => [key, normalizeTemplatePreviewValue(value)]),
+    ),
+    templateColors: { ...state.templateColors },
+    templateScale: Number(state.templateScale || DEFAULT_TEMPLATE_SCALE),
+    templateX: Number(state.templateX || 0),
+    templateY: Number(state.templateY || 0),
+    textFontSize: Number(state.textFontSize || DEFAULT_TEMPLATE_FONT_SIZE),
+    frameUrl: frameAsset ? frameAsset.url : null,
+    durationMs: getTemplatePreviewDurationMs(),
+    musicUrl: musicAsset ? musicAsset.url : null,
+    musicVolume: Math.max(0, Math.min(1, Number(state.musicVolume || 0) / 100)),
+    voiceoverUrl: state.voiceover ? window.desktopApi.toFileUrl(state.voiceover) : null,
+    voiceoverVolume: Math.max(0, Math.min(2, Number(state.voiceoverVolume || 100) / 100)),
+  };
+}
+
+function getExactPreviewDurationInFrames() {
+  ensureTemplateSlide();
+  const fps = FPS;
+  const framesPerSlide = Math.floor(Number(state.slideDurationInSeconds || 20) * fps);
+  const overlapFrames = 30;
+  const validSlides = state.slides.filter((slide) => slide.fileUrl);
+
+  if (validSlides.length === 0) {
+    return 30;
+  }
+
+  const slideFrames = (validSlides.length * (framesPerSlide - overlapFrames)) + overlapFrames;
+  const endPageFrames = state.endPage ? Math.max(0, Number(state.endPageDurationFrames || 0)) : 0;
+  return slideFrames + endPageFrames;
+}
+
+function ensureExactPreviewMounted() {
+  const preset = getTemplatePreset();
+  if (!preset) {
+    return false;
+  }
+
+  document.body.classList.add('preview-uses-template');
+  let mountNode = document.getElementById('preview-exact-root');
+  if (!mountNode) return false;
+
+  let iframe = mountNode.querySelector('iframe');
+  if (!iframe) {
+    mountNode.innerHTML = '';
+    iframe = document.createElement('iframe');
+    iframe.className = 'template-preview-frame';
+    iframe.setAttribute('title', preset.label || 'Qawaleb template preview');
+    iframe.setAttribute('allow', 'autoplay');
+    iframe.setAttribute('loading', 'eager');
+    iframe.addEventListener('load', () => {
+      exactPreviewRef.loaded = true;
+      exactPreviewRef.signature = '';
+      syncTemplatePreviewContent(true);
+    });
+    mountNode.appendChild(iframe);
+  }
+
+  exactPreviewRef.iframe = iframe;
+  return true;
+}
+
+function renderExactPreview() {
+  const preset = getTemplatePreset();
+  if (!preset) {
+    return false;
+  }
+
+  if (hasExactPreviewPlayer()) {
+    document.body.classList.add('preview-uses-template');
+    const mountNode = document.getElementById('preview-exact-root');
+    const api = templatePreviewApi();
+    if (!mountNode || !api) {
+      return false;
+    }
+
+    if (mountNode.querySelector('iframe')) {
+      mountNode.innerHTML = '';
+    }
+
+    api.mount(mountNode);
+    api.update({
+      inputProps: buildTemplatePreviewInputProps(),
+      durationInFrames: getTemplatePreviewDurationInFrames(),
+    });
+    if (!state.previewPlaying && state.previewPositionMs > 0) {
+      api.seekTo(Math.round((state.previewPositionMs / 1000) * FPS));
+    }
+    syncTemplatePreviewUi();
+    return true;
+  }
+
+  if (!ensureExactPreviewMounted()) {
+    return false;
+  }
+
+  const nextSrc = getTemplatePreviewSource(preset);
+  if (exactPreviewRef.src !== nextSrc || exactPreviewRef.templateId !== preset.id) {
+    exactPreviewRef.src = nextSrc;
+    exactPreviewRef.templateId = preset.id;
+    exactPreviewRef.loaded = false;
+    exactPreviewRef.signature = '';
+    if (exactPreviewRef.iframe) {
+      exactPreviewRef.iframe.src = nextSrc;
+    }
+  } else {
+    syncTemplatePreviewContent();
+  }
+
+  syncTemplatePreviewUi();
+  return true;
+}
+
+function moveSlide(fromIndex, toIndex) {
+  if (
+    fromIndex === toIndex ||
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= state.slides.length ||
+    toIndex >= state.slides.length
+  ) {
+    return;
+  }
+
+  const nextSlides = [...state.slides];
+  const [movedSlide] = nextSlides.splice(fromIndex, 1);
+  nextSlides.splice(toIndex, 0, movedSlide);
+  state.slides = nextSlides;
+  markProjectDirty();
+}
+
+function reorderSlidesById(draggedSlideId, targetSlideId) {
+  if (!draggedSlideId || !targetSlideId || draggedSlideId === targetSlideId) {
+    return;
+  }
+
+  const fromIndex = state.slides.findIndex((slide) => slide.id === draggedSlideId);
+  const toIndex = state.slides.findIndex((slide) => slide.id === targetSlideId);
+  moveSlide(fromIndex, toIndex);
+}
+
+async function handleReplaceSlideImage(slideId) {
+  if (state.replacingSlideImageId) {
+    return;
+  }
+
+  const slide = state.slides.find((item) => item.id === slideId);
+  if (!slide) {
+    return;
+  }
+
+  state.selectedSlideId = slideId;
+  state.replacingSlideImageId = slideId;
+  renderSlides();
+  updateProjectStatusUi();
+
+  try {
+    const pickedImage = await window.desktopApi.pickSlideImage();
+    if (!pickedImage) {
+      return;
+    }
+
+    if (!isSupportedSlideImage(pickedImage.imagePath || pickedImage.fileUrl)) {
+      setStatus('Ø®Ø·Ø£', 'Ø§Ø®ØªØ± ØµÙˆØ±Ø© Ø¨ØµÙŠØºØ© PNG Ø£Ùˆ JPG Ø£Ùˆ JPEG Ø£Ùˆ WEBP');
+      return;
+    }
+
+    const currentSlide = state.slides.find((item) => item.id === slideId);
+    if (!currentSlide) {
+      return;
+    }
+
+    currentSlide.imagePath = pickedImage.imagePath;
+    currentSlide.fileUrl = pickedImage.fileUrl;
+    markProjectDirty();
+    setStatus('Ø§Ù„Ø´Ø±Ø§Ø¦Ø­', 'ØªÙ… ØªØºÙŠÙŠØ± ØµÙˆØ±Ø© Ø§Ù„Ø´Ø±ÙŠØ­Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø©');
+  } catch (err) {
+    setStatus('Ø®Ø·Ø£', err?.message || 'ØªØ¹Ø°Ø± ØªØºÙŠÙŠØ± ØµÙˆØ±Ø© Ø§Ù„Ø´Ø±ÙŠØ­Ø©');
+  } finally {
+    state.replacingSlideImageId = null;
+    renderSlides();
+  }
+}
+
+function ensurePreviewShell() {
+  if (ensureExactPreviewMounted()) {
+    return;
+  }
+
+  if (previewRefs.runtime) {
+    return;
+  }
+
+  elements.previewStage.innerHTML = '';
+
+  const runtime = document.createElement('div');
+  runtime.className = 'preview-runtime';
+
+  const slideLayerOne = document.createElement('div');
+  slideLayerOne.className = 'preview-slide-layer';
+  const slideImageOne = document.createElement('img');
+  slideImageOne.className = 'preview-media';
+  slideLayerOne.appendChild(slideImageOne);
+
+  const slideLayerTwo = document.createElement('div');
+  slideLayerTwo.className = 'preview-slide-layer';
+  const slideImageTwo = document.createElement('img');
+  slideImageTwo.className = 'preview-media';
+  slideLayerTwo.appendChild(slideImageTwo);
+
+  const endPageLayer = document.createElement('div');
+  endPageLayer.className = 'preview-endpage-layer';
+  const endPageVideo = document.createElement('video');
+  endPageVideo.className = 'preview-media';
+  endPageVideo.preload = 'auto';
+  endPageVideo.playsInline = true;
+  endPageVideo.loop = false;
+  endPageLayer.appendChild(endPageVideo);
+
+  const overlayLayer = document.createElement('div');
+  overlayLayer.className = 'preview-overlay-layer';
+
+  const lightLeakFlash = document.createElement('div');
+  lightLeakFlash.className = 'preview-light-leak-flash';
+
+  const effectLayer = document.createElement('div');
+  effectLayer.className = 'preview-effects-layer';
+
+  const dust = document.createElement('div');
+  dust.className = 'preview-effect effect-dust';
+  effectLayer.appendChild(dust);
+
+  const leak = document.createElement('div');
+  leak.className = 'preview-effect effect-light-leak';
+  effectLayer.appendChild(leak);
+
+  const bokeh = document.createElement('div');
+  bokeh.className = 'preview-effect effect-bokeh';
+  effectLayer.appendChild(bokeh);
+
+  const textGradient = document.createElement('div');
+  textGradient.className = 'preview-text-gradient';
+
+  const textWrap = document.createElement('div');
+  textWrap.className = 'preview-text-wrap';
+  const textBar = document.createElement('div');
+  textBar.className = 'preview-text-bar';
+  textWrap.appendChild(textBar);
+
+  const cornerBadge = document.createElement('div');
+  cornerBadge.className = 'preview-corner-badge';
+  cornerBadge.textContent = 'Preview';
+
+  runtime.appendChild(slideLayerOne);
+  runtime.appendChild(slideLayerTwo);
+  runtime.appendChild(endPageLayer);
+  runtime.appendChild(overlayLayer);
+  runtime.appendChild(lightLeakFlash);
+  runtime.appendChild(effectLayer);
+  runtime.appendChild(textGradient);
+  runtime.appendChild(textWrap);
+  runtime.appendChild(cornerBadge);
+  elements.previewStage.appendChild(runtime);
+
+  const musicAudio = document.createElement('audio');
+  musicAudio.preload = 'auto';
+  musicAudio.loop = true;
+  musicAudio.className = 'preview-hidden-media';
+  elements.previewStage.appendChild(musicAudio);
+
+  previewRefs.runtime = runtime;
+  previewRefs.slideLayers = [
+    { container: slideLayerOne, media: slideImageOne },
+    { container: slideLayerTwo, media: slideImageTwo },
+  ];
+  previewRefs.endPageLayer = endPageLayer;
+  previewRefs.endPageVideo = endPageVideo;
+  previewRefs.overlayLayer = overlayLayer;
+  previewRefs.effectLayer = effectLayer;
+  previewRefs.effectDust = dust;
+  previewRefs.effectLeak = leak;
+  previewRefs.effectBokeh = bokeh;
+  previewRefs.textGradient = textGradient;
+  previewRefs.textWrap = textWrap;
+  previewRefs.textBar = textBar;
+  previewRefs.lightLeakFlash = lightLeakFlash;
+  previewRefs.musicAudio = musicAudio;
+}
+
+function stopPreviewLoop() {
+  if (state.previewRafId) {
+    cancelAnimationFrame(state.previewRafId);
+    state.previewRafId = null;
+  }
+}
+
+function pauseMedia(media) {
+  if (!media) {
+    return;
+  }
+
+  try {
+    media.pause();
+  } catch {
+    // Ignore preview media pause failures.
+  }
+}
+
+function clearMediaSource(media) {
+  if (!media) {
+    return;
+  }
+
+  pauseMedia(media);
+  media.removeAttribute('src');
+  media.dataset.src = '';
+  try {
+    media.load();
+  } catch {
+    // Ignore preview media reset failures.
+  }
+}
+
+function ensureOverlayElement(asset) {
+  if (!asset) {
+    previewRefs.overlayLayer.innerHTML = '';
+    previewRefs.overlayVideo = null;
+    previewRefs.overlayImage = null;
+    previewRefs.overlayLayer.dataset.kind = '';
+    return;
+  }
+
+  const isVideo = isVideoFile(asset.name);
+  const currentKind = previewRefs.overlayLayer.dataset.kind || '';
+  const wantedKind = isVideo ? 'video' : 'image';
+
+  if (currentKind === wantedKind) {
+    return;
+  }
+
+  previewRefs.overlayLayer.innerHTML = '';
+  previewRefs.overlayLayer.dataset.kind = wantedKind;
+
+  if (isVideo) {
+    const video = document.createElement('video');
+    video.className = 'preview-overlay-media';
+    video.preload = 'auto';
+    video.playsInline = true;
+    video.loop = true;
+    video.muted = true;
+    previewRefs.overlayLayer.appendChild(video);
+    previewRefs.overlayVideo = video;
+    previewRefs.overlayImage = null;
+    return;
+  }
+
+  const image = document.createElement('img');
+  image.className = 'preview-overlay-media';
+  previewRefs.overlayLayer.appendChild(image);
+  previewRefs.overlayImage = image;
+  previewRefs.overlayVideo = null;
+}
+
+function syncLoopingMedia(media, src, currentSeconds, shouldPlay, muted, volume) {
+  if (!media) {
+    return;
+  }
+
+  if (!src) {
+    media.style.display = 'none';
+    clearMediaSource(media);
+    return;
+  }
+
+  media.style.display = '';
+  if (media.dataset.src !== src) {
+    media.src = src;
+    media.dataset.src = src;
+  }
+
+  media.muted = Boolean(muted);
+  if (typeof volume === 'number') {
+    media.volume = volume;
+  }
+
+  const applyCurrentTime = () => {
+    const duration = Number.isFinite(media.duration) && media.duration > 0 ? media.duration : null;
+    const safeTime = duration
+      ? clamp(currentSeconds % duration, 0, Math.max(0, duration - 0.05))
+      : Math.max(0, currentSeconds);
+
+    if (Math.abs((media.currentTime || 0) - safeTime) > 0.35) {
+      try {
+        media.currentTime = safeTime;
+      } catch {
+        // Ignore preview media seek failures.
+      }
+    }
+  };
+
+  if (media.readyState >= 1) {
+    applyCurrentTime();
+  } else {
+    media.addEventListener('loadedmetadata', applyCurrentTime, { once: true });
+  }
+
+  if (shouldPlay) {
+    media.play().catch(() => {});
+  } else {
+    pauseMedia(media);
+  }
+}
+
+function syncFiniteVideo(media, src, currentSeconds, shouldPlay) {
+  if (!media) {
+    return;
+  }
+
+  if (!src) {
+    media.style.display = 'none';
+    clearMediaSource(media);
+    return;
+  }
+
+  media.style.display = '';
+  if (media.dataset.src !== src) {
+    media.src = src;
+    media.dataset.src = src;
+  }
+
+  const applyCurrentTime = () => {
+    const duration = Number.isFinite(media.duration) && media.duration > 0 ? media.duration : null;
+    const safeTime = duration
+      ? clamp(currentSeconds, 0, Math.max(0, duration - 0.05))
+      : Math.max(0, currentSeconds);
+
+    if (Math.abs((media.currentTime || 0) - safeTime) > 0.35) {
+      try {
+        media.currentTime = safeTime;
+      } catch {
+        // Ignore preview media seek failures.
+      }
+    }
+  };
+
+  if (media.readyState >= 1) {
+    applyCurrentTime();
+  } else {
+    media.addEventListener('loadedmetadata', applyCurrentTime, { once: true });
+  }
+
+  if (shouldPlay) {
+    media.play().catch(() => {});
+  } else {
+    pauseMedia(media);
+  }
+}
+
+function getVisibleSlideLayers(currentMs, timeline) {
+  const visible = [];
+
+  state.slides.forEach((slide, index) => {
+    const startMs = index * timeline.offsetMs;
+    const endMs = startMs + timeline.slideDurationMs;
+
+    if (currentMs < startMs || currentMs > endMs) {
+      return;
+    }
+
+    const localMs = currentMs - startMs;
+    const progress = clamp(localMs / timeline.slideDurationMs, 0, 1);
+    const transitionType = getTransitionType(index);
+    let opacity = 1;
+    let filter = '';
+    let clipPath = '';
+    let transitionProgress = 1;
+
+    if (index > 0 && localMs < timeline.overlapMs) {
+      transitionProgress = clamp(localMs / timeline.overlapMs, 0, 1);
+
+      if (transitionType === 'fade' || transitionType === 'light-leak') {
+        opacity = transitionProgress;
+      }
+
+      if (transitionType === 'blur-wipe') {
+        opacity = 0.45 + (transitionProgress * 0.55);
+        filter = `blur(${(1 - transitionProgress) * 22}px)`;
+        const clipStart = 100 - (transitionProgress * 100);
+        clipPath = `polygon(${clipStart}% 0, 100% 0, 100% 100%, ${clipStart}% 100%)`;
+      }
+    }
+
+    const isZoomIn = index % 2 === 0;
+    const startScale = isZoomIn ? 1.0 : 1.06;
+    const endScale = isZoomIn ? 1.06 : 1.0;
+    const scale = startScale + ((endScale - startScale) * progress);
+
+    visible.push({
+      slide,
+      index,
+      opacity,
+      filter,
+      clipPath,
+      scale,
+      transitionType,
+      transitionProgress,
+    });
+  });
+
+  return visible.slice(-2);
+}
+
+function updatePreviewMeta(items) {
+  void items;
+}
+
+function applySlideLayer(slot, layerData) {
+  const slotRef = previewRefs.slideLayers[slot];
+  if (!slotRef) {
+    return;
+  }
+
+  if (!layerData) {
+    slotRef.container.style.opacity = '0';
+    slotRef.container.style.display = 'none';
+    return;
+  }
+
+  slotRef.container.style.display = '';
+  slotRef.container.style.opacity = String(layerData.opacity);
+  slotRef.container.style.filter = layerData.filter;
+  slotRef.container.style.clipPath = layerData.clipPath || 'none';
+  slotRef.container.style.zIndex = String(10 + slot);
+
+  if (slotRef.media.dataset.src !== layerData.slide.fileUrl) {
+    slotRef.media.src = layerData.slide.fileUrl;
+    slotRef.media.dataset.src = layerData.slide.fileUrl;
+  }
+
+  slotRef.media.style.transform = `scale(${layerData.scale})`;
+}
+
+function updateEffectLayer() {
+  previewRefs.effectDust.style.display = state.effects.includes('dust') ? 'block' : 'none';
+  previewRefs.effectLeak.style.display = state.effects.includes('light-leak') ? 'block' : 'none';
+  previewRefs.effectBokeh.style.display = state.effects.includes('bokeh') ? 'block' : 'none';
+}
+
+function updatePreviewPlayerUi(timeline) {
+  const totalMs = timeline.totalMs;
+  const safePosition = clamp(state.previewPositionMs, 0, totalMs || 0);
+  const sliderValue = totalMs > 0 ? Math.round((safePosition / totalMs) * 1000) : 0;
+
+  elements.previewSeek.disabled = totalMs <= 0;
+  elements.previewSeek.value = String(sliderValue);
+  elements.previewTimeInline.textContent = `${formatClock(safePosition)} / ${formatClock(totalMs)}`;
+  elements.previewPlayBtn.textContent = state.previewPlaying ? 'âšâš' : 'â–¶';
+  elements.previewMuteBtn.textContent = state.previewMuted ? 'ðŸ”‡' : 'ðŸ”Š';
+  elements.previewPlayBtn.disabled = totalMs <= 0;
+}
+
+function syncPreviewButtonUi(timeline) {
+  const disabled = timeline.totalMs <= 0;
+  elements.previewPlayBtn.textContent = state.previewPlaying ? 'âšâš' : 'â–¶';
+  elements.previewMuteBtn.textContent = state.previewMuted ? 'ðŸ”‡' : 'ðŸ”Š';
+  elements.previewMuteBtn.disabled = disabled;
+  elements.previewRestartBtn.disabled = disabled;
+}
+
+function renderPreviewFrame() {
+  updateTemplateRuntimeSummary();
+  if (renderExactPreview()) {
+    return;
+  }
+
+  ensurePreviewShell();
+  syncStateWithAssets();
+  syncSelectedSlide();
+
+  const timeline = getPreviewTimeline();
+  const totalMs = timeline.totalMs;
+
+  if (totalMs <= 0) {
+    previewRefs.slideLayers.forEach((slotRef) => {
+      slotRef.container.style.display = 'none';
+    });
+    previewRefs.endPageLayer.style.display = 'none';
+    previewRefs.overlayLayer.style.display = 'none';
+    previewRefs.textGradient.style.display = 'none';
+    previewRefs.textWrap.style.display = 'none';
+    previewRefs.lightLeakFlash.style.opacity = '0';
+    updateEffectLayer();
+    updatePreviewPlayerUi(timeline);
+    syncPreviewButtonUi(timeline);
+    pauseMedia(previewRefs.musicAudio);
+    pauseMedia(previewRefs.overlayVideo);
+    pauseMedia(previewRefs.endPageVideo);
+    return;
+  }
+
+  state.previewPositionMs = clamp(state.previewPositionMs, 0, totalMs);
+  const currentMs = state.previewPositionMs;
+  const overlayAsset = findOverlayAsset();
+  const musicAsset = findMusicAsset();
+  const endPageAsset = findEndPageAsset();
+  const inEndPage = Boolean(endPageAsset) && currentMs >= timeline.slideEndMs;
+
+  updatePreviewPlayerUi(timeline);
+  syncPreviewButtonUi(timeline);
+  updateEffectLayer();
+
+  if (inEndPage && endPageAsset) {
+    previewRefs.slideLayers.forEach((slotRef) => {
+      slotRef.container.style.display = 'none';
+    });
+
+    previewRefs.endPageLayer.style.display = '';
+    syncFiniteVideo(
+      previewRefs.endPageVideo,
+      endPageAsset.url,
+      Math.max(0, (currentMs - timeline.slideEndMs) / 1000),
+      state.previewPlaying,
+    );
+
+    previewRefs.textGradient.style.display = 'none';
+    previewRefs.textWrap.style.display = 'none';
+    previewRefs.lightLeakFlash.style.opacity = '0';
+  } else {
+    pauseMedia(previewRefs.endPageVideo);
+    previewRefs.endPageLayer.style.display = 'none';
+
+    const visibleLayers = getVisibleSlideLayers(currentMs, timeline);
+    applySlideLayer(0, visibleLayers[0] || null);
+    applySlideLayer(1, visibleLayers[1] || null);
+
+    const activeLayer = visibleLayers[visibleLayers.length - 1] || null;
+    if (activeLayer && activeLayer.slide.text) {
+      const preset = TEXT_PRESET_STYLES[state.textPreset] || TEXT_PRESET_STYLES.dark;
+      const bottomOffsetPercent = Math.max(18, Math.min(38, (state.textBottomOffset / 1080) * 100));
+      const previewFontSize = Math.max(18, Math.min(56, Math.round(state.textFontSize * 0.72)));
+
+      previewRefs.textGradient.style.display = '';
+      previewRefs.textWrap.style.display = '';
+      previewRefs.textWrap.style.bottom = `${bottomOffsetPercent}%`;
+      previewRefs.textWrap.style.transform = state.textHorizontalOffset ? `translateX(${state.textHorizontalOffset}%)` : '';
+      previewRefs.textBar.textContent = activeLayer.slide.text;
+      previewRefs.textBar.style.backgroundColor = preset.bg;
+      previewRefs.textBar.style.color = preset.color;
+      previewRefs.textBar.style.borderColor = preset.border;
+      previewRefs.textBar.style.fontSize = `${previewFontSize}px`;
+      previewRefs.textWrap.style.opacity = String(activeLayer.opacity);
+    } else {
+      previewRefs.textGradient.style.display = 'none';
+      previewRefs.textWrap.style.display = 'none';
+    }
+
+    if (
+      activeLayer &&
+      activeLayer.transitionType === 'light-leak' &&
+      activeLayer.index > 0 &&
+      activeLayer.transitionProgress < 1
+    ) {
+      const intensity = Math.sin(activeLayer.transitionProgress * Math.PI);
+      previewRefs.lightLeakFlash.style.opacity = String(0.45 * intensity);
+    } else {
+      previewRefs.lightLeakFlash.style.opacity = '0';
+    }
+  }
+
+  ensureOverlayElement(overlayAsset);
+  if (overlayAsset) {
+    previewRefs.overlayLayer.style.display = '';
+    if (previewRefs.overlayVideo) {
+      syncLoopingMedia(
+        previewRefs.overlayVideo,
+        overlayAsset.url,
+        currentMs / 1000,
+        state.previewPlaying,
+        true,
+        0,
+      );
+    } else if (previewRefs.overlayImage) {
+      previewRefs.overlayImage.src = overlayAsset.url;
+      previewRefs.overlayImage.alt = prettifyPath(overlayAsset.name);
+    }
+  } else {
+    previewRefs.overlayLayer.style.display = 'none';
+    pauseMedia(previewRefs.overlayVideo);
+  }
+
+  if (musicAsset) {
+    const fadeStartMs = Math.max(0, totalMs - 1500);
+    const fadeVolume = currentMs >= fadeStartMs && totalMs > fadeStartMs
+      ? 1 - ((currentMs - fadeStartMs) / (totalMs - fadeStartMs))
+      : 1;
+
+    syncLoopingMedia(
+      previewRefs.musicAudio,
+      musicAsset.url,
+      currentMs / 1000,
+      state.previewPlaying,
+      state.previewMuted,
+      state.previewMuted ? 0 : clamp(fadeVolume, 0, 1),
+    );
+  } else {
+    pauseMedia(previewRefs.musicAudio);
+  }
+}
+
+function setPreviewPosition(nextMs) {
+  if (isTemplatePreviewMode()) {
+    const totalMs = getTemplatePreviewDurationMs();
+    state.previewPositionMs = clamp(nextMs, 0, totalMs || 0);
+    if (hasExactPreviewPlayer()) {
+      templatePreviewApi()?.seekTo(Math.round((state.previewPositionMs / 1000) * FPS));
+    } else if (exactPreviewRef.loaded) {
+      postTemplatePreviewMessage({
+        type: 'qawaleb:seek',
+        timeMs: state.previewPositionMs,
+        playing: state.previewPlaying,
+      });
+      if (state.previewPlaying) {
+        postTemplatePreviewMessage({
+          type: 'qawaleb:set-playing',
+          playing: true,
+        });
+      }
+    }
+    syncTemplatePreviewUi();
+    return;
+  }
+
+  const timeline = getPreviewTimeline();
+  state.previewPositionMs = clamp(nextMs, 0, timeline.totalMs || 0);
+  renderPreviewFrame();
+}
+
+function stepPreviewFrame(timestamp) {
+  if (!state.previewPlaying) {
+    stopPreviewLoop();
+    return;
+  }
+
+  if (!state.previewStartedAt) {
+    state.previewStartedAt = timestamp - state.previewPositionMs;
+  }
+
+  if (isTemplatePreviewMode()) {
+    const totalMs = getTemplatePreviewDurationMs();
+    if (totalMs <= 0) {
+      state.previewPlaying = false;
+      state.previewStartedAt = 0;
+      syncTemplatePreviewUi();
+      stopPreviewLoop();
+      return;
+    }
+
+    const elapsed = timestamp - state.previewStartedAt;
+    state.previewPositionMs = elapsed % totalMs;
+    syncTemplatePreviewUi();
+    state.previewRafId = requestAnimationFrame(stepPreviewFrame);
+    return;
+  }
+
+  const timeline = getPreviewTimeline();
+  if (timeline.totalMs <= 0) {
+    state.previewPlaying = false;
+    state.previewStartedAt = 0;
+    renderPreviewFrame();
+    stopPreviewLoop();
+    return;
+  }
+
+  const elapsed = timestamp - state.previewStartedAt;
+  state.previewPositionMs = elapsed % timeline.totalMs;
+  renderPreviewFrame();
+  state.previewRafId = requestAnimationFrame(stepPreviewFrame);
+}
+
+function playPreview() {
+  if (isTemplatePreviewMode()) {
+    const totalMs = getTemplatePreviewDurationMs();
+    if (totalMs <= 0 || state.previewPlaying) {
+      syncTemplatePreviewUi();
+      return;
+    }
+
+    state.previewPlaying = true;
+    state.previewStartedAt = performance.now() - state.previewPositionMs;
+    if (hasExactPreviewPlayer()) {
+      const api = templatePreviewApi();
+      api?.seekTo(Math.round((state.previewPositionMs / 1000) * FPS));
+      api?.play();
+    } else if (state.previewPositionMs <= 16) {
+      postTemplatePreviewMessage({ type: 'qawaleb:restart', autoplay: true });
+    } else {
+      postTemplatePreviewMessage({ type: 'qawaleb:seek', timeMs: state.previewPositionMs, playing: true });
+      postTemplatePreviewMessage({ type: 'qawaleb:set-playing', playing: true });
+    }
+    syncTemplatePreviewUi();
+    stopPreviewLoop();
+    state.previewRafId = requestAnimationFrame(stepPreviewFrame);
+    return;
+  }
+
+  const timeline = getPreviewTimeline();
+  if (timeline.totalMs <= 0 || state.previewPlaying) {
+    renderPreviewFrame();
+    return;
+  }
+
+  state.previewPlaying = true;
+  state.previewStartedAt = performance.now() - state.previewPositionMs;
+  renderPreviewFrame();
+  stopPreviewLoop();
+  state.previewRafId = requestAnimationFrame(stepPreviewFrame);
+}
+
+function pausePreview() {
+  if (isTemplatePreviewMode()) {
+    state.previewPlaying = false;
+    state.previewStartedAt = 0;
+    stopPreviewLoop();
+    if (hasExactPreviewPlayer()) {
+      templatePreviewApi()?.pause();
+    } else {
+      postTemplatePreviewMessage({ type: 'qawaleb:set-playing', playing: false });
+    }
+    syncTemplatePreviewUi();
+    return;
+  }
+
+  state.previewPlaying = false;
+  state.previewStartedAt = 0;
+  stopPreviewLoop();
+  pauseMedia(previewRefs.musicAudio);
+  pauseMedia(previewRefs.overlayVideo);
+  pauseMedia(previewRefs.endPageVideo);
+  renderPreviewFrame();
+}
+
+function togglePreviewPlayback() {
+  if (state.previewPlaying) {
+    pausePreview();
+  } else {
+    playPreview();
+  }
+}
+
+function togglePreviewMute() {
+  state.previewMuted = !state.previewMuted;
+  renderPreviewFrame();
+}
+
+async function togglePreviewFullscreen() {
+  const target = elements.previewStageShell;
+  if (!target) {
+    return;
+  }
+
+  if (document.fullscreenElement === target) {
+    await document.exitFullscreen().catch(() => {});
+    return;
+  }
+
+  await target.requestFullscreen?.().catch(() => {});
+}
+
+function restartPreview(autoplay = state.previewPlaying) {
+  if (isTemplatePreviewMode()) {
+    stopPreviewLoop();
+    state.previewPositionMs = 0;
+    state.previewStartedAt = 0;
+    state.previewPlaying = Boolean(autoplay);
+    if (hasExactPreviewPlayer()) {
+      const api = templatePreviewApi();
+      api?.seekTo(0);
+      if (autoplay) {
+        api?.play();
+      } else {
+        api?.pause();
+      }
+    } else {
+      postTemplatePreviewMessage({
+        type: 'qawaleb:restart',
+        autoplay: Boolean(autoplay),
+      });
+    }
+    syncTemplatePreviewUi();
+    if (state.previewPlaying) {
+      state.previewStartedAt = performance.now();
+      state.previewRafId = requestAnimationFrame(stepPreviewFrame);
+    }
+    return;
+  }
+
+  const shouldResume = autoplay;
+  pausePreview();
+  state.previewPositionMs = 0;
+  renderPreviewFrame();
+  if (shouldResume) {
+    playPreview();
+  }
+}
+
+function getChapterPositions() {
+  const timeline = getPreviewTimeline();
+  const chapters = state.slides.map((_slide, index) => index * timeline.offsetMs);
+  if (timeline.endPageMs > 0) {
+    chapters.push(timeline.slideEndMs);
+  }
+  return chapters;
+}
+
+function seekToPreviousChapter() {
+  const chapters = getChapterPositions();
+  const current = state.previewPositionMs;
+  let target = 0;
+
+  chapters.forEach((chapter) => {
+    if (chapter < current - 250) {
+      target = chapter;
+    }
+  });
+
+  setPreviewPosition(target);
+}
+
+function seekToNextChapter() {
+  const chapters = getChapterPositions();
+  const current = state.previewPositionMs;
+  const nextChapter = chapters.find((chapter) => chapter > current + 250);
+  if (typeof nextChapter === 'number') {
+    setPreviewPosition(nextChapter);
+    return;
+  }
+
+  const timeline = getPreviewTimeline();
+  setPreviewPosition(timeline.totalMs);
+}
+
+function selectSlide(slideId) {
+  state.selectedSlideId = slideId;
+  const slideIndex = state.slides.findIndex((slide) => slide.id === slideId);
+  if (slideIndex >= 0) {
+    renderSlides();
+    if (isTemplatePreviewMode()) {
+      syncTemplatePreviewUi();
+      return;
+    }
+    if (hasExactPreviewPlayer()) {
+      const framesPerSlide = Math.floor(Number(state.slideDurationInSeconds || 20) * FPS);
+      const overlapFrames = 30;
+      const offsetFrames = framesPerSlide - overlapFrames;
+      templatePreviewApi()?.seekTo(slideIndex * offsetFrames);
+      return;
+    }
+
+    const timeline = getPreviewTimeline();
+    setPreviewPosition(slideIndex * timeline.offsetMs);
+    return;
+  }
+
+  renderSlides();
+}
+
+function buildSlideCard(slide, index) {
+  const wrapper = document.createElement('article');
+  wrapper.className = 'slide-card';
+  wrapper.dataset.slideId = slide.id;
+
+  if (slide.id === state.selectedSlideId) {
+    wrapper.classList.add('selected');
+  }
+  if (slide.id === state.dragOverSlideId) {
+    wrapper.classList.add('drag-over');
+  }
+
+  wrapper.addEventListener('click', (event) => {
+    if (event.target.closest('input,textarea,button,.drag-handle')) {
+      return;
+    }
+    selectSlide(slide.id);
+  });
+
+  wrapper.addEventListener('dragover', (event) => {
+    if (!state.draggedSlideId || state.draggedSlideId === slide.id) {
+      return;
+    }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  });
+
+  wrapper.addEventListener('dragenter', (event) => {
+    if (!state.draggedSlideId || state.draggedSlideId === slide.id) {
+      return;
+    }
+    event.preventDefault();
+    if (state.dragOverSlideId !== slide.id) {
+      state.dragOverSlideId = slide.id;
+      updateDragOverClasses();
+    }
+  });
+
+  wrapper.addEventListener('drop', (event) => {
+    if (!state.draggedSlideId || state.draggedSlideId === slide.id) {
+      return;
+    }
+    event.preventDefault();
+    reorderSlidesById(state.draggedSlideId, slide.id);
+    clearDragState();
+    renderSlides();
+  });
+
+  const dragHandle = document.createElement('div');
+  dragHandle.className = 'drag-handle';
+  dragHandle.draggable = true;
+  dragHandle.title = 'Ø§Ø³Ø­Ø¨ Ù„Ø¥Ø¹Ø§Ø¯Ø© ØªØ±ØªÙŠØ¨ Ø§Ù„Ø´Ø±ÙŠØ­Ø©';
+  dragHandle.innerHTML = '<span></span><span></span><span></span>';
+  dragHandle.addEventListener('dragstart', (event) => {
+    state.draggedSlideId = slide.id;
+    state.dragOverSlideId = slide.id;
+    updateDragOverClasses();
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', slide.id);
+    }
+  });
+  dragHandle.addEventListener('dragend', () => {
+    window.setTimeout(() => {
+      clearDragState();
+      updateDragOverClasses();
+    }, 0);
+  });
+
+  const sideMeta = document.createElement('div');
+  sideMeta.className = 'slide-side-meta';
+
+  const order = document.createElement('div');
+  order.className = 'slide-order';
+  order.textContent = String(index + 1);
+
+  sideMeta.appendChild(dragHandle);
+  sideMeta.appendChild(order);
+
+  const thumbWrap = document.createElement('div');
+  thumbWrap.className = 'slide-thumb-wrap';
+  thumbWrap.style.position = 'relative';
+  
+  const isVideo = isVideoFile(slide.imagePath);
+  let thumb;
+  if (isVideo) {
+    thumb = document.createElement('video');
+    thumb.className = 'slide-thumb';
+    thumb.src = slide.fileUrl;
+    thumb.muted = true;
+  } else {
+    thumb = document.createElement('img');
+    thumb.className = 'slide-thumb';
+    thumb.src = slide.fileUrl;
+    thumb.alt = `Slide ${index + 1}`;
+  }
+  thumbWrap.appendChild(thumb);
+
+  const changeImageBtn = document.createElement('button');
+  changeImageBtn.type = 'button';
+  changeImageBtn.className = 'slide-change-image-btn';
+  changeImageBtn.textContent = state.replacingSlideImageId === slide.id ? '...' : 'ØªØºÙŠÙŠØ±';
+  changeImageBtn.title = 'ØªØºÙŠÙŠØ± ØµÙˆØ±Ø© Ø§Ù„Ø´Ø±ÙŠØ­Ø©';
+  changeImageBtn.setAttribute('aria-label', `ØªØºÙŠÙŠØ± ØµÙˆØ±Ø© Ø§Ù„Ø´Ø±ÙŠØ­Ø© ${index + 1}`);
+  changeImageBtn.disabled = state.replacingSlideImageId === slide.id;
+  changeImageBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleReplaceSlideImage(slide.id);
+  });
+  thumbWrap.appendChild(changeImageBtn);
+  
+  if (isVideo) {
+     const muteBtn = document.createElement('button');
+     muteBtn.type = 'button';
+     muteBtn.style.position = 'absolute';
+     muteBtn.style.bottom = '6px';
+     muteBtn.style.right = '6px';
+     muteBtn.style.padding = '4px 6px';
+     muteBtn.style.borderRadius = '4px';
+     muteBtn.style.backgroundColor = 'rgba(0,0,0,0.6)';
+     muteBtn.style.color = '#fff';
+     muteBtn.style.border = 'none';
+     muteBtn.style.cursor = 'pointer';
+     muteBtn.style.fontSize = '12px';
+     muteBtn.innerHTML = slide.isMuted !== false ? 'ðŸ”‡' : 'ðŸ”Š';
+     muteBtn.title = 'ÙƒØªÙ…/ØªØ´ØºÙŠÙ„ Ø§Ù„ØµÙˆØª ÙÙŠ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ';
+     muteBtn.addEventListener('click', (e) => {
+       e.stopPropagation();
+       slide.isMuted = slide.isMuted === false ? true : false;
+       muteBtn.innerHTML = slide.isMuted ? 'ðŸ”‡' : 'ðŸ”Š';
+       markProjectDirty();
+       renderPreviewFrame();
+     });
+     thumbWrap.appendChild(muteBtn);
+  }
+
+  const main = document.createElement('div');
+  main.className = 'slide-main';
+
+  const textInput = document.createElement('input');
+  textInput.type = 'text';
+  textInput.className = 'slide-input';
+  textInput.placeholder = 'Ø§ÙƒØªØ¨ Ø§Ù„Ù†Øµ Ø§Ù„Ø°ÙŠ Ø³ÙŠØ¸Ù‡Ø± Ø¹Ù„Ù‰ Ù‡Ø°Ù‡ Ø§Ù„Ø´Ø±ÙŠØ­Ø©';
+  textInput.value = slide.text || '';
+  textInput.addEventListener('input', (event) => {
+    slide.text = event.target.value;
+    renderPreviewFrame();
+  });
+  main.appendChild(textInput);
+
+  if (slide.voiceoverUrl) {
+    const voBadge = document.createElement('div');
+    voBadge.className = 'slide-voiceover-badge';
+    voBadge.textContent = 'âœ… ØµÙˆØª';
+    voBadge.style.fontSize = '0.78rem';
+    voBadge.style.color = '#10b981';
+    voBadge.style.marginTop = '4px';
+    voBadge.style.fontWeight = '600';
+    main.appendChild(voBadge);
+  }
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'slide-delete-btn';
+  deleteBtn.title = 'Ø­Ø°Ù Ø§Ù„Ø´Ø±ÙŠØ­Ø©';
+  deleteBtn.setAttribute('aria-label', 'Ø­Ø°Ù Ø§Ù„Ø´Ø±ÙŠØ­Ø©');
+  deleteBtn.innerHTML = '<span aria-hidden="true">ðŸ—‘</span>';
+  deleteBtn.addEventListener('click', () => {
+    state.slides = state.slides.filter((item) => item.id !== slide.id);
+    if (state.selectedSlideId === slide.id) {
+      state.selectedSlideId = null;
+    }
+    markProjectDirty();
+    renderSlides();
+  });
+
+  wrapper.appendChild(sideMeta);
+  wrapper.appendChild(thumbWrap);
+  wrapper.appendChild(main);
+  wrapper.appendChild(deleteBtn);
+
+  return wrapper;
+}
+
+function renderSlides() {
+  const preset = ensureTemplateState();
+  ensureTemplateSlide();
+  if (elements.slidesList) {
+    elements.slidesList.innerHTML = '';
+  }
+  if (!preset) {
+    renderPreviewFrame();
+    return;
+  }
+
+  if (elements.slidesCount) {
+    elements.slidesCount.textContent = String(preset.fields.length);
+  }
+  if (elements.templateDescription) {
+    elements.templateDescription.textContent = preset.description || '';
+  }
+  if (elements.selectedTemplateBadge) {
+    elements.selectedTemplateBadge.textContent = preset.label;
+  }
+  if (elements.slidesList) {
+    preset.fields.forEach((field) => {
+      const value = state.templateValues[field.id] ?? '';
+      elements.slidesList.appendChild(buildTemplateFieldCard(field, value));
+    });
+  }
+  renderPreviewFrame();
+}
+
+function syncAssetControls() {
+  syncStateWithAssets();
+  formatAssetOptions(elements.overlaySelect, state.assets.frame_sewar || [], 'بدون إطار');
+  formatAssetOptions(elements.frameSelect, state.assets.frame_sewar || [], 'بدون إطار');
+  formatAssetOptions(elements.musicSelect, state.assets.music, 'Ø¨Ø¯ÙˆÙ† Music');
+  formatAssetOptions(elements.endPageSelect, state.assets.endpage, 'Ø¨Ø¯ÙˆÙ† End Page');
+
+  elements.overlaySelect.value = state.frame || '';
+  elements.frameSelect.value = state.frame || '';
+  elements.musicSelect.value = state.music;
+  elements.endPageSelect.value = state.endPage;
+}
+
+function syncAssetControlsV2() {
+  syncStateWithAssets();
+  formatAssetOptions(elements.overlaySelect, state.assets.frame_sewar || [], 'بدون إطار');
+  formatAssetOptions(elements.frameSelect, state.assets.frame_sewar || [], 'بدون إطار');
+  formatAssetOptions(elements.musicSelect, state.assets.music, 'Ø¨Ø¯ÙˆÙ† Ù…ÙˆØ³ÙŠÙ‚Ù‰');
+  formatAssetOptions(elements.endPageSelect, state.assets.endpage, 'Ø¨Ø¯ÙˆÙ† Ø´Ø§Ø´Ø© Ø®ØªØ§Ù…');
+
+  elements.overlaySelect.value = state.frame || '';
+  elements.frameSelect.value = state.frame || '';
+  elements.musicSelect.value = state.music;
+  elements.endPageSelect.value = state.endPage;
+  updateEndPageDurationHint();
+  syncTextSettingsUi();
+}
+
+function collectEffects() {
+  state.effects = elements.effectCheckboxes
+    .filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.value);
+}
+
+async function detectVideoDurationFrames(fileUrl) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.src = fileUrl;
+    video.onloadedmetadata = () => resolve(Math.ceil(video.duration * FPS));
+    video.onerror = () => resolve(5 * FPS);
+  });
+}
+
+async function ensureEndPageDuration() {
+  const endPageAsset = findEndPageAsset();
+  if (!endPageAsset) {
+    state.endPageDurationFrames = 0;
+    state.endPageDurationSource = '';
+    updateEndPageDurationHint();
+    return 0;
+  }
+
+  if (state.endPageDurationFrames <= 0 || state.endPageDurationSource !== endPageAsset.url) {
+    state.endPageDurationFrames = await detectVideoDurationFrames(endPageAsset.url);
+    state.endPageDurationSource = endPageAsset.url;
+  }
+
+  updateEndPageDurationHint();
+  return state.endPageDurationFrames;
+}
+
+async function refreshAssets() {
+  state.assets = await window.desktopApi.refreshAssets();
+  syncAssetControlsV2();
+  await ensureEndPageDuration();
+  renderPreviewFrame();
+}
+
+function buildRenderPayload() {
+  ensureTemplateSlide();
+  const preset = getTemplatePreset();
+  const musicAsset = findMusicAsset();
+  const frameAsset = findFrameAsset();
+
+  if (!preset) {
+    throw new Error('Ù„Ù… ÙŠØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ù‚Ø§Ù„Ø¨ ØµØ§Ù„Ø­ Ù„Ù„Ø±Ù†Ø¯Ø±');
+  }
+
+  return {
+    model: 'qawaleb',
+    templateId: preset.id,
+    templateLabel: preset.label || '',
+    templateFileName: preset.fileName,
+    templateValues: { ...state.templateValues },
+    templateColors: { ...state.templateColors },
+    templateScale: Number(state.templateScale || DEFAULT_TEMPLATE_SCALE),
+    templateX: Number(state.templateX || 0),
+    templateY: Number(state.templateY || 0),
+    textFontSize: Number(state.textFontSize || DEFAULT_TEMPLATE_FONT_SIZE),
+    frame: frameAsset ? frameAsset.path : null,
+    music: musicAsset ? musicAsset.path : null,
+    voiceover: state.voiceover || null,
+    durationMs: Math.max(1000, Number(state.slideDurationInSeconds || 20) * 1000),
+    fps: FPS,
+    musicVolume: Number(state.musicVolume !== undefined ? state.musicVolume : 50),
+    voiceoverVolume: Number(state.voiceoverVolume !== undefined ? state.voiceoverVolume : 100),
+    turboMode: document.getElementById('turbo-render-checkbox')?.checked || false,
+  };
+}
+
+async function handleGenerateVoiceovers() {
+  if (state.isGeneratingVoiceovers) return;
+  const slidesWithText = state.slides.filter((s) => s.text && s.text.trim().length > 0);
+  if (slidesWithText.length === 0) {
+    setStatus('ØªÙ†Ø¨ÙŠÙ‡', 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¶Ø§ÙØ© Ù†Øµ Ù„Ø´Ø±ÙŠØ­Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„');
+    return;
+  }
+
+  state.isGeneratingVoiceovers = true;
+  const btn = document.getElementById('generate-voiceovers-btn');
+  const originalLabel = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³Ø±Ø¯ Ø§Ù„ØµÙˆØªÙŠ...';
+  }
+  setStatus('ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³Ø±Ø¯ Ø§Ù„ØµÙˆØªÙŠ', 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø®Ø¯Ù…Ø© Google TTS...');
+
+  try {
+    const payload = {
+      slides: state.slides.map((slide) => ({
+        id: slide.id,
+        imageUrl: slide.fileUrl || slide.imagePath,
+        text: slide.text,
+        isMuted: slide.isMuted,
+        voiceoverText: slide.voiceoverText,
+        voiceoverUrl: slide.voiceoverUrl,
+        voiceoverDurationMs: slide.voiceoverDurationMs,
+      })),
+      maxWords: 18,
+      languageCode: 'ar-XA',
+      ssmlGender: 'MALE',
+      speakingRate: 0.92,
+      pitch: 0,
+      voiceName: state.settings.ttsVoice || DEFAULT_SETTINGS.ttsVoice,
+      ttsModel: state.settings.ttsModel || DEFAULT_SETTINGS.ttsModel,
+      apiKey: state.settings.geminiApiKey || '',
+      stylePrompt: state.settings.ttsStylePrompt || DEFAULT_TTS_STYLE_PROMPT,
+    };
+
+    const data = await window.desktopApi.generateVoiceovers(payload);
+    if (!data.success && !Array.isArray(data.slides)) {
+      throw new Error(data?.error || 'ÙØ´Ù„ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³Ø±Ø¯ Ø§Ù„ØµÙˆØªÙŠ');
+    }
+
+    if (Array.isArray(data.slides)) {
+      const updatedById = new Map(data.slides.map((s) => [s.id, s]));
+      state.slides = state.slides.map((slide) => {
+        const updated = updatedById.get(slide.id);
+        if (!updated) return slide;
+        return {
+          ...slide,
+          voiceoverText: updated.voiceoverText,
+          voiceoverUrl: updated.voiceoverUrl,
+          voiceoverPath: updated.voiceoverPath || slide.voiceoverPath || null,
+          voiceoverDurationMs: updated.voiceoverDurationMs,
+        };
+      });
+      markProjectDirty();
+      renderSlides();
+    }
+
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      setStatus('Ø§Ù†ØªÙ‡Ù‰ Ù…Ø¹ ØªØ­Ø°ÙŠØ±Ø§Øª', `ØªÙ… Ø§Ù„ØªÙˆÙ„ÙŠØ¯ Ù…Ø¹ ${data.errors.length} Ø®Ø·Ø£`);
+      console.warn('Voiceover errors', data.errors);
+    } else {
+      setStatus('Ø§ÙƒØªÙ…Ù„', 'ØªÙ… ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³Ø±Ø¯ Ø§Ù„ØµÙˆØªÙŠ Ø¨Ù†Ø¬Ø§Ø­');
+    }
+  } catch (error) {
+    setStatus('ÙØ´Ù„ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³Ø±Ø¯', error.message || 'ØªØ£ÙƒØ¯ Ù…Ù† ØªØ´ØºÙŠÙ„ Ø®Ø§Ø¯Ù… Next Ø¹Ù„Ù‰ :3000');
+  } finally {
+    state.isGeneratingVoiceovers = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+    }
+  }
+}
+
+async function handleGenerateTextVoiceover() {
+  const btn = document.getElementById('generate-text-voiceover-btn');
+  const statusEl = document.getElementById('tts-gen-status');
+  const textarea = document.getElementById('voiceover-text-input');
+
+  const text = textarea ? textarea.value.trim() : '';
+  if (!text) {
+    if (statusEl) statusEl.textContent = 'âš ï¸ Ø§ÙƒØªØ¨ Ø§Ù„Ù†Øµ Ø£ÙˆÙ„Ø§Ù‹';
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙˆÙ„ÙŠØ¯...'; }
+  if (statusEl) statusEl.textContent = '';
+  setStatus('ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØª', 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø®Ø¯Ù…Ø© Gemini TTS...');
+
+  try {
+    const result = await window.desktopApi.generateSingleVoiceover({
+      text,
+      voiceName: state.settings.ttsVoice || DEFAULT_SETTINGS.ttsVoice,
+      ttsModel: state.settings.ttsModel || DEFAULT_SETTINGS.ttsModel,
+      apiKey: state.settings.geminiApiKey || '',
+      stylePrompt: state.settings.ttsStylePrompt || DEFAULT_TTS_STYLE_PROMPT,
+    });
+
+    if (!result.success) throw new Error(result.error || 'ÙØ´Ù„ Ø§Ù„ØªÙˆÙ„ÙŠØ¯');
+
+    state.voiceover = result.voiceoverPath;
+    state.voiceoverDurationMs = result.durationMs || 0;
+
+    const label = text.length > 40 ? text.slice(0, 40) + '...' : text;
+    if (elements.voiceoverFilename) {
+      elements.voiceoverFilename.textContent = label;
+      elements.voiceoverFilename.title = text;
+    }
+    updateVoiceoverMeta();
+    markProjectDirty();
+    if (statusEl) statusEl.textContent = 'âœ“ ØªÙ… Ø§Ù„ØªÙˆÙ„ÙŠØ¯ Ø¨Ù†Ø¬Ø§Ø­';
+    setStatus('Ø§ÙƒØªÙ…Ù„', 'ØªÙ… ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„ØµÙˆØªÙŠ Ø¨Ù†Ø¬Ø§Ø­');
+    renderPreviewFrame();
+  } catch (err) {
+    if (statusEl) statusEl.textContent = `âœ— ${err.message}`;
+    setStatus('Ø®Ø·Ø£', err.message || 'ÙØ´Ù„ Ø§Ù„ØªÙˆÙ„ÙŠØ¯');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="mic" style="width:17px;height:17px;display:inline;margin-left:0.4rem;"></i> ØªÙˆÙ„ÙŠØ¯ ØªØ¹Ù„ÙŠÙ‚ ØµÙˆØªÙŠ';
+      lucide.createIcons({ nodes: [btn] });
+    }
+  }
+}
+
+function ensureGenerateVoiceoversButton() {
+  return;
+  if (document.getElementById('generate-voiceovers-btn')) return;
+  const renderBtn = elements.renderBtn;
+  if (!renderBtn || !renderBtn.parentElement) return;
+  const btn = document.createElement('button');
+  btn.id = 'generate-voiceovers-btn';
+  btn.type = 'button';
+  btn.className = 'btn-secondary';
+  btn.style.padding = '0.4rem 1rem';
+  btn.style.borderRadius = '6px';
+  btn.style.fontSize = '0.9rem';
+  btn.style.minHeight = '48px';
+  btn.style.gap = '0.4rem';
+  btn.textContent = 'ØªÙˆÙ„ÙŠØ¯ Ø³Ø±Ø¯ ØµÙˆØªÙŠ Ù„Ù„Ø´Ø±Ø§Ø¦Ø­';
+  btn.addEventListener('click', handleGenerateVoiceovers);
+  renderBtn.parentElement.insertBefore(btn, renderBtn);
+}
+
+async function handleRender() {
+  ensureTemplateSlide();
+  if (!getTemplatePreset() || state.isRendering) {
+    return;
+  }
+
+  state.isRendering = true;
+  elements.renderBtn.disabled = true;
+  elements.renderBtn.style.display = 'none';
+  if (elements.cancelRenderBtn) elements.cancelRenderBtn.style.display = 'inline-flex';
+  elements.navBtns.forEach(btn => {
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.5';
+  });
+  elements.renderResult.innerHTML = '';
+  setStatus('Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±Ù†Ø¯Ø±', 'ÙŠØªÙ… Ø§Ù„Ø¢Ù† ØªØ¬Ù‡ÙŠØ² Ø§Ù„ÙÙŠØ¯ÙŠÙˆ.');
+  setProgress(0.02, 'Ø¨Ø¯Ø¡ Ù…Ù‡Ù…Ø© Ø§Ù„Ø±Ù†Ø¯Ø±...');
+
+  try {
+    await ensureEndPageDuration();
+    const result = await window.desktopApi.render(buildRenderPayload());
+    state.lastRender = result;
+    setStatus('Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø±Ù†Ø¯Ø±', 'ØªÙ… Ø­ÙØ¸ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ Ø¨Ù†Ø¬Ø§Ø­.');
+    setProgress(1, 'Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø±Ù†Ø¯Ø±');
+    elements.renderResult.innerHTML = `
+      <div class="result-card">
+        <strong>ØªÙ… Ø­ÙØ¸ Ø§Ù„ÙÙŠØ¯ÙŠÙˆ</strong>
+        <span class="muted">${result.outputPath}</span>
+        <div class="result-actions">
+          <button id="reveal-file-btn" class="btn secondary small">Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ù…Ù„Ù</button>
+          <button id="open-folder-btn" class="btn secondary small">ÙØªØ­ Ø§Ù„Ù…Ø¬Ù„Ø¯</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('reveal-file-btn').addEventListener('click', () => {
+      window.desktopApi.revealInFolder(result.outputPath);
+    });
+    document.getElementById('open-folder-btn').addEventListener('click', () => {
+      window.desktopApi.openOutputFolder();
+    });
+    
+    showSuccessModal(result.outputPath);
+  } catch (error) {
+    setStatus('ÙØ´Ù„ Ø§Ù„Ø±Ù†Ø¯Ø±', error.message || 'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø±Ù†Ø¯Ø±.');
+    setProgress(0, 'ÙØ´Ù„ Ø§Ù„Ø±Ù†Ø¯Ø±');
+  } finally {
+    state.isRendering = false;
+    elements.renderBtn.disabled = false;
+    elements.renderBtn.style.display = 'inline-flex';
+    if (elements.cancelRenderBtn) elements.cancelRenderBtn.style.display = 'none';
+    elements.navBtns.forEach(btn => {
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity = '1';
+    });
+  }
+}
+
+function showSuccessModal(outputPath) {
+  const overlay = document.getElementById('success-modal-overlay');
+  if (!overlay) return;
+  document.getElementById('modal-file-path').textContent = outputPath;
+  overlay.classList.add('is-active');
+
+  // Re-render lucide icons inside the freshly-shown modal
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+
+  const previewBtn = document.getElementById('modal-preview-btn');
+  const revealBtn = document.getElementById('modal-reveal-btn');
+  const closeBtn = document.getElementById('modal-close-btn');
+
+  // Replace buttons to clear old listeners
+  const newPreviewBtn = previewBtn.cloneNode(true);
+  const newRevealBtn = revealBtn.cloneNode(true);
+  const newCloseBtn = closeBtn.cloneNode(true);
+  previewBtn.parentNode.replaceChild(newPreviewBtn, previewBtn);
+  revealBtn.parentNode.replaceChild(newRevealBtn, revealBtn);
+  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+
+  newPreviewBtn.addEventListener('click', () => {
+    window.desktopApi.openFile(outputPath);
+  });
+  newRevealBtn.addEventListener('click', () => {
+    window.desktopApi.revealInFolder(outputPath);
+  });
+  newCloseBtn.addEventListener('click', () => {
+    overlay.classList.remove('is-active');
+  });
+
+  // Close on backdrop click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('is-active');
+  }, { once: true });
+
+  createConfetti();
+}
+
+function createConfetti() {
+  const emojis = ['ðŸŽ‰', 'ðŸŽŠ', 'âœ¨', 'ðŸŽˆ', 'â­'];
+  for (let i = 0; i < 40; i++) {
+    const flake = document.createElement('div');
+    flake.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    flake.style.position = 'fixed';
+    flake.style.left = Math.random() * 100 + 'vw';
+    flake.style.top = '-50px';
+    flake.style.fontSize = (Math.random() * 20 + 15) + 'px';
+    flake.style.zIndex = '100000';
+    flake.style.pointerEvents = 'none';
+    flake.style.transition = 'transform ' + (Math.random() * 1.5 + 1.5) + 's linear, top ' + (Math.random() * 1.5 + 2) + 's ease-in';
+    document.body.appendChild(flake);
+
+    setTimeout(() => {
+      flake.style.top = '120vh';
+      flake.style.transform = 'rotate(' + (Math.random() * 720 - 360) + 'deg)';
+    }, 50);
+
+    setTimeout(() => {
+      flake.remove();
+    }, 4000);
+  }
+}
+
+async function bootstrap() {
+  renderTextAnimationButtons();
+  syncTextSettingsUi();
+
+  // Load persisted settings
+  try {
+    const saved = await window.desktopApi.getSettings();
+    if (saved && typeof saved === 'object') {
+      state.settings = { ...DEFAULT_SETTINGS, ...saved };
+    }
+  } catch {
+    // settings load failure is non-fatal
+  }
+  updatePromptInspector();
+
+  const bootstrapPayload = await window.desktopApi.bootstrap();
+  state.appVersion = bootstrapPayload.appVersion || state.appVersion;
+  state.assets = bootstrapPayload.assets;
+  state.placeholderPath = bootstrapPayload.placeholderPath || null;
+  applyTemplateSelection(state.selectedTemplateId, { preserveExisting: true });
+  ensureDesktopQawalebFonts(bootstrapPayload.fontDataUrl, bootstrapPayload.rbFontDataUrl);
+  const logoPath = `${bootstrapPayload.assetsDir.replace(/[\\/]+$/, '')}\\logo.png`;
+  elements.brandLogo.src = bootstrapPayload.logoDataUrl || window.desktopApi.toFileUrl(logoPath);
+
+  syncAssetControlsV2();
+  await ensureEndPageDuration();
+  if (elements.slideDurationInput) {
+    elements.slideDurationInput.value = String(state.slideDurationInSeconds || 20);
+  }
+  renderSlides();
+  setStatus('Ø±Ù†Ø¯Ø± Ø§Ù„ÙÙŠØ¯ÙŠÙˆ', '');
+  setProgress(0, 'Ù„Ù… ÙŠØ¨Ø¯Ø£ Ø§Ù„Ø±Ù†Ø¯Ø± Ø¨Ø¹Ø¯');
+  updateProjectStatusUi();
+}
+
+async function handlePickSlides() {
+  const pickedSlides = await window.desktopApi.pickSlides();
+  if (pickedSlides.length === 0) {
+    return;
+  }
+
+  state.slides = [...state.slides, ...pickedSlides];
+  state.selectedSlideId = state.selectedSlideId || pickedSlides[0].id;
+  markProjectDirty();
+  renderSlides();
+}
+
+function shouldIgnoreDirtyEvent(target) {
+  if (!target || typeof target.closest !== 'function') return false;
+  return Boolean(target.closest(
+    '#preview-seek, .preview-icon-btn, #preview-stage, #project-save-btn, #project-open-btn, #settings-modal-overlay',
+  ));
+}
+
+document.addEventListener('input', (event) => {
+  if (!shouldIgnoreDirtyEvent(event.target)) {
+    markProjectDirty();
+  }
+}, true);
+
+document.addEventListener('change', (event) => {
+  if (!shouldIgnoreDirtyEvent(event.target)) {
+    markProjectDirty();
+  }
+}, true);
+
+document.addEventListener('click', (event) => {
+  if (event.target.closest('.tab-btn')) {
+    markProjectDirty();
+  }
+}, true);
+
+if (elements.projectSaveBtn) {
+  elements.projectSaveBtn.addEventListener('click', () => saveCurrentProject());
+}
+if (elements.projectOpenBtn) {
+  elements.projectOpenBtn.addEventListener('click', openProjectFromDisk);
+}
+
+elements.refreshAssetsBtn.addEventListener('click', refreshAssets);
+elements.openOutputBtn.addEventListener('click', () => window.desktopApi.openOutputFolder());
+elements.renderBtn.addEventListener('click', handleRender);
+if (elements.cancelRenderBtn) {
+  elements.cancelRenderBtn.addEventListener('click', async () => {
+    const canceled = await window.desktopApi.cancelRender({ model: 'qawaleb' });
+    if (canceled) {
+      setStatus('ØªÙ… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù', 'ØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø±Ù†Ø¯Ø± Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø·Ù„Ø¨Ùƒ.');
+      setProgress(0, 'ØªÙ… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù');
+    }
+  });
+}
+
+elements.overlaySelect.addEventListener('change', (event) => {
+  state.frame = event.target.value;
+  state.overlay = state.frame;
+  syncAssetControlsV2();
+  markProjectDirty();
+  renderPreviewFrame();
+});
+
+elements.frameSelect?.addEventListener('change', (event) => {
+  state.frame = event.target.value;
+  state.overlay = state.frame;
+  syncAssetControlsV2();
+  markProjectDirty();
+  renderPreviewFrame();
+});
+
+elements.musicSelect.addEventListener('change', (event) => {
+  state.music = event.target.value;
+  renderPreviewFrame();
+});
+
+if (elements.musicVolumeInput && elements.voiceoverVolumeInput) {
+  elements.musicVolumeInput.addEventListener('input', (event) => {
+    state.musicVolume = Number(event.target.value);
+    elements.musicVolumeValue.textContent = `${state.musicVolume}%`;
+    updateRangeVisual(elements.musicVolumeInput);
+    renderPreviewFrame();
+  });
+  elements.voiceoverVolumeInput.addEventListener('input', (event) => {
+    state.voiceoverVolume = Number(event.target.value);
+    elements.voiceoverVolumeValue.textContent = `${state.voiceoverVolume}%`;
+    updateRangeVisual(elements.voiceoverVolumeInput);
+    renderPreviewFrame();
+  });
+}
+
+if (elements.pickVoiceoverBtn) {
+  elements.pickVoiceoverBtn.addEventListener('click', async () => {
+    const voiceoverData = await window.desktopApi.pickVoiceover();
+    if (voiceoverData) {
+      state.voiceover = voiceoverData.path;
+      state.voiceoverDurationMs = await readAudioDurationMs(voiceoverData.url);
+      const parsedPath = state.voiceover.replace(/\\/g, '/').split('/').pop();
+      elements.voiceoverFilename.textContent = parsedPath;
+      elements.voiceoverFilename.title = parsedPath;
+      updateVoiceoverMeta();
+      markProjectDirty();
+      renderPreviewFrame();
+    }
+  });
+
+  elements.clearVoiceoverBtn.addEventListener('click', () => {
+    state.voiceover = null;
+    state.voiceoverDurationMs = 0;
+    elements.voiceoverFilename.textContent = 'Ø¨Ø¯ÙˆÙ† ØªØ¹Ù„ÙŠÙ‚';
+    elements.voiceoverFilename.title = 'Ø¨Ø¯ÙˆÙ† ØªØ¹Ù„ÙŠÙ‚ ØµÙˆØªÛŒ';
+    updateVoiceoverMeta();
+    markProjectDirty();
+    renderPreviewFrame();
+  });
+}
+
+elements.endPageSelect.addEventListener('change', async (event) => {
+  state.endPage = event.target.value;
+  state.endPageDisabledByUser = !state.endPage;
+  const endPageAsset = findEndPageAsset();
+  state.endPageDurationFrames = endPageAsset ? await detectVideoDurationFrames(endPageAsset.url) : 0;
+  state.endPageDurationSource = endPageAsset ? endPageAsset.url : '';
+  updateEndPageDurationHint();
+  renderPreviewFrame();
+});
+
+if (elements.textPresetSelect) {
+  elements.textPresetSelect.addEventListener('change', (event) => {
+    state.textPreset = event.target.value;
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+if (elements.fontSizeInput) {
+  elements.fontSizeInput.addEventListener('input', (event) => {
+    state.textFontSize = Number(event.target.value);
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+if (elements.templateScaleInput) {
+  elements.templateScaleInput.addEventListener('input', (event) => {
+    state.templateScale = Number(event.target.value) / 100;
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+if (elements.templateXInput) {
+  elements.templateXInput.addEventListener('input', (event) => {
+    state.templateX = Number(event.target.value);
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+if (elements.templateYInput) {
+  elements.templateYInput.addEventListener('input', (event) => {
+    state.templateY = Number(event.target.value);
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+elements.slideDurationInput.addEventListener('input', (event) => {
+  state.slideDurationInSeconds = Number(event.target.value);
+  const totalMs = isTemplatePreviewMode()
+    ? getTemplatePreviewDurationMs()
+    : getPreviewTimeline().totalMs;
+  state.previewPositionMs = clamp(state.previewPositionMs, 0, totalMs || 0);
+  updateVoiceoverMeta();
+  renderPreviewFrame();
+});
+
+elements.effectCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener('change', () => {
+    collectEffects();
+    
+    // Toggle cinematic bars slider visibility
+    const barContainer = document.getElementById('cinematic-bar-size-container');
+    if (barContainer) {
+      if (state.effects.includes('cinematic-bars')) barContainer.classList.remove('ui-hidden');
+      else barContainer.classList.add('ui-hidden');
+    }
+    
+    renderPreviewFrame();
+  });
+});
+
+elements.textPresetButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    state.textPreset = button.dataset.preset || 'dark';
+    syncTextSettingsUi();
+    markProjectDirty();
+    renderPreviewFrame();
+  });
+});
+
+if (elements.barSizeInput) {
+  elements.barSizeInput.addEventListener('input', (event) => {
+    state.cinematicBarSize = Number(event.target.value);
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+if (elements.animationRadios) {
+  elements.animationRadios.forEach((radio) => {
+    radio.addEventListener('change', (event) => {
+      if (event.target.checked) {
+        state.textAnimationType = event.target.value;
+        syncTextSettingsUi();
+        renderPreviewFrame();
+      }
+    });
+  });
+}
+
+if (elements.textAnimationButtons) {
+  elements.textAnimationButtons.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-template-preset]');
+    if (!button) {
+      return;
+    }
+    applyTemplateSelection(button.dataset.templatePreset || DEFAULT_TEMPLATE_ID);
+    syncTextSettingsUi();
+    renderSlides();
+    markProjectDirty();
+  });
+}
+
+if (elements.parallaxCheckbox) {
+  elements.parallaxCheckbox.addEventListener('change', (event) => {
+    state.parallaxEnabled = event.target.checked;
+    syncTextSettingsUi();
+    renderPreviewFrame();
+  });
+}
+
+elements.previewPlayBtn?.addEventListener('click', togglePreviewPlayback);
+elements.previewMuteBtn?.addEventListener('click', togglePreviewMute);
+elements.previewRestartBtn?.addEventListener('click', () => restartPreview(state.previewPlaying));
+elements.previewFullscreenBtn?.addEventListener('click', togglePreviewFullscreen);
+
+elements.previewSeek?.addEventListener('input', (event) => {
+  const ratio = Number(event.target.value) / 1000;
+  const totalMs = isTemplatePreviewMode()
+    ? getTemplatePreviewDurationMs()
+    : getPreviewTimeline().totalMs;
+  setPreviewPosition(ratio * totalMs);
+});
+
+window.addEventListener('message', (event) => {
+  if (!event?.data || event.data.type !== 'qawaleb:ready') {
+    return;
+  }
+
+  exactPreviewRef.loaded = true;
+  exactPreviewRef.signature = '';
+  syncTemplatePreviewContent(true);
+});
+
+window.desktopApi.onRenderProgress((payload) => {
+  setProgress(payload.progress, payload.message);
+});
+
+window.addEventListener('beforeunload', () => {
+  if (hasExactPreviewPlayer()) {
+    templatePreviewApi()?.destroy();
+  }
+  pausePreview();
+});
+
+// â”€â”€â”€ Generate Text Voiceover button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// â”€â”€â”€ Content Generation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+async function handleGenerateContentSlides() {
+  const topicInput = document.getElementById('content-topic-input');
+  const slideCountInput = document.getElementById('content-slide-count');
+  const contentStyleSelect = document.getElementById('content-style-select');
+  const presetSelect = document.getElementById('content-preset-select');
+  const btn = document.getElementById('generate-content-btn');
+  const status = document.getElementById('content-generate-status');
+  const scriptPreview = document.getElementById('content-script-preview');
+
+  const topic = topicInput ? topicInput.value.trim() : '';
+  if (!topic) {
+    if (status) status.textContent = 'ÙŠØ±Ø¬Ù‰ ÙƒØªØ§Ø¨Ø© Ù…ÙˆØ¶ÙˆØ¹ Ø£Ùˆ Ù†Øµ Ø£ÙˆÙ„Ø§Ù‹';
+    return;
+  }
+
+  const count = slideCountInput ? Number(slideCountInput.value) || 10 : 10;
+  const contentStyle = contentStyleSelect ? contentStyleSelect.value : 'informative';
+  const textPreset = presetSelect ? presetSelect.value : 'automatic';
+  const maxWordsInput = document.getElementById('content-max-words');
+  const slideDurationInput = document.getElementById('content-slide-duration');
+  const maxWords = maxWordsInput ? Math.max(8, Math.min(30, Number(maxWordsInput.value) || 18)) : 18;
+  const slideDuration = slideDurationInput ? Math.max(4, Math.min(20, Number(slideDurationInput.value) || 8)) : 8;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙˆÙ„ÙŠØ¯...'; }
+  if (status) status.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ù€ Gemini...';
+  if (scriptPreview) { scriptPreview.value = ''; scriptPreview.placeholder = 'Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª...'; }
+
+  try {
+    const result = await window.desktopApi.generateContentSlides({
+      topic,
+      count,
+      contentStyle,
+      textPreset,
+      maxWords,
+      systemPrompt: getInspectorSystemPrompt(),
+      apiKey: state.settings.geminiApiKey || '',
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || 'ÙØ´Ù„ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø´Ø±Ø§Ø¦Ø­');
+    }
+    if (!Array.isArray(result.slides) || result.slides.length === 0) {
+      throw new Error('Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø´Ø±Ø§Ø¦Ø­ Ù…Ù† Gemini');
+    }
+
+    // Replace all slides with newly generated ones (fresh content session)
+    state.slides = result.slides;
+    state.selectedSlideId = result.slides[0].id;
+
+    // Set slide duration from the content tab control
+    state.slideDurationInSeconds = slideDuration;
+    const durationInput = document.getElementById('slide-duration-input');
+    if (durationInput) durationInput.value = slideDuration;
+
+    // Apply text preset if not automatic
+    if (textPreset && textPreset !== 'automatic') {
+      state.textPreset = textPreset;
+      const presetEl = document.getElementById('text-preset-select');
+      if (presetEl) presetEl.value = textPreset;
+    }
+
+    // Populate the editable script textarea
+    if (scriptPreview) {
+      scriptPreview.value = result.fullScript || result.slides.map((s) => s.voiceoverText || s.text || '').join('\n\n');
+      scriptPreview.placeholder = 'Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª Ø§Ù„ÙƒØ§Ù…Ù„ Ù„Ù„ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„ØµÙˆØªÙŠ...';
+    }
+
+    renderSlides();
+    markProjectDirty();
+    renderPreviewFrame();
+    if (status) status.textContent = `âœ… ØªÙ… ØªÙˆÙ„ÙŠØ¯ ${result.slides.length} Ø´Ø±ÙŠØ­Ø© â€” Ø±Ø§Ø¬Ø¹ Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª Ø£Ø¯Ù†Ø§Ù‡`;
+    setStatus('Ø§Ù„Ù…Ø­ØªÙˆÙ‰', `ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ ${result.slides.length} Ø´Ø±ÙŠØ­Ø© Ù…Ù† Gemini`);
+  } catch (err) {
+    if (status) status.textContent = `âŒ ${err.message}`;
+    if (scriptPreview) scriptPreview.placeholder = 'Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª Ø§Ù„ÙƒØ§Ù…Ù„ Ù„Ù„ØªØ¹Ù„ÙŠÙ‚ Ø§Ù„ØµÙˆØªÙŠ...';
+    setStatus('Ø®Ø·Ø£', err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="sparkles" style="width:18px;height:18px;"></i> ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø´Ø±Ø§Ø¦Ø­ ÙˆØ§Ù„Ø³ÙƒØ±ÙŠØ¨Øª';
+      if (window.lucide) lucide.createIcons({ nodes: [btn.querySelector('[data-lucide]')] });
+    }
+  }
+}
+
+async function handleGenerateScriptVoiceover() {
+  const btn = document.getElementById('generate-script-audio-btn');
+  const statusEl = document.getElementById('script-audio-status');
+  const scriptPreview = document.getElementById('content-script-preview');
+
+  const scriptText = scriptPreview ? scriptPreview.value.trim() : '';
+  if (!scriptText) {
+    if (statusEl) statusEl.textContent = 'Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª ÙØ§Ø±Øº â€” ÙŠØ±Ø¬Ù‰ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„Ø´Ø±Ø§Ø¦Ø­ Ø£ÙˆÙ„Ø§Ù‹';
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªÙˆÙ„ÙŠØ¯...'; }
+  if (statusEl) statusEl.textContent = 'Ø¬Ø§Ø±ÙŠ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØª...';
+
+  try {
+    const result = await window.desktopApi.generateSingleVoiceover({
+      text: scriptText,
+      apiKey: state.settings.geminiApiKey || '',
+      ttsModel: state.settings.ttsModel || DEFAULT_SETTINGS.ttsModel,
+      voiceName: state.settings.ttsVoice || DEFAULT_SETTINGS.ttsVoice,
+      stylePrompt: getInspectorTtsStyle(),
+    });
+
+    if (!result.success) throw new Error(result.error || 'ÙØ´Ù„ ØªÙˆÙ„ÙŠØ¯ Ø§Ù„ØµÙˆØª');
+
+    state.voiceover = result.voiceoverPath;
+    state.voiceoverDurationMs = result.durationMs || 0;
+
+    const label = 'Ø³ÙƒØ±ÙŠØ¨Øª Ø§Ù„Ù…Ø­ØªÙˆÙ‰';
+    if (elements.voiceoverFilename) {
+      elements.voiceoverFilename.textContent = label;
+      elements.voiceoverFilename.title = scriptText.slice(0, 80);
+    }
+    updateVoiceoverMeta();
+    markProjectDirty();
+    renderPreviewFrame();
+
+    if (statusEl) statusEl.textContent = `âœ… ØªÙ… Ø§Ù„ØªÙˆÙ„ÙŠØ¯ â€” ${(state.voiceoverDurationMs / 1000).toFixed(1)}Ø«`;
+    setStatus('Ø§ÙƒØªÙ…Ù„', 'ØªÙ… ØªÙˆÙ„ÙŠØ¯ ØµÙˆØª Ø§Ù„Ø³ÙƒØ±ÙŠØ¨Øª Ø¨Ù†Ø¬Ø§Ø­');
+  } catch (err) {
+    if (statusEl) statusEl.textContent = `âŒ ${err.message}`;
+    setStatus('Ø®Ø·Ø£', err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="mic" style="width:16px;height:16px;"></i> ØªÙˆÙ„ÙŠØ¯ ØµÙˆØª Ø§Ù„Ø§Ø³ÙƒØ±ÙŠØ¨Øª';
+      if (window.lucide) lucide.createIcons({ nodes: [btn.querySelector('[data-lucide]')] });
+    }
+  }
+}
+
+const generateContentBtn = document.getElementById('generate-content-btn');
+if (generateContentBtn) {
+  generateContentBtn.addEventListener('click', handleGenerateContentSlides);
+}
+
+const generateScriptAudioBtn = document.getElementById('generate-script-audio-btn');
+if (generateScriptAudioBtn) {
+  generateScriptAudioBtn.addEventListener('click', handleGenerateScriptVoiceover);
+}
+
+const copyScriptBtn = document.getElementById('copy-script-btn');
+if (copyScriptBtn) {
+  copyScriptBtn.addEventListener('click', () => {
+    const scriptPreview = document.getElementById('content-script-preview');
+    if (!scriptPreview || !scriptPreview.value.trim()) return;
+    navigator.clipboard.writeText(scriptPreview.value).then(() => {
+      const orig = copyScriptBtn.textContent;
+      copyScriptBtn.textContent = 'âœ“ ØªÙ… Ø§Ù„Ù†Ø³Ø®';
+      setTimeout(() => { copyScriptBtn.textContent = orig; }, 1500);
+    });
+  });
+}
+
+// â”€â”€â”€ Prompt Inspector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function updatePromptInspector() {
+  const ttsEl = document.getElementById('prompt-inspector-tts');
+  const contentEl = document.getElementById('prompt-inspector-content');
+  if (ttsEl && !ttsEl._userEdited) ttsEl.value = state.settings.ttsStylePrompt || DEFAULT_TTS_STYLE_PROMPT;
+  if (contentEl && !contentEl._userEdited) contentEl.value = state.settings.contentSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+}
+
+function getInspectorTtsStyle() {
+  const el = document.getElementById('prompt-inspector-tts');
+  return (el && el.value.trim()) ? el.value.trim() : (state.settings.ttsStylePrompt || DEFAULT_TTS_STYLE_PROMPT);
+}
+
+function getInspectorSystemPrompt() {
+  const el = document.getElementById('prompt-inspector-content');
+  return (el && el.value.trim()) ? el.value.trim() : (state.settings.contentSystemPrompt || DEFAULT_SYSTEM_PROMPT);
+}
+
+// â”€â”€â”€ Settings Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function openSettingsModal() {
+  const overlay = document.getElementById('settings-modal-overlay');
+  if (!overlay) return;
+
+  // Populate fields from state.settings
+  const apiKeyInput = document.getElementById('settings-api-key');
+  const modelSelect = document.getElementById('settings-tts-model');
+  const ttsStylePromptInput = document.getElementById('settings-tts-style-prompt');
+  const contentModelSelect = document.getElementById('settings-content-model');
+  const contentSystemPromptInput = document.getElementById('settings-content-system-prompt');
+  if (apiKeyInput) apiKeyInput.value = state.settings.geminiApiKey || '';
+  if (modelSelect) modelSelect.value = state.settings.ttsModel || DEFAULT_SETTINGS.ttsModel;
+  if (ttsStylePromptInput) ttsStylePromptInput.value = state.settings.ttsStylePrompt || DEFAULT_TTS_STYLE_PROMPT;
+  if (contentModelSelect) contentModelSelect.value = state.settings.contentModel || DEFAULT_SETTINGS.contentModel;
+  if (contentSystemPromptInput) contentSystemPromptInput.value = state.settings.contentSystemPrompt || DEFAULT_SYSTEM_PROMPT;
+
+  syncVoiceGrid(state.settings.ttsVoice || DEFAULT_SETTINGS.ttsVoice);
+  updateApiKeyStatus(state.settings.geminiApiKey);
+
+  overlay.classList.add('is-active');
+}
+
+function closeSettingsModal() {
+  const overlay = document.getElementById('settings-modal-overlay');
+  if (overlay) overlay.classList.remove('is-active');
+}
+
+function syncVoiceGrid(selectedVoice) {
+  document.querySelectorAll('#voice-selection-grid .voice-card').forEach((card) => {
+    card.classList.toggle('is-selected', card.dataset.voice === selectedVoice);
+  });
+}
+
+function updateApiKeyStatus(apiKey) {
+  const badge = document.getElementById('api-key-status');
+  if (!badge) return;
+  if (apiKey && apiKey.trim().length > 10) {
+    badge.innerHTML = '<span class="settings-status-badge ok">âœ“ Ù…ÙØªØ§Ø­ Ù…Ø­ÙÙˆØ¸</span>';
+  } else {
+    badge.innerHTML = '<span class="settings-status-badge missing">âœ— Ù„Ù… ÙŠÙØ¶Ù Ù…ÙØªØ§Ø­ Ø¨Ø¹Ø¯</span>';
+  }
+}
+
+async function saveSettings() {
+  const apiKeyInput = document.getElementById('settings-api-key');
+  const modelSelect = document.getElementById('settings-tts-model');
+  const ttsStylePromptInput = document.getElementById('settings-tts-style-prompt');
+  const selectedVoiceCard = document.querySelector('#voice-selection-grid .voice-card.is-selected');
+  const contentModelSelect = document.getElementById('settings-content-model');
+  const contentSystemPromptInput = document.getElementById('settings-content-system-prompt');
+
+  const newSettings = {
+    geminiApiKey: apiKeyInput ? apiKeyInput.value.trim() : '',
+    ttsModel: modelSelect ? modelSelect.value : DEFAULT_SETTINGS.ttsModel,
+    ttsVoice: selectedVoiceCard ? selectedVoiceCard.dataset.voice : DEFAULT_SETTINGS.ttsVoice,
+    ttsStylePrompt: ttsStylePromptInput ? ttsStylePromptInput.value.trim() || DEFAULT_TTS_STYLE_PROMPT : DEFAULT_TTS_STYLE_PROMPT,
+    contentModel: contentModelSelect ? contentModelSelect.value : DEFAULT_SETTINGS.contentModel,
+    contentSystemPrompt: contentSystemPromptInput ? contentSystemPromptInput.value : DEFAULT_SYSTEM_PROMPT,
+  };
+
+  const result = await window.desktopApi.saveSettings(newSettings);
+  if (result.success) {
+    state.settings = newSettings;
+    updatePromptInspector();
+    closeSettingsModal();
+    markProjectDirty();
+    setStatus('Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª', 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¨Ù†Ø¬Ø§Ø­');
+  } else {
+    setStatus('Ø®Ø·Ø£', 'ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª');
+  }
+}
+
+// Gear button
+const openSettingsBtn = document.getElementById('open-settings-btn');
+if (openSettingsBtn) {
+  openSettingsBtn.addEventListener('click', openSettingsModal);
+}
+
+// Close buttons
+const settingsCloseBtn = document.getElementById('settings-modal-close-btn');
+const settingsCancelBtn = document.getElementById('settings-cancel-btn');
+if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettingsModal);
+if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettingsModal);
+
+// Close on backdrop click
+const settingsOverlay = document.getElementById('settings-modal-overlay');
+if (settingsOverlay) {
+  settingsOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsOverlay) closeSettingsModal();
+  });
+}
+
+// Save button
+const settingsSaveBtn = document.getElementById('settings-save-btn');
+if (settingsSaveBtn) {
+  settingsSaveBtn.addEventListener('click', saveSettings);
+}
+
+// Show/hide API key
+const toggleApiKeyBtn = document.getElementById('toggle-api-key-visibility');
+if (toggleApiKeyBtn) {
+  toggleApiKeyBtn.addEventListener('click', () => {
+    const input = document.getElementById('settings-api-key');
+    const icon = document.getElementById('eye-icon');
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    if (icon) {
+      icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+      lucide.createIcons({ nodes: [icon] });
+    }
+  });
+}
+
+// Voice card selection
+const voiceGrid = document.getElementById('voice-selection-grid');
+if (voiceGrid) {
+  voiceGrid.addEventListener('click', (e) => {
+    const card = e.target.closest('.voice-card');
+    if (!card) return;
+    syncVoiceGrid(card.dataset.voice);
+  });
+}
+
+// Live update of API key status while typing
+const apiKeyInput = document.getElementById('settings-api-key');
+if (apiKeyInput) {
+  apiKeyInput.addEventListener('input', () => updateApiKeyStatus(apiKeyInput.value));
+}
+
+bootstrap();
+

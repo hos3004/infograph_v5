@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>قالب مقولة متحركة · Quote Broadcast Template V6</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#d80b14;
+    --red2:#b8050d;
+    --white:#fff;
+    --yellow:#ffd21e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:"Cairo","Tajawal",Arial,sans-serif}
+  body{display:grid;place-items:center}
+  .viewport{position:fixed;inset:0;display:grid;place-items:center;background:#000;perspective:1200px;overflow:hidden}
+  .stage{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--red);transform-origin:center center;color:#fff;isolation:isolate}
+  .stage::before{
+    content:"";position:absolute;inset:-4%;z-index:-2;
+    background:
+      radial-gradient(circle at 82% 38%,rgba(255,255,255,.09),transparent 25%),
+      radial-gradient(circle at 20% 85%,rgba(0,0,0,.20),transparent 36%),
+      linear-gradient(135deg,var(--red),var(--red2));
+    animation:bgBreath 12s ease-in-out infinite alternate;
+  }
+  .stage::after{
+    content:"";position:absolute;inset:0;z-index:-1;opacity:.13;mix-blend-mode:soft-light;
+    background-image:
+      linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);
+    background-size:80px 80px;transform:rotate(-1deg) scale(1.08);
+  }
+  @keyframes bgBreath{to{transform:scale(1.03) translate(-18px,10px)}}
+  .noise{position:absolute;inset:0;opacity:.16;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E")}
+
+  .edge-accent{position:absolute;right:-2px;top:250px;width:34px;height:160px;background:var(--yellow);opacity:0;transform:translateX(30px);box-shadow:0 0 40px rgba(255,210,30,.35)}
+
+  .portrait-wrap{position:absolute;left:80px;bottom:115px;width:560px;height:760px;opacity:0;transform:translateX(-80px) scale(.96);pointer-events:none}
+  .portrait-breath{position:absolute;inset:0;transform-origin:50% 68%}
+  .portrait-ring{position:absolute;left:18px;bottom:28px;width:520px;height:520px;border-radius:50%;border:3px solid rgba(255,255,255,.23);box-shadow:inset 0 0 90px rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.22)}
+  .portrait-glow{position:absolute;left:80px;bottom:90px;width:410px;height:520px;border-radius:45%;background:radial-gradient(circle,rgba(255,255,255,.30),transparent 68%);filter:blur(28px);opacity:.45}
+  .portrait{position:absolute;left:50px;bottom:0;width:470px;height:690px;object-fit:cover;object-position:center top;border-radius:280px 280px 32px 32px;filter:grayscale(1) contrast(1.12);mix-blend-mode:luminosity;opacity:.88;box-shadow:0 28px 90px rgba(0,0,0,.32)}
+  .portrait-vignette{position:absolute;inset:0;background:linear-gradient(90deg,rgba(216,11,20,.00),rgba(216,11,20,.08) 45%,rgba(216,11,20,.85) 92%)}
+  .speaker-badge{position:absolute;left:62px;bottom:58px;min-width:330px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);padding:18px 24px;border-radius:18px;direction:rtl;box-shadow:0 18px 44px rgba(0,0,0,.20);opacity:0;transform:translateY(16px)}
+  .speaker-badge .speaker{font-size:30px;font-weight:900;line-height:1.15}
+  .speaker-badge .role{font-size:19px;color:rgba(255,255,255,.74);font-weight:700;margin-top:6px}
+
+  .quote-area{position:absolute;right:210px;top:100px;width:1120px;min-height:780px;direction:rtl;text-align:right}
+  .bg-quote-mark{position:absolute;right:180px;top:10px;font-family:Georgia,serif;font-size:2040px;font-weight:900;line-height:.8;color:#fff;filter:blur(.3px);text-shadow:0 30px 80px rgba(0,0,0,.08);pointer-events:none;transform-origin:50% 50%;z-index:0;opacity:.03;animation:floatQuote 35s ease-in-out infinite}
+  .quote-mark{position:absolute;right:115px;top:-8px;font-family:Georgia,serif;font-size:250px;font-weight:900;line-height:.75;color:#fff;opacity:0;transform:scale(.75) translateY(-16px);text-shadow:0 22px 60px rgba(0,0,0,.14)}
+  .title-block{position:absolute;right:0;top:90px;width:460px;z-index:2;color:#fff;font-weight:900;opacity:0;transform:translateY(22px)}
+  .title-main{font-size:60px;line-height:1.14;letter-spacing:-1px;white-space:nowrap}
+  .title-sub{font-size:34px;color:rgba(255,255,255,.72);line-height:1.25;margin-top:18px;white-space:nowrap;position:relative;display:inline-block}
+  .title-sub::after{content:"";position:absolute;right:0;bottom:-9px;width:68%;height:5px;background:rgba(255,255,255,.28);transform-origin:right;transform:scaleX(0)}
+
+  .timeline{position:absolute;right:-6px;top:248px;width:80px;height:470px;opacity:0;z-index:4}
+  .timeline-line{position:absolute;right:34px;top:24px;width:0;height:0;border-right:3px dashed rgba(255,255,255,.72)}
+  .node{position:absolute;right:20px;width:30px;height:30px;border:5px solid rgba(255,255,255,.92);background:transparent;transform:scale(0);box-shadow:0 0 0 5px rgba(255,210,30,.0)}
+  .node::before{content:"";position:absolute;inset:6px;background:var(--yellow);opacity:.92}
+  .node.n1{top:135px}
+  .node.n2{top:335px}
+
+  .quote-box{position:absolute;right:110px;top:300px;width:900px;z-index:3;padding-right:0}
+  .quote-line{position:relative;display:block;width:max-content;max-width:900px;margin:0 0 48px auto;font-size:62px;font-weight:900;line-height:1.22;letter-spacing:-.8px;color:#fff;opacity:0;transform:translateY(32px);clip-path:inset(0 100% 0 0);text-shadow:0 15px 38px rgba(0,0,0,.12)}
+  .quote-line.dim{color:rgba(255,255,255,.82)}
+  .quote-line::after{content:"";position:absolute;inset:0 -16px 0 auto;width:70px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:translateX(120%);opacity:0;mix-blend-mode:screen}
+  .quote-line .highlight{color:#fff;background:linear-gradient(transparent 58%,rgba(255,210,30,.42) 58%);padding:0 .08em}
+
+  .source-pill{position:absolute;right:110px;top:700px;display:flex;align-items:center;gap:14px;padding:14px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.13);font-size:24px;font-weight:800;color:rgba(255,255,255,.82);opacity:0;transform:translateY(12px)}
+  .source-dot{width:13px;height:13px;background:var(--yellow);box-shadow:0 0 22px rgba(255,210,30,.75)}
+
+
+  /* Rotating grouped points */
+  .quote-box.group-exit{animation:groupOut .46s ease forwards}
+  .quote-box.group-enter{animation:groupIn .58s ease forwards}
+  .timeline.group-exit{animation:groupOut .46s ease forwards !important}
+  .timeline.group-enter{animation:groupIn .58s ease forwards !important}
+  .playing .timeline.is-rotating .timeline-line{animation:lineDraw .7s .06s cubic-bezier(.4,0,.2,1) forwards}
+  .playing .timeline.is-rotating .node.n1{animation-delay:.14s}
+  .playing .timeline.is-rotating .node.n2{animation-delay:.36s}
+  @keyframes groupIn{from{opacity:0;transform:translateY(24px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes groupOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-22px) scale(.985)}}
+
+  .controls{position:fixed;left:22px;bottom:22px;z-index:50;width:520px;background:#101010;color:#fff;border:1px solid #2a2a2a;border-radius:18px;padding:16px;box-shadow:0 22px 70px rgba(0,0,0,.45);direction:rtl;font-family:"Tajawal",Arial,sans-serif}
+  .controls h3{font-size:18px;margin-bottom:10px;color:#fff}
+  .controls label{font-size:13px;color:#bbb;display:block;margin:10px 0 5px}
+  .controls input,.controls textarea{width:100%;background:#1d1d1d;border:1px solid #3a3a3a;border-radius:10px;color:#fff;padding:10px 12px;font-family:inherit;font-size:14px;outline:none}
+  .controls textarea{height:92px;resize:vertical;line-height:1.6}
+  .controls .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .controls button{width:100%;margin-top:12px;border:0;border-radius:999px;background:#e30b16;color:#fff;font-weight:900;font-size:16px;padding:12px 18px;cursor:pointer;font-family:inherit;box-shadow:0 12px 26px rgba(227,11,22,.26)}
+  .hint{font-size:12px;color:#8f8f8f;line-height:1.5;margin-top:9px}
+
+  .playing .edge-accent{animation:edgeIn .7s .55s cubic-bezier(.2,.9,.2,1) forwards}
+  .playing .quote-mark{animation:quoteMark .95s .45s cubic-bezier(.16,1,.3,1) forwards}
+  .playing .title-block{animation:titleIn .85s .85s cubic-bezier(.2,.9,.2,1) forwards}
+  .playing .title-sub::after{animation:underlineIn .65s 1.45s cubic-bezier(.2,.9,.2,1) forwards}
+  .playing .timeline{animation:timelineShow .1s .95s forwards}
+  .playing .timeline-line{animation:lineDraw 1.15s 1.15s cubic-bezier(.4,0,.2,1) forwards}
+  .playing .node{animation:nodePop .45s cubic-bezier(.16,1.5,.4,1) forwards}
+  .playing .node.n1{animation-delay:1.55s}
+  .playing .node.n2{animation-delay:2.15s}
+  .playing .portrait-wrap{animation:portraitIn 1.05s 1.05s cubic-bezier(.16,1,.3,1) forwards}
+  .playing .portrait-breath{animation:portraitBreath 7.5s ease-in-out 2.2s infinite}
+
+  .playing .speaker-badge{animation:fadeUp .75s 2.0s cubic-bezier(.2,.9,.2,1) forwards}
+  .playing .source-pill{animation:fadeUp .7s 3.2s cubic-bezier(.2,.9,.2,1) forwards}
+  .playing .quote-line{animation:lineReveal .82s cubic-bezier(.16,1,.3,1) forwards}
+  .playing .quote-line::after{animation:sweep .72s ease-out forwards}
+
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes edgeIn{to{opacity:1;transform:translateX(0)}}
+  @keyframes quoteMark{0%{opacity:0;transform:scale(.72) translateY(-20px)}70%{opacity:1;transform:scale(1.05) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
+  @keyframes titleIn{to{opacity:1;transform:translateY(0)}}
+  @keyframes underlineIn{to{transform:scaleX(1)}}
+  @keyframes timelineShow{to{opacity:1}}
+  @keyframes lineDraw{to{height:390px}}
+  @keyframes nodePop{0%{transform:scale(0);box-shadow:0 0 0 0 rgba(255,210,30,.0)}70%{transform:scale(1.18);box-shadow:0 0 0 10px rgba(255,210,30,.18)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,210,30,.0)}}
+  @keyframes portraitIn{to{opacity:1;transform:translateX(0) scale(1)}}
+  @keyframes portraitBreath{0%{transform:translateY(0) scale(1) rotate(0deg)}25%{transform:translateY(-6px) scale(1.012) rotate(-.35deg)}50%{transform:translateY(-10px) scale(1.02) rotate(0deg)}75%{transform:translateY(-5px) scale(1.01) rotate(.35deg)}100%{transform:translateY(0) scale(1) rotate(0deg)}}
+  @keyframes floatQuote{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:.03}25%{transform:translate(-120px,60px) rotate(-3deg) scale(1.03);opacity:.045}50%{transform:translate(-40px,180px) rotate(2deg) scale(0.97);opacity:.025}75%{transform:translate(-200px,120px) rotate(-1deg) scale(1.02);opacity:.04}100%{transform:translate(0,0) rotate(0deg) scale(1);opacity:.03}}
+  @keyframes lineReveal{0%{opacity:0;transform:translateY(32px);clip-path:inset(0 100% 0 0)}30%{opacity:1}100%{opacity:1;transform:translateY(0);clip-path:inset(0 0 0 0)}}
+  @keyframes sweep{35%{opacity:.65}100%{opacity:0;transform:translateX(-105%)}}
+
+  @media (max-width:900px){.controls{width:calc(100% - 32px);left:16px;bottom:16px}.controls .row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="stage" id="stage">
+    <div class="noise"></div>
+    <div class="edge-accent"></div>
+
+    <div class="portrait-wrap" id="portraitWrap">
+      <div class="portrait-breath">
+        <div class="portrait-ring"></div>
+        <div class="portrait-glow"></div>
+        <img class="portrait" id="portrait" alt="صورة صاحب المقولة" />
+        <div class="portrait-vignette"></div>
+        <div class="speaker-badge">
+          <div class="speaker" id="speakerNameView">اسم صاحب المقولة</div>
+          <div class="role" id="speakerRoleView">الصفة أو المصدر</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-area">
+      <div class="bg-quote-mark">”</div>
+      <div class="quote-mark">”</div>
+      <div class="title-block">
+        <div class="title-main" id="programTitleMain">مراسل الجزيرة</div>
+        <div class="title-sub" id="programSub">البرلمان العراقي</div>
+      </div>
+      <div class="timeline" id="timeline">
+        <div class="timeline-line"></div>
+        <div class="node n1"></div>
+        <div class="node n2"></div>
+      </div>
+      <div class="quote-box" id="quoteBox"></div>
+      <div class="source-pill"><span class="source-dot"></span><span id="sourceView">المصدر: الجزيرة مباشر</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls" id="controls">
+  <h3>قالب مقولة متحركة — Broadcast Quote</h3>
+  <label>العنوان الرئيسي</label>
+  <input id="i-title-main" value="مراسل الجزيرة" />
+  <label>العنوان الفرعي</label>
+  <input id="i-title-sub" value="البرلمان العراقي" />
+  <label>النقاط — افصل كل نقطة بعلامة ++ أو Enter</label>
+  <textarea id="i-quote">البرلمان العراقي يصوت لصالح منح الثقة لحكومة الزيدي ++ البرلمان العراقي يصوت على عدد من الوزراء الجدد ++ الحكومة تعلن أولويات المرحلة المقبلة ++ الكتل السياسية تترقب التصويت النهائي ++ الشارع العراقي ينتظر نتائج التشكيل ++ مراقبون يتحدثون عن تحديات اقتصادية وأمنية</textarea>
+  <div class="row">
+    <div><label>مدة كل مجموعة بالثواني</label><input id="i-group-duration" type="number" min="3" max="60" value="10" /></div>
+    <div><label>التكرار</label><input id="i-loop" value="1" title="1 للتكرار المستمر، 0 للتوقف عند النهاية" /></div>
+  </div>
+  <div class="row">
+    <div><label>اسم صاحب المقولة</label><input id="i-speaker" value="مراسل الجزيرة" /></div>
+    <div><label>الصفة / المصدر</label><input id="i-role" value="بغداد — العراق" /></div>
+  </div>
+  <label>رابط صورة صاحب المقولة</label>
+  <input id="i-photo" value="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=900" />
+  <label>المصدر</label>
+  <input id="i-source" value="المصدر: الجزيرة مباشر" />
+  <button onclick="play(true)">▶ تشغيل الأنيميشن</button>
+  <div class="hint">يعرض القالب نقطتين في كل مرة. اكتب أي عدد من النقاط، وسيعرض كل مجموعتين لمدة محددة ثم ينتقل للمجموعة التالية. قيمة التكرار: 1 للتكرار، 0 للتوقف عند النهاية.</div>
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+  const quoteBox = document.getElementById('quoteBox');
+  const timeline = document.getElementById('timeline');
+
+  let allLines = [];
+  let groups = [];
+  let currentGroupIndex = 0;
+  let rotationTimer = null;
+
+  function $(id){return document.getElementById(id)}
+  function getVal(id, fallback=''){return ($(id)?.value ?? fallback).trim() || fallback}
+
+  function escapeHTML(str){
+    return String(str).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+
+  function smartHighlight(line){
+    const words = line.trim().split(/\s+/);
+    if(words.length < 5) return escapeHTML(line);
+    const index = Math.min(words.length - 2, Math.max(1, Math.floor(words.length * .55)));
+    return words.map((w,i)=> i === index ? `<span class="highlight">${escapeHTML(w)}</span>` : escapeHTML(w)).join(' ');
+  }
+
+  function normalizeLines(text){
+    return text
+      .split(/\+\+|\n/g)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0,60);
+  }
+
+  function chunkPairs(lines){
+    const result = [];
+    for(let i = 0; i < lines.length; i += 2){
+      result.push(lines.slice(i, i + 2));
+    }
+    return result.length ? result : [[]];
+  }
+
+  function getGroupDurationMs(){
+    const seconds = Number(getVal('i-group-duration','10'));
+    return Math.max(3, Math.min(60, Number.isFinite(seconds) ? seconds : 10)) * 1000;
+  }
+
+  function shouldLoop(){
+    return getVal('i-loop','1') !== '0';
+  }
+
+  function clearRotationTimer(){
+    if(rotationTimer){
+      clearTimeout(rotationTimer);
+      rotationTimer = null;
+    }
+  }
+
+  function renderTimelineNodes(count, fast=false){
+    const safeCount = Math.max(0, Math.min(2, count));
+    timeline.innerHTML = `
+      <div class="timeline-line"></div>
+      ${safeCount >= 1 ? '<div class="node n1"></div>' : ''}
+      ${safeCount >= 2 ? '<div class="node n2"></div>' : ''}
+    `;
+    timeline.classList.toggle('is-rotating', fast);
+  }
+
+  function renderGroup(index, options={}){
+    const { fast=false } = options;
+    const group = groups[index] || [];
+    const firstDelay = fast ? 0.16 : 1.85;
+    const stepDelay = fast ? 0.22 : 0.58;
+
+    quoteBox.innerHTML = group.map((line, idx)=>{
+      const delay = (firstDelay + idx * stepDelay).toFixed(2);
+      const cls = idx % 2 ? 'quote-line dim' : 'quote-line';
+      return `<span class="${cls}" style="animation-delay:${delay}s">${smartHighlight(line)}</span>`;
+    }).join('');
+
+    renderTimelineNodes(group.length, fast);
+  }
+
+  function rotateToNextGroup(){
+    if(groups.length <= 1) return;
+
+    const atLastGroup = currentGroupIndex >= groups.length - 1;
+    if(atLastGroup && !shouldLoop()){
+      clearRotationTimer();
+      return;
+    }
+
+    quoteBox.classList.remove('group-enter');
+    timeline.classList.remove('group-enter');
+    quoteBox.classList.add('group-exit');
+    timeline.classList.add('group-exit');
+
+    setTimeout(() => {
+      currentGroupIndex = atLastGroup ? 0 : currentGroupIndex + 1;
+
+      quoteBox.classList.remove('group-exit');
+      timeline.classList.remove('group-exit');
+
+      renderGroup(currentGroupIndex, { fast:true });
+
+      quoteBox.classList.add('group-enter');
+      timeline.classList.add('group-enter');
+
+      setTimeout(() => {
+        quoteBox.classList.remove('group-enter');
+        timeline.classList.remove('group-enter');
+      }, 650);
+
+      scheduleNextGroup();
+    }, 520);
+  }
+
+  function scheduleNextGroup(){
+    clearRotationTimer();
+    if(groups.length <= 1) return;
+    rotationTimer = setTimeout(rotateToNextGroup, getGroupDurationMs());
+  }
+
+  function render(){
+    clearRotationTimer();
+
+    $('programTitleMain').textContent = getVal('i-title-main','مراسل الجزيرة');
+    $('programSub').textContent = getVal('i-title-sub','البرلمان العراقي');
+    $('sourceView').textContent = getVal('i-source','المصدر: الجزيرة مباشر');
+    $('speakerNameView').textContent = getVal('i-speaker','مراسل الجزيرة');
+    $('speakerRoleView').textContent = getVal('i-role','بغداد — العراق');
+
+    const imgUrl = getVal('i-photo','');
+    if(imgUrl){
+      $('portrait').src = imgUrl;
+      $('portraitWrap').style.display = 'block';
+    } else {
+      $('portraitWrap').style.display = 'none';
+    }
+
+    allLines = normalizeLines(getVal('i-quote',''));
+    groups = chunkPairs(allLines);
+    currentGroupIndex = 0;
+
+    quoteBox.classList.remove('group-exit','group-enter');
+    timeline.classList.remove('group-exit','group-enter','is-rotating');
+
+    renderGroup(currentGroupIndex, { fast:false });
+  }
+
+  function fit(){
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = `scale(${scale})`;
+  }
+
+  window.addEventListener('resize', fit);
+
+  function play(){
+    clearRotationTimer();
+    render();
+    stage.classList.remove('playing');
+    void stage.offsetWidth;
+    stage.classList.add('playing');
+    scheduleNextGroup();
+  }
+
+  window.render = render;
+  window.play = play;
+  window.stopPointRotation = clearRotationTimer;
+
+  fit();
+  setTimeout(()=>play(true), 250);
+</script>
+
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const embedMode = params.get('embed') === '1';
+  const controls = document.getElementById('controls') || document.querySelector('.controls');
+  const viewport = document.querySelector('.viewport');
+  const stage = document.getElementById('stage');
+
+  function hideControlsInEmbedMode() {
+    if (!embedMode) return;
+    if (controls) controls.style.display = 'none';
+    const style = document.createElement('style');
+    style.textContent = `html,body{width:100%;height:100%;overflow:hidden!important;background:#000!important}.controls{display:none!important}`;
+    document.head.appendChild(style);
+  }
+  function getStageBaseSize() {
+    if (!stage) return { width: 1920, height: 1080 };
+    const computed = window.getComputedStyle(stage);
+    return { width: parseFloat(computed.width) || 1920, height: parseFloat(computed.height) || 1080 };
+  }
+  function fitEmbeddedStage() {
+    if (!embedMode || !stage) return;
+    const { width, height } = getStageBaseSize();
+    const scale = Math.min(window.innerWidth / width, window.innerHeight / height);
+    if (viewport) {
+      viewport.style.position = 'fixed';
+      viewport.style.inset = '0';
+      viewport.style.display = 'block';
+      viewport.style.overflow = 'hidden';
+      viewport.style.perspectiveOrigin = 'center center';
+    }
+    stage.style.position = 'absolute';
+    stage.style.left = '50%';
+    stage.style.top = '50%';
+    stage.style.margin = '0';
+    stage.style.transformOrigin = 'center center';
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+  function getAnimations() {
+    if (typeof document.getAnimations !== 'function') return [];
+    try { return document.getAnimations({ subtree: true }); } catch { return document.getAnimations(); }
+  }
+  function applyValues(values) {
+    if (!values || typeof values !== 'object') return;
+    Object.entries(values).forEach(([fieldId, value]) => {
+      const control = document.getElementById(fieldId);
+      if (control && 'value' in control) control.value = value ?? '';
+    });
+  }
+  function renderNow() { if (typeof window.render === 'function') window.render(); }
+  function restartNative() { if (typeof window.play === 'function') { window.play(true); return; } renderNow(); }
+  function afterAnimationsReady(callback) { requestAnimationFrame(() => requestAnimationFrame(callback)); }
+  function stageAt(timeMs, playing) {
+    const safeTimeMs = Math.max(0, Number(timeMs || 0));
+    restartNative();
+    afterAnimationsReady(() => {
+      getAnimations().forEach(animation => {
+        try { animation.pause(); animation.currentTime = safeTimeMs; if (playing) animation.play(); } catch {}
+      });
+    });
+  }
+  function setPlaying(playing) {
+    getAnimations().forEach(animation => { try { playing ? animation.play() : animation.pause(); } catch {} });
+    try { if (!playing && typeof window.stopPointRotation === 'function') window.stopPointRotation(); } catch {}
+    try { if (playing && typeof window.play === 'function') window.play(true); } catch {}
+  }
+  function handleMessage(event) {
+    const data = event?.data;
+    if (!data || typeof data !== 'object') return;
+    switch (data.type) {
+      case 'qawaleb:update': applyValues(data.values); renderNow(); stageAt(data.timeMs || 0, data.autoplay === true); break;
+      case 'qawaleb:restart': stageAt(0, data.autoplay === true); break;
+      case 'qawaleb:seek': stageAt(data.timeMs || 0, data.playing === true); break;
+      case 'qawaleb:set-playing': setPlaying(data.playing === true); break;
+    }
+  }
+  hideControlsInEmbedMode();
+  window.addEventListener('message', handleMessage);
+  window.addEventListener('resize', fitEmbeddedStage);
+  renderNow();
+  if (embedMode) { fitEmbeddedStage(); stageAt(0, false); }
+  if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'qawaleb:ready' }, '*');
+  window.QAWALEB_TEMPLATE_BRIDGE = { applyValues, renderNow, restart: (autoplay=true)=>stageAt(0,autoplay), seek: (timeMs, playing=false)=>stageAt(timeMs,playing), setPlaying };
+})();
+</script>
+</body>
+</html>

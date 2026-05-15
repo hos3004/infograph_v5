@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>رسالة تلجرام متحركة · TG Animated</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #0e1621; --bubble: #182533; --text: #fff; --blue: #5288c1; --muted: #7f91a4; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #000; overflow: hidden; font-family: "Tajawal", sans-serif; }
+  .viewport { position: fixed; inset: 0; display: grid; place-items: center; perspective: 1500px;}
+  .stage { width: 1920px; height: 1080px; position: relative; background: #070b10; overflow: hidden; }
+  
+  /* Paper Plane Background */
+  .bg-logo { position: absolute; top: 30%; left: 10%; width: 600px; opacity: 0.03; animation: flyPlane 40s linear infinite; }
+  @keyframes flyPlane { 0% { transform: translate(-200px, 200px) rotate(-10deg); } 100% { transform: translate(1500px, -500px) rotate(10deg); } }
+
+  .tg-header { position: absolute; top: 0; left: 0; right: 0; height: 110px; background: #17212b; display: flex; align-items: center; padding: 0 60px; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transform: translateY(-100%); z-index: 10;}
+  .avatar-circle { width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(#64b5f6, #2196f3); display: grid; place-items: center; color: #fff; font-size: 30px; font-weight: bold; }
+  .channel-info { display: flex; flex-direction: column; }
+  .channel-name { font-size: 28px; font-weight: 700; color: #fff; }
+  .channel-subs { font-size: 20px; color: var(--muted); }
+
+  .msg-wrapper { position: absolute; bottom: 120px; right: 120px; opacity: 0; transform: translateY(100px); }
+  .float-wrapper { transform-style: preserve-3d; }
+  
+  .msg-bubble { width: 850px; background: var(--bubble); border-radius: 20px; padding: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  
+  .anim-item { opacity: 0; transform: translateY(15px); }
+
+  .msg-photo { width: 100%; height: 500px; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+  .msg-photo img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .msg-content { padding: 0 15px 10px; }
+  .msg-title { font-size: 30px; font-weight: 700; color: var(--blue); margin-bottom: 12px; }
+  .msg-text { font-size: 36px; line-height: 1.5; color: var(--text); }
+  
+  .msg-meta { display: flex; justify-content: flex-end; align-items: center; gap: 10px; color: var(--muted); font-size: 20px; margin-top: 20px; }
+
+  /* Animations */
+  .playing .tg-header { animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .playing .msg-wrapper { animation: msgEnter 1s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .playing .float-wrapper { animation: floatTG 12s ease-in-out infinite 1.4s; }
+
+  .playing .item-1 { animation: itemFadeUp 0.6s 0.8s forwards; }
+  .playing .item-2 { animation: itemFadeUp 0.6s 1.0s forwards; }
+  .playing .item-3 { animation: itemFadeUp 0.6s 1.2s forwards; }
+
+  @keyframes slideDown { to { transform: translateY(0); } }
+  @keyframes msgEnter { to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatTG { 
+    0%, 100% { transform: translateY(0) rotateX(0); } 
+    50% { transform: translateY(-12px) rotateX(1deg); } 
+  }
+  @keyframes itemFadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .controls { position: fixed; left: 24px; bottom: 24px; z-index: 50; background: #17212b; padding: 15px; border-radius: 12px; width: 400px; color: #fff; border: 1px solid #2b3a4a; font-family: inherit;}
+  .controls input, .controls textarea { width: 100%; background: #0e1621; border: 1px solid #2b3a4a; color: #fff; padding: 10px; margin-bottom: 10px; border-radius: 6px; font-family: inherit;}
+  .btn { background: var(--blue); color: #fff; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 16px;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="stage" id="stage">
+    
+    <svg class="bg-logo" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+
+    <div class="tg-header">
+      <div class="avatar-circle" id="initial">أ</div>
+      <div class="channel-info">
+        <div class="channel-name" id="channel"></div>
+        <div class="channel-subs">2.8M subscribers</div>
+      </div>
+    </div>
+    
+    <div class="msg-wrapper">
+      <div class="float-wrapper">
+        <div class="msg-bubble">
+          <div class="msg-photo anim-item item-1"><img id="photo" src="" /></div>
+          <div class="msg-content">
+            <div class="msg-title anim-item item-2" id="m-title"></div>
+            <div class="msg-text anim-item item-2" id="text"></div>
+            <div class="msg-meta anim-item item-3">👁️ 412.5K • 11:45 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="controls">
+  <input id="i-channel" value="أخبار العالم" />
+  <input id="i-title" value="🔴 تغطية مباشرة" />
+  <textarea id="i-text" rows="3">انطلاق القمة الاقتصادية بمشاركة قادة الدول لمناقشة تحديات الطاقة واستقرار الأسواق العالمية في المرحلة القادمة.</textarea>
+  <input id="i-img" value="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1000&q=80" />
+  <button class="btn" onclick="play()">▶ عرض بأنيميشن كامل</button>
+</div>
+<script>
+  function fit() { document.getElementById('stage').style.transform = `scale(${Math.min(innerWidth/1920, innerHeight/1080)})`; }
+  window.addEventListener('resize', fit); fit();
+  function play() {
+    document.getElementById('channel').innerText = document.getElementById('i-channel').value;
+    document.getElementById('initial').innerText = document.getElementById('i-channel').value.charAt(0);
+    document.getElementById('m-title').innerText = document.getElementById('i-title').value;
+    document.getElementById('text').innerText = document.getElementById('i-text').value;
+    document.getElementById('photo').src = document.getElementById('i-img').value;
+    const stage = document.getElementById('stage');
+    stage.classList.remove('playing'); void stage.offsetWidth; stage.classList.add('playing');
+  }
+  setTimeout(play, 200);
+</script>
+  <script src="./template-bridge.js"></script>
+</body>
+</html>

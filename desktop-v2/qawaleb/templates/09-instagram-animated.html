@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>منشور إنستغرام متحرك · IG Animated</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #ffffff; --text: #262626; --muted: #8e8e8e; --accent: #0095f6; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #000; overflow: hidden; font-family: "Tajawal", sans-serif; }
+  .viewport { position: fixed; inset: 0; display: grid; place-items: center; perspective: 1200px;}
+  .stage { width: 1920px; height: 1080px; position: relative; background: radial-gradient(circle at 80% 20%, #ffebf0 0%, #fafafa 60%); overflow: hidden; display: flex; align-items: center; justify-content: center;}
+  
+  /* Gradient Ambient Blob */
+  .bg-blob { position: absolute; width: 800px; height: 800px; background: radial-gradient(circle, rgba(225,48,108,0.08) 0%, rgba(253,29,29,0.05) 40%, rgba(255,255,255,0) 70%); top: 10%; left: 10%; filter: blur(60px); animation: blobMove 25s ease-in-out infinite alternate;}
+  @keyframes blobMove { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(200px, 200px) scale(1.2); } }
+
+  .entrance-wrapper { opacity: 0; transform: scale(0.8) translateY(50px); }
+  .float-wrapper { transform-style: preserve-3d; }
+
+  .ig-card { width: 850px; background: #fff; border: 1px solid #dbdbdb; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
+  
+  .anim-item { opacity: 0; transform: translateY(15px); }
+
+  .ig-header { height: 80px; padding: 0 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #dbdbdb; background: #fff; z-index: 2; position: relative;}
+  .ig-avatar { width: 50px; height: 50px; border-radius: 50%; padding: 3px; border: 3px solid #e1306c; object-fit: cover; }
+  .ig-user { font-size: 22px; font-weight: 700; color: var(--text); }
+  .ig-more { margin-right: auto; font-size: 28px; color: var(--text); letter-spacing: 2px; }
+
+  .ig-photo { width: 100%; aspect-ratio: 1/1; background: #efefef; overflow: hidden; }
+  .ig-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .ig-bottom-sec { background: #fff; position: relative; z-index: 2; }
+  .ig-actions { padding: 15px 20px; display: flex; gap: 20px; font-size: 30px; color: var(--text); }
+  .ig-save { margin-right: auto; }
+
+  .ig-content { padding: 0 20px 20px; }
+  .ig-likes { font-weight: 700; margin-bottom: 10px; font-size: 22px; }
+  .ig-caption { font-size: 22px; line-height: 1.5; color: var(--text); }
+  .ig-caption b { margin-left: 8px; }
+  .ig-date { font-size: 16px; color: var(--muted); text-transform: uppercase; margin-top: 15px; }
+
+  /* Animations */
+  .playing .entrance-wrapper { animation: cardEnterIG 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .playing .float-wrapper { animation: floatIG 14s ease-in-out infinite 1s; }
+
+  .playing .item-1 { animation: itemFade 0.6s 0.6s forwards; }
+  .playing .item-2 { animation: itemFade 0.6s 0.8s forwards; }
+  .playing .item-3 { animation: itemFade 0.6s 1.0s forwards; }
+  .playing .item-4 { animation: itemFade 0.6s 1.2s forwards; }
+
+  @keyframes cardEnterIG { to { opacity: 1; transform: scale(1) translateY(0); } }
+  @keyframes floatIG { 
+    0%, 100% { transform: translateY(0) rotateY(0); } 
+    50% { transform: translateY(-15px) rotateY(-2deg); } 
+  }
+  @keyframes itemFade { to { opacity: 1; transform: translateY(0); } }
+
+  .controls { position: fixed; left: 24px; bottom: 24px; z-index: 50; background: #fff; padding: 15px; border-radius: 12px; width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); font-family: inherit;}
+  .controls input, .controls textarea { width: 100%; background: #fafafa; border: 1px solid #dbdbdb; padding: 10px; margin-bottom: 10px; border-radius: 8px; font-family: inherit;}
+  .btn { background: var(--accent); color: #fff; border: none; padding: 12px; width: 100%; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 16px;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="stage" id="stage">
+    <div class="bg-blob"></div>
+
+    <div class="entrance-wrapper">
+      <div class="float-wrapper">
+        <div class="ig-card">
+          <div class="ig-header anim-item item-1">
+            <img class="ig-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200" />
+            <div class="ig-user" id="user"></div>
+            <div class="ig-more">•••</div>
+          </div>
+          <div class="ig-photo anim-item item-2"><img id="photo" src="" /></div>
+          
+          <div class="ig-bottom-sec">
+            <div class="ig-actions anim-item item-3">
+              <span>❤️</span> <span>💬</span> <span>✈️</span>
+              <span class="ig-save">🔖</span>
+            </div>
+            <div class="ig-content anim-item item-4">
+              <div class="ig-likes">إعجاب بواسطة <b>آخرون</b> و ٤,٢١٠ آخرين</div>
+              <div class="ig-caption"><b id="user-cap"></b><span id="text"></span></div>
+              <div class="ig-date">منذ ١٤ ساعة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="controls">
+  <input id="i-user" value="lens_and_life" />
+  <textarea id="i-text" rows="2">الجمال يكمن في التفاصيل الصغيرة التي لا نلحظها عادة في صخب الحياة اليومية. شاركونا أكثر شيء جميل رأيتموه اليوم.</textarea>
+  <input id="i-img" value="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1000&q=80" />
+  <button class="btn" onclick="play()">▶ عرض بأنيميشن كامل</button>
+</div>
+<script>
+  function fit() { document.getElementById('stage').style.transform = `scale(${Math.min(innerWidth/1920, innerHeight/1080)})`; }
+  window.addEventListener('resize', fit); fit();
+  function play() {
+    const user = document.getElementById('i-user').value;
+    document.getElementById('user').innerText = user;
+    document.getElementById('user-cap').innerText = user;
+    document.getElementById('text').innerText = document.getElementById('i-text').value;
+    document.getElementById('photo').src = document.getElementById('i-img').value;
+    const stage = document.getElementById('stage');
+    stage.classList.remove('playing'); void stage.offsetWidth; stage.classList.add('playing');
+  }
+  setTimeout(play, 200);
+</script>
+  <script src="./template-bridge.js"></script>
+</body>
+</html>

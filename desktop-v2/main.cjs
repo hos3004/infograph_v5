@@ -5,6 +5,32 @@ const path = require('path');
 const crypto = require('crypto');
 const zlib = require('zlib');
 
+function configureChromiumStorage() {
+  try {
+    const localAppData = process.env.LOCALAPPDATA || process.cwd();
+    const profileRoot = path.join(
+      localAppData,
+      app.isPackaged ? 'InfographicGeneratorDesktopV2' : 'InfographicGeneratorDesktopV2Dev',
+      'electron-profile',
+    );
+    const sessionDataDir = path.join(profileRoot, 'session-data');
+    const cacheDir = path.join(profileRoot, 'cache');
+    const gpuCacheDir = path.join(cacheDir, 'GPUCache');
+
+    [profileRoot, sessionDataDir, cacheDir, gpuCacheDir].forEach((dir) => {
+      fs.mkdirSync(dir, { recursive: true });
+    });
+
+    app.setPath('sessionData', sessionDataDir);
+    app.commandLine.appendSwitch('disk-cache-dir', cacheDir);
+    app.commandLine.appendSwitch('gpu-shader-disk-cache-dir', gpuCacheDir);
+  } catch {
+    // Cache-path hardening must never block the desktop app from starting.
+  }
+}
+
+configureChromiumStorage();
+
 // ─── PNG generator (pure Node.js, no deps) ────────────────────────────────
 
 const _CRC32_TABLE = (() => {
@@ -305,12 +331,14 @@ let renderWorkerMotadawel = null;
 let renderWorkerPersonalities = null;
 let renderWorkerLaqtat = null;
 let renderWorkerSowar = null;
+let renderWorkerQawaleb = null;
 
 function getWorkerName(model) {
   if (model === 'motadawel') return 'motadawel';
   if (model === 'personalities') return 'personalities';
   if (model === 'laqtat') return 'laqtat';
   if (model === 'sowar') return 'sowar';
+  if (model === 'qawaleb') return 'qawaleb';
   return 'infograph';
 }
 
@@ -319,6 +347,7 @@ function getWorkerRef(workerName) {
   if (workerName === 'personalities') return renderWorkerPersonalities;
   if (workerName === 'laqtat') return renderWorkerLaqtat;
   if (workerName === 'sowar') return renderWorkerSowar;
+  if (workerName === 'qawaleb') return renderWorkerQawaleb;
   return renderWorkerInfograph;
 }
 
@@ -327,6 +356,7 @@ function setWorkerRef(workerName, worker) {
   else if (workerName === 'personalities') renderWorkerPersonalities = worker;
   else if (workerName === 'laqtat') renderWorkerLaqtat = worker;
   else if (workerName === 'sowar') renderWorkerSowar = worker;
+  else if (workerName === 'qawaleb') renderWorkerQawaleb = worker;
   else renderWorkerInfograph = worker;
 }
 
@@ -347,6 +377,8 @@ function spawnRenderWorker(model) {
     workerEntry = path.join(desktopPaths.codeRoot, 'laqtat', 'worker', 'render-worker-laqtat.cjs');
   } else if (workerName === 'sowar') {
     workerEntry = path.join(desktopPaths.codeRoot, 'sowar', 'worker', 'render-worker-sowar.cjs');
+  } else if (workerName === 'qawaleb') {
+    workerEntry = path.join(desktopPaths.codeRoot, 'qawaleb', 'worker', 'render-worker-qawaleb.cjs');
   } else {
     workerEntry = desktopPaths.workerScript;
   }
@@ -499,6 +531,15 @@ function buildBootstrapPayload() {
   const logoPath = findAssetPath(desktopPaths, 'root', 'logo.png');
   const fontPath = findAssetPath(desktopPaths, 'fonts', 'alfont_com_AlFont_com_AvenirArabic-Heavy.otf')
     || findAssetPath(desktopPaths, 'root', 'alfont_com_AlFont_com_AvenirArabic-Heavy.otf');
+  const displayFontPath = findAssetPath(desktopPaths, 'fonts', 'rb.ttf')
+    || findAssetPath(desktopPaths, 'root', 'rb.ttf');
+  const qawalebDefaultBackgroundPath = path.join(
+    desktopPaths.publicDir,
+    'assets',
+    'qawaleb',
+    'backgrounds',
+    'rm380-05.jpg',
+  );
   return {
     mode: app.isPackaged ? 'packaged' : 'development',
     appHome: desktopPaths.appHome,
@@ -507,6 +548,8 @@ function buildBootstrapPayload() {
     appVersion: getAppVersion(),
     logoDataUrl: readFileAsDataUrl(logoPath),
     fontDataUrl: readFileAsDataUrl(fontPath),
+    rbFontDataUrl: readFileAsDataUrl(displayFontPath),
+    qawalebDefaultBackgroundDataUrl: readFileAsDataUrl(qawalebDefaultBackgroundPath),
     assets: listAssetsSnapshot(desktopPaths),
     placeholderPath: ensurePlaceholderPng(),
   };
@@ -586,6 +629,24 @@ ipcMain.handle('desktop:pick-slides', async () => {
 ipcMain.handle('desktop:pick-slide-image', async () => {
   const result = await dialog.showOpenDialog({
     title: 'Select replacement slide image',
+    filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+    properties: ['openFile'],
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+
+  const filePath = result.filePaths[0];
+  return {
+    imagePath: filePath,
+    fileUrl: toFileUrl(filePath),
+  };
+});
+
+ipcMain.handle('desktop:pick-template-image', async () => {
+  const result = await dialog.showOpenDialog({
+    title: 'Select template image',
     filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
     properties: ['openFile'],
   });
@@ -1130,5 +1191,8 @@ app.on('before-quit', () => {
   }
   if (renderWorkerSowar && !renderWorkerSowar.killed) {
     renderWorkerSowar.kill();
+  }
+  if (renderWorkerQawaleb && !renderWorkerQawaleb.killed) {
+    renderWorkerQawaleb.kill();
   }
 });

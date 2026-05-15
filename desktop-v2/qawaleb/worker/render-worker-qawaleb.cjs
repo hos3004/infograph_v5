@@ -7,6 +7,8 @@ const { renderMedia, selectComposition } = require('@remotion/renderer');
 const { createDesktopPaths, ensureDesktopDirs } = require('../../shared/paths.cjs');
 const { prepareRemotionPublicDir } = require('../../shared/remotion-public.cjs');
 
+const QAWALEB_BUNDLE_VERSION = 1;
+
 const desktopPaths = createDesktopPaths({
   packaged: process.env.DESKTOP_V2_PACKAGED === 'true',
   appHome: process.env.DESKTOP_V2_APP_HOME,
@@ -16,7 +18,7 @@ const desktopPaths = createDesktopPaths({
 desktopPaths.bundleDir = path.join(
   desktopPaths.packaged ? desktopPaths.resourceRoot : desktopPaths.runtimeRoot,
   desktopPaths.packaged ? 'generated' : 'cache',
-  'bundle-staging-sowar',
+  'bundle-staging-qawaleb',
   'remotion-bundle'
 );
 
@@ -26,6 +28,74 @@ try {
   process.env.REMOTION_FFMPEG_EXECUTABLE = require('ffmpeg-static');
   process.env.REMOTION_FFPROBE_EXECUTABLE = require('ffprobe-static').path;
 } catch {}
+
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function getLatestMtime(targetPath) {
+  if (!targetPath || !fs.existsSync(targetPath)) {
+    return 0;
+  }
+
+  const stat = fs.statSync(targetPath);
+  if (!stat.isDirectory()) {
+    return stat.mtimeMs;
+  }
+
+  let latest = stat.mtimeMs;
+  const entries = fs.readdirSync(targetPath, { withFileTypes: true });
+  for (const entry of entries) {
+    latest = Math.max(latest, getLatestMtime(path.join(targetPath, entry.name)));
+  }
+  return latest;
+}
+
+function getBundleMetaPath() {
+  return path.join(desktopPaths.bundleDir, 'bundle-meta.json');
+}
+
+function needsBundleRebuild(bundleMarker) {
+  if (!fs.existsSync(bundleMarker)) {
+    return true;
+  }
+
+  if (desktopPaths.packaged) {
+    return false;
+  }
+
+  const meta = readJsonIfExists(getBundleMetaPath());
+  if (!meta || Number(meta.version || 0) !== QAWALEB_BUNDLE_VERSION) {
+    return true;
+  }
+
+  const bundleMtime = fs.statSync(bundleMarker).mtimeMs;
+  const latestSourceMtime = Math.max(
+    getLatestMtime(path.join(desktopPaths.repoRoot, 'src', 'remotion', 'qawaleb')),
+    getLatestMtime(path.join(desktopPaths.repoRoot, 'public', 'assets', 'fonts')),
+  );
+
+  return latestSourceMtime > bundleMtime;
+}
+
+function writeBundleMeta() {
+  fs.writeFileSync(
+    getBundleMetaPath(),
+    `${JSON.stringify({
+      version: QAWALEB_BUNDLE_VERSION,
+      builtAt: new Date().toISOString(),
+    }, null, 2)}\n`,
+    'utf8',
+  );
+}
 
 function reply(message) {
   if (process.send) process.send(message);
@@ -47,13 +117,11 @@ function getContentType(filePath) {
     '.jpeg': 'image/jpeg',
     '.webp': 'image/webp',
     '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
     '.mp3': 'audio/mpeg',
     '.wav': 'audio/wav',
     '.m4a': 'audio/mp4',
     '.aac': 'audio/aac',
-    '.mp4': 'video/mp4',
-    '.mov': 'video/quicktime',
-    '.webm': 'video/webm',
   };
   return map[ext] || 'application/octet-stream';
 }
@@ -132,132 +200,138 @@ function registerMediaFile(fileMap, baseKey, filePath) {
 
 function ensureBundle() {
   const bundleMarker = path.join(desktopPaths.bundleDir, 'bundle.js');
-  if (fs.existsSync(bundleMarker)) {
+  if (!needsBundleRebuild(bundleMarker)) {
     return Promise.resolve(desktopPaths.bundleDir);
   }
 
   if (desktopPaths.packaged) {
-    throw new Error('Desktop V2 Sowar bundle is missing from the packaged app.');
+    throw new Error('Desktop V2 Qawaleb bundle is missing from the packaged app.');
   }
 
   reply({
     type: 'progress',
     payload: {
       stage: 'bundle',
-      progress: 0.45,
-      message: 'Building the Remotion bundle for Sowar...',
+      progress: 0.05,
+      message: 'Building the Remotion bundle for Qawaleb...',
     },
   });
 
-  return prepareRemotionPublicDir(desktopPaths).then((stagedPublicDir) => bundle({
-    entryPoint: path.join(desktopPaths.repoRoot, 'src', 'remotion', 'sowar', 'index.ts'),
-    outDir: desktopPaths.bundleDir,
-    enableCaching: true,
-    publicDir: stagedPublicDir,
-  }));
+  return prepareRemotionPublicDir(desktopPaths)
+    .then((stagedPublicDir) => bundle({
+      entryPoint: path.join(desktopPaths.repoRoot, 'src', 'remotion', 'qawaleb', 'index.ts'),
+      outDir: desktopPaths.bundleDir,
+      enableCaching: true,
+      publicDir: stagedPublicDir,
+    }))
+    .then((result) => {
+      writeBundleMeta();
+      return result;
+    });
 }
 
-function normalizeSegments(_segments, fallbackDurationMs) {
-  return [{
-    id: 'image-duration',
-    startMs: 0,
-    endMs: Math.max(1000, Number(fallbackDurationMs || 10000)),
-    label: '',
-  }];
+function normalizeTemplateValues(templateValues, fileMap) {
+  const values = {};
+  const entries = Object.entries(templateValues && typeof templateValues === 'object' ? templateValues : {});
+
+  entries.forEach(([key, rawValue]) => {
+    const value = typeof rawValue === 'string' ? rawValue : String(rawValue ?? '');
+    if (value && fs.existsSync(value)) {
+      const mediaKey = registerMediaFile(fileMap, `template-${key}`, value);
+      values[key] = { __mediaKey: mediaKey };
+      return;
+    }
+    values[key] = value;
+  });
+
+  return values;
 }
 
-function normalizeBlurRegions(blurRegions, fallbackDurationMs) {
-  return (Array.isArray(blurRegions) ? blurRegions : []).map((region, index) => ({
-    id: region.id || `blur-${index + 1}`,
-    x: Number(region.x || 0),
-    y: Number(region.y || 0),
-    endX: Number(region.endX ?? region.x ?? 0),
-    endY: Number(region.endY ?? region.y ?? 0),
-    width: Number(region.width || 260),
-    height: Number(region.height || 160),
-    blur: Number(region.blur || 24),
-    radius: Number(region.radius || 12),
-    feather: Number(region.feather || 0),
-    motionEnabled: region.motionEnabled === true,
-    alwaysOn: region.alwaysOn !== false,
-    startMs: Number(region.startMs || 0),
-    endMs: Number(region.endMs || fallbackDurationMs || 0),
-  }));
-}
-
-async function renderImageVideo(payload) {
-  if (!payload?.mainImage) {
-    throw new Error('Main image path is required for Sowar rendering.');
-  }
-  if (!fs.existsSync(payload.mainImage)) {
-    throw new Error('The selected main image could not be found on disk.');
-  }
-
+async function renderQawaleb(payload) {
   const serveUrl = await ensureBundle();
   const fileMap = new Map();
   const binariesDirectory = getRemotionBinariesDirectory();
 
-  const mainImageKey = registerMediaFile(fileMap, 'main', payload.mainImage);
-  const frameKey = payload.frame && fs.existsSync(payload.frame)
+  const musicMediaKey = payload.music && fs.existsSync(payload.music)
+    ? registerMediaFile(fileMap, 'music', payload.music)
+    : null;
+  const voiceoverMediaKey = payload.voiceover && fs.existsSync(payload.voiceover)
+    ? registerMediaFile(fileMap, 'voiceover', payload.voiceover)
+    : null;
+  const frameMediaKey = payload.frame && fs.existsSync(payload.frame)
     ? registerMediaFile(fileMap, 'frame', payload.frame)
     : null;
-  const bgMusicKey = payload.bgMusic && fs.existsSync(payload.bgMusic)
-    ? registerMediaFile(fileMap, 'bgMusic', payload.bgMusic)
+  const backgroundMediaKey = payload.backgroundImage && fs.existsSync(payload.backgroundImage)
+    ? registerMediaFile(fileMap, 'background', payload.backgroundImage)
     : null;
 
+  const normalizedValues = normalizeTemplateValues(payload.templateValues, fileMap);
   const mediaServer = await startMediaServer(fileMap);
 
   try {
-    const mainImageDurationMs = Number(payload.mainImageDurationMs || 10000);
+    const resolvedValues = Object.fromEntries(
+      Object.entries(normalizedValues).map(([key, value]) => {
+        if (value && typeof value === 'object' && value.__mediaKey) {
+          return [key, mediaServer.urlFor(value.__mediaKey)];
+        }
+        return [key, value];
+      }),
+    );
+
     const inputProps = {
-      mainImageUrl: mediaServer.urlFor(mainImageKey),
-      frameUrl: frameKey ? mediaServer.urlFor(frameKey) : null,
-      mainText: payload.text || '',
-      imageScale: Number(payload.imageScale || 1),
-      imageX: Number(payload.imageX || 0),
-      imageY: Number(payload.imageY || 0),
-      imageMotionEnabled: payload.imageMotionEnabled === true,
-      imageMotionStartY: Number(payload.imageMotionStartY || 0),
-      imageMotionEndY: Number(payload.imageMotionEndY || -200),
-      effects: Array.isArray(payload.effects) ? payload.effects : [],
-      textBottomOffset: Number(payload.textBottomOffset || 160),
-      textFontSize: Number(payload.textFontSize || 46),
-      textPreset: payload.textPreset || 'dark',
-      textAnimationType: payload.textAnimationType || 'motion-blur',
-      cinematicBarSize: Number(payload.cinematicBarSize || 6),
-      bgMusicUrl: bgMusicKey ? mediaServer.urlFor(bgMusicKey) : null,
-      bgMusicVolume: Number(payload.bgMusicVolume ?? 0.25),
-      fitMode: payload.fitMode || 'blurred-background',
-      blurBackgroundAmount: Number(payload.blurBackgroundAmount || 36),
-      backgroundScale: Number(payload.backgroundScale || 1.18),
-      segments: normalizeSegments(payload.segments, mainImageDurationMs),
-      blurRegions: normalizeBlurRegions(payload.blurRegions, mainImageDurationMs),
+      templateId: payload.templateId || 'points-broadcast',
+      templateValues: resolvedValues,
+      backgroundImageUrl: backgroundMediaKey ? mediaServer.urlFor(backgroundMediaKey) : null,
+      backgroundOpacity: Number(payload.backgroundOpacity ?? 10),
+      backgroundBlur: Number(payload.backgroundBlur ?? 12),
+      backgroundRadius: Number(payload.backgroundRadius ?? 42),
+      backgroundFeather: Number(payload.backgroundFeather ?? 84),
+      parallaxEnabled: payload.parallaxEnabled !== false,
+      templateColors: payload.templateColors && typeof payload.templateColors === 'object'
+        ? { ...payload.templateColors }
+        : {},
+      templateScale: Number(payload.templateScale ?? 1),
+      templateX: Number(payload.templateX ?? 0),
+      templateY: Number(payload.templateY ?? 0),
+      textFontSize: Number(payload.textFontSize ?? 65),
+      portraitScale: Number(payload.portraitScale ?? 1),
+      portraitX: Number(payload.portraitX ?? 0),
+      portraitY: Number(payload.portraitY ?? 0),
+      portraitMonochrome: payload.portraitMonochrome !== false,
+      portraitSquare: payload.portraitSquare === true,
+      showQuoteMark: payload.showQuoteMark !== false,
+      frameUrl: frameMediaKey ? mediaServer.urlFor(frameMediaKey) : null,
+      durationMs: Math.max(1000, Number(payload.durationMs || 20000)),
+      musicUrl: musicMediaKey ? mediaServer.urlFor(musicMediaKey) : null,
+      musicVolume: Math.max(0, Math.min(1, Number(payload.musicVolume ?? 50) / 100)),
+      voiceoverUrl: voiceoverMediaKey ? mediaServer.urlFor(voiceoverMediaKey) : null,
+      voiceoverVolume: Math.max(0, Math.min(2, Number(payload.voiceoverVolume ?? 100) / 100)),
     };
 
     reply({
       type: 'progress',
       payload: {
         stage: 'composition',
-        progress: 0.6,
-        message: 'Preparing the Sowar composition...',
+        progress: 0.2,
+        message: 'Preparing the Qawaleb composition...',
       },
     });
 
     const composition = await selectComposition({
       serveUrl,
-      id: payload.compositionId || 'SowarVideo',
+      id: 'QawalebVideo',
       inputProps,
       binariesDirectory,
     });
 
-    const outputPath = path.join(desktopPaths.outputDir, `Sowar_${Date.now()}.mp4`);
+    const outputPath = path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`);
 
     reply({
       type: 'progress',
       payload: {
         stage: 'render',
-        progress: 0,
-        message: 'Rendering the Sowar video...',
+        progress: 0.25,
+        message: 'Rendering the selected template...',
       },
     });
 
@@ -271,6 +345,9 @@ async function renderImageVideo(payload) {
       outputLocation: outputPath,
       inputProps,
       binariesDirectory,
+      ...(payload.turboMode ? {
+        concurrency: require('os').cpus().length,
+      } : {}),
       onProgress: ({ renderedFrames, encodedFrames, progress }) => {
         const frameProgress = composition.durationInFrames
           ? renderedFrames / composition.durationInFrames
@@ -286,7 +363,7 @@ async function renderImageVideo(payload) {
             renderedFrames,
             encodedFrames,
             totalFrames: composition.durationInFrames,
-            message: 'Rendering the Sowar video...',
+            message: 'Rendering the selected template...',
           },
         });
       },
@@ -305,7 +382,7 @@ async function renderImageVideo(payload) {
 async function handleRequest(action, payload) {
   switch (action) {
     case 'render':
-      return renderImageVideo(payload);
+      return renderQawaleb(payload);
     default:
       throw new Error(`Unsupported action: ${action}`);
   }

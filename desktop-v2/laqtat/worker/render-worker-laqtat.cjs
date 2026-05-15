@@ -278,6 +278,8 @@ async function renderVideo(payload) {
       serveUrl,
       codec: 'h264',
       audioCodec: 'aac',
+      imageFormat: 'jpeg',
+      jpegQuality: 100,
       outputLocation: outputPath,
       inputProps,
       binariesDirectory,

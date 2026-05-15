@@ -8,6 +8,7 @@ const motadawelBundleStagingDir = path.join(buildRoot, 'bundle-staging-motadawel
 const laqtatBundleStagingDir = path.join(buildRoot, 'bundle-staging-laqtat', 'remotion-bundle');
 const sowarBundleStagingDir = path.join(buildRoot, 'bundle-staging-sowar', 'remotion-bundle');
 const personalitiesBundleStagingDir = path.join(buildRoot, 'bundle-staging-personalities', 'remotion-bundle');
+const qawalebBundleStagingDir = path.join(buildRoot, 'bundle-staging-qawaleb', 'remotion-bundle');
 const outputDir = process.env.DESKTOP_V2_BUILD_DIR || path.join(buildRoot, 'dist');
 
 module.exports = {
@@ -25,6 +26,7 @@ module.exports = {
     'desktop-v2/motadawel/**/*',
     'desktop-v2/laqtat/**/*',
     'desktop-v2/sowar/**/*',
+    'desktop-v2/qawaleb/**/*',
     'desktop-v2/personalities/**/*',
     'package.json',
   ],
@@ -55,6 +57,11 @@ module.exports = {
     {
       from: personalitiesBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-personalities/remotion-bundle',
+      filter: ['**/*'],
+    },
+    {
+      from: qawalebBundleStagingDir,
+      to: 'desktop-v2/generated/bundle-staging-qawaleb/remotion-bundle',
       filter: ['**/*'],
     },
   ],
