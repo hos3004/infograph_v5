@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('desktopApi', {
   generateContentSlides: (payload) => ipcRenderer.invoke('desktop:generate-content-slides', payload),
   generatePersonalityScenes: (payload) => ipcRenderer.invoke('desktop:generate-personality-scenes', payload),
   onRenderProgress: (listener) => {
-    const channel = (_event, payload) => listener(payload, payload);
+    const channel = (_event, payload) => listener(payload);
     ipcRenderer.on('desktop:render-progress', channel);
     return () => ipcRenderer.removeListener('desktop:render-progress', channel);
   },
@@ -36,4 +36,31 @@ contextBridge.exposeInMainWorld('projectApi', {
   saveProject: (data) => ipcRenderer.invoke('project:save', data),
   saveProjectAs: (data) => ipcRenderer.invoke('project:saveAs', data),
   openProject: (context) => ipcRenderer.invoke('project:open', context),
+});
+
+contextBridge.exposeInMainWorld('updateApi', {
+  checkCoreUpdate: () => ipcRenderer.invoke('core-updater:check'),
+  downloadCoreUpdate: () => ipcRenderer.invoke('core-updater:download'),
+  installCoreUpdate: () => ipcRenderer.invoke('core-updater:install'),
+  getCoreStatus: () => ipcRenderer.invoke('core-updater:status'),
+
+  checkContentUpdate: () => ipcRenderer.invoke('content-updater:check'),
+  downloadContentUpdate: () => ipcRenderer.invoke('content-updater:download'),
+  applyContentUpdate: () => ipcRenderer.invoke('content-updater:apply'),
+  getContentUpdateStatus: () => ipcRenderer.invoke('content-updater:get-status'),
+  rollbackContentUpdate: () => ipcRenderer.invoke('content-updater:rollback-last'),
+  openRuntimeUpdatesFolder: () => ipcRenderer.invoke('content-updater:open-runtime-folder'),
+  resolveUpdatedPath: (relativePath, bundledFallbackPath) => ipcRenderer.invoke('content-updater:resolve-path', relativePath, bundledFallbackPath),
+
+  onCoreUpdateStatus: (listener) => {
+    const channel = (_event, payload) => listener(payload);
+    ipcRenderer.on('core-updater:status', channel);
+    return () => ipcRenderer.removeListener('core-updater:status', channel);
+  },
+
+  onContentUpdateStatus: (listener) => {
+    const channel = (_event, payload) => listener(payload);
+    ipcRenderer.on('content-updater:status', channel);
+    return () => ipcRenderer.removeListener('content-updater:status', channel);
+  },
 });

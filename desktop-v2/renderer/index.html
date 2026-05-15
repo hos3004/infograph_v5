@@ -1464,6 +1464,168 @@
       });
     });
   </script>
+
+  <!-- ─── Hybrid Update Panel ─────────────────────────────────────────────── -->
+  <div id="update-panel" style="
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 2px solid var(--border);
+    padding: 8px 16px; font-family: var(--font); font-size: 13px;
+    display: flex; align-items: center; gap: 12px; z-index: 9999;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    direction: rtl;
+  ">
+    <button id="btn-check-core" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;">فحص تحديث البرنامج</button>
+    <button id="btn-check-content" style="background:var(--text-mu);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;">فحص تحديثات المحتوى</button>
+    <span id="update-status" style="flex:1;color:var(--text-mu);font-size:12px;">جاهز</span>
+    <div id="update-progress-wrap" style="display:none;flex:0 0 200px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+      <div id="update-progress-bar" style="width:0%;height:100%;background:var(--accent);border-radius:3px;transition:width .3s;"></div>
+    </div>
+    <button id="btn-install-core" style="display:none;background:var(--danger);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;">تثبيت وإعادة تشغيل</button>
+    <button id="btn-apply-content" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;">تطبيق التحديثات</button>
+    <button id="btn-rollback-content" style="display:none;background:var(--text-fa);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:12px;">تراجع</button>
+  </div>
+
+  <script>
+  (function() {
+    if (typeof window.updateApi === 'undefined') return;
+
+    const $ = id => document.getElementById(id);
+    const statusEl = $('update-status');
+    const progressWrap = $('update-progress-wrap');
+    const progressBar = $('update-progress-bar');
+    const btnCore = $('btn-check-core');
+    const btnContent = $('btn-check-content');
+    const btnInstall = $('btn-install-core');
+    const btnApply = $('btn-apply-content');
+    const btnRollback = $('btn-rollback-content');
+
+    function setStatus(msg, color) {
+      statusEl.textContent = msg;
+      if (color) statusEl.style.color = color;
+    }
+
+    function showProgress(pct) {
+      progressWrap.style.display = 'block';
+      progressBar.style.width = pct + '%';
+    }
+
+    function hideProgress() {
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+    }
+
+    // ── Core Update ──
+    btnCore.addEventListener('click', async () => {
+      setStatus('جاري فحص تحديث البرنامج...', 'var(--text-mu)');
+      btnCore.disabled = true;
+      try {
+        await window.updateApi.checkCoreUpdate();
+      } catch (e) {
+        setStatus('خطأ: ' + e.message, 'var(--danger)');
+      }
+      btnCore.disabled = false;
+    });
+
+    const coreCleanup = window.updateApi.onCoreUpdateStatus((status) => {
+      switch (status.phase) {
+        case 'checking-for-update':
+          setStatus('جاري فحص التحديثات...');
+          break;
+        case 'update-available':
+          setStatus('📦 تحديث البرنامج متوفر', 'var(--accent)');
+          btnInstall.style.display = 'inline-block';
+          btnInstall.onclick = async () => {
+            setStatus('جاري تنزيل التحديث...');
+            btnInstall.disabled = true;
+            await window.updateApi.downloadCoreUpdate();
+          };
+          break;
+        case 'update-not-available':
+          setStatus('البرنامج محدث', 'var(--success)');
+          btnInstall.style.display = 'none';
+          break;
+        case 'download-progress':
+          showProgress(status.progress.percent);
+          setStatus(`جاري التنزيل... ${Math.round(status.progress.percent)}%`);
+          break;
+        case 'update-downloaded':
+          hideProgress();
+          setStatus('✅ تم تنزيل التحديث. اضغط تثبيت لإعادة التشغيل.', 'var(--success)');
+          btnInstall.textContent = '🔄 تثبيت وإعادة تشغيل';
+          btnInstall.style.display = 'inline-block';
+          btnInstall.disabled = false;
+          btnInstall.onclick = async () => {
+            setStatus('جاري التثبيت...');
+            await window.updateApi.installCoreUpdate();
+          };
+          break;
+        case 'error':
+          hideProgress();
+          setStatus('❌ ' + (status.error || 'خطأ في التحديث'), 'var(--danger)');
+          btnInstall.style.display = 'none';
+          btnInstall.disabled = false;
+          break;
+      }
+    });
+
+    // ── Content Update ──
+    btnContent.addEventListener('click', async () => {
+      setStatus('جاري فحص تحديثات المحتوى...');
+      btnContent.disabled = true;
+      try {
+        const result = await window.updateApi.checkContentUpdate();
+        if (result.upToDate) {
+          setStatus('جميع ملفات المحتوى محدثة', 'var(--success)');
+          btnApply.style.display = 'none';
+          btnRollback.style.display = 'none';
+        } else {
+          const mb = (result.totalSize / 1024 / 1024).toFixed(1);
+          setStatus(`توجد ${result.changedFiles.length} ملفات للتحديث (${mb} MB)`, 'var(--accent)');
+          btnApply.style.display = 'inline-block';
+          btnApply.onclick = async () => {
+            btnApply.disabled = true;
+            setStatus('جاري التنزيل...');
+            const dlResult = await window.updateApi.downloadContentUpdate();
+            if (dlResult.success) {
+              setStatus('جاري تطبيق التحديثات...');
+              const apResult = await window.updateApi.applyContentUpdate();
+              if (apResult.success) {
+                if (apResult.needsRestart) {
+                  setStatus('✅ تم التطبيق. يرجى إعادة تشغيل التطبيق.', 'var(--success)');
+                } else {
+                  setStatus('✅ تم تطبيق تحديثات المحتوى', 'var(--success)');
+                }
+                btnApply.style.display = 'none';
+                btnRollback.style.display = 'inline-block';
+              }
+            } else {
+              setStatus('❌ ' + (dlResult.error || 'فشل التنزيل'), 'var(--danger)');
+            }
+            btnApply.disabled = false;
+          };
+          btnRollback.style.display = 'inline-block';
+          btnRollback.onclick = async () => {
+            setStatus('جاري التراجع...');
+            await window.updateApi.rollbackContentUpdate();
+            setStatus('تم التراجع عن آخر تحديث', 'var(--text-mu)');
+            btnRollback.style.display = 'none';
+          };
+        }
+      } catch (e) {
+        setStatus('❌ ' + e.message, 'var(--danger)');
+      }
+      btnContent.disabled = false;
+    });
+
+    // Load initial status
+    window.updateApi.getContentUpdateStatus().then(r => {
+      if (r.success && r.status && r.status.installedFiles && r.status.installedFiles.length > 0) {
+        btnRollback.style.display = 'inline-block';
+        setStatus(`آخر تحديث: ${r.status.lastAppliedUpdateId || 'مثبت'}`, 'var(--text-mu)');
+      }
+    }).catch(() => {});
+  })();
+  </script>
 </body>
 </html>
 

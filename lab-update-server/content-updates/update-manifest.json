@@ -1,0 +1,29 @@
+{
+  "manifestVersion": 1,
+  "updateId": "lab-content-2026-05-15-001",
+  "appMinVersion": "1.0.0",
+  "appMaxVersion": null,
+  "assetsVersion": "1.0.1",
+  "templatesVersion": "1.0.1",
+  "promptsVersion": "1.0.1",
+  "bundlesVersion": "1.0.1",
+  "publishedAt": "2026-05-15T00:00:00Z",
+  "files": [
+    {
+      "category": "prompt-template",
+      "path": "templates/prompts/news.json",
+      "url": "http://127.0.0.1:8089/content-updates/templates/prompts/news.json",
+      "sha256": "1e993359c9eda9248bc220eb2ef35163fcc68f3d35c5ceaa5da6b19ba101837c",
+      "size": 175,
+      "restartRequired": false
+    },
+    {
+      "category": "asset",
+      "path": "assets/music/example.mp3",
+      "url": "http://127.0.0.1:8089/content-updates/assets/music/example.mp3",
+      "sha256": "29fe37071cf0697fcbadfe3580d12ea39eac5179948e3ef2e8d42abcbd698ea8",
+      "size": 59,
+      "restartRequired": false
+    }
+  ]
+}

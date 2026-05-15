@@ -28,6 +28,7 @@ module.exports = {
     'desktop-v2/sowar/**/*',
     'desktop-v2/qawaleb/**/*',
     'desktop-v2/personalities/**/*',
+    'desktop-v2/updater/**/*',
     'package.json',
     '!**/*.map',
     '!**/*.ts.map',
@@ -99,8 +100,21 @@ module.exports = {
     'node_modules/ffprobe-static/package.json',
   ],
   npmRebuild: false,
+  publish: {
+    provider: 'generic',
+    url: 'http://127.0.0.1:8089/core-updates/',
+  },
   win: {
-    target: 'dir',
-    icon: 'public/favicon.ico',
+    target: [
+      { target: 'nsis', arch: ['x64'] },
+      { target: 'dir', arch: ['x64'] },
+    ],
+  },
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    perMachine: false,
+    createDesktopShortcut: true,
+    artifactName: '${productName}-Setup-${version}.${ext}',
   },
 };

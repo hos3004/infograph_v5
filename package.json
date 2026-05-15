@@ -12,10 +12,13 @@
     "desktop:v2:preview": "node ./desktop-v2/scripts/build-preview-player.mjs && node ./desktop-v2/motadawel/scripts/build-preview-player-motadawel.mjs && node ./desktop-v2/personalities/scripts/build-preview-player-personalities.mjs && node ./desktop-v2/laqtat/scripts/build-preview-player-laqtat.mjs && node ./desktop-v2/sowar/scripts/build-preview-player-sowar.mjs && node ./desktop-v2/qawaleb/scripts/build-preview-player-qawaleb.mjs",
     "desktop:v2:bundle": "node ./desktop-v2/scripts/build-remotion-bundle.mjs && node ./desktop-v2/motadawel/scripts/build-remotion-bundle-motadawel.mjs && node ./desktop-v2/personalities/scripts/build-remotion-bundle-personalities.mjs && node ./desktop-v2/laqtat/scripts/build-remotion-bundle-laqtat.mjs && node ./desktop-v2/sowar/scripts/build-remotion-bundle-sowar.mjs && node ./desktop-v2/qawaleb/scripts/build-remotion-bundle-qawaleb.mjs",
     "desktop:v2:build": "npm run desktop:v2:preview && npm run desktop:v2:bundle && electron-builder --config ./desktop-v2/electron-builder.config.cjs --dir",
+    "desktop:v2:build-nsis": "npm run desktop:v2:preview && npm run desktop:v2:bundle && electron-builder --config ./desktop-v2/electron-builder.config.cjs",
+    "desktop:v2:build-all": "npm run desktop:v2:preview && npm run desktop:v2:bundle && electron-builder --config ./desktop-v2/electron-builder.config.cjs --win",
     "desktop:v2:clean": "rimraf \"%LOCALAPPDATA%\\InfographicGeneratorDesktopV2Build\" \"%LOCALAPPDATA%\\InfographicGeneratorDesktopV2Dev\"",
     "prebuild:desktop": "npm run clean && npm run build",
     "build:desktop": "electron-builder --dir",
-    "clean": "rimraf temp output dist_electron"
+    "clean": "rimraf temp output dist_electron",
+    "serve:lab-updates": "node ./desktop-v2/scripts/serve-lab-updates.cjs"
   },
   "build": {
     "appId": "com.infograph.generator",
@@ -71,6 +74,8 @@
     "@remotion/renderer": "4.0.140",
     "@remotion/transitions": "4.0.140",
     "busboy": "^1.6.0",
+    "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.3",
     "ffmpeg-static": "^5.3.0",
     "ffprobe-static": "^3.1.0",
     "lucide-react": "^0.379.0",

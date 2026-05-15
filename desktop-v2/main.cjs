@@ -4,6 +4,15 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const zlib = require('zlib');
+const log = require('electron-log');
+const { autoUpdater } = require('electron-updater');
+const { ContentUpdateManager } = require('./updater/content-update-manager.cjs');
+
+autoUpdater.logger = log;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
+
+let contentUpdateManager = null;
 
 function configureChromiumStorage() {
   try {
@@ -247,6 +256,12 @@ function createPaths() {
 }
 
 const desktopPaths = createPaths();
+
+function initContentUpdateManager() {
+  if (contentUpdateManager) return contentUpdateManager;
+  contentUpdateManager = new ContentUpdateManager(app, process.env.CONTENT_UPDATE_MANIFEST_URL || 'http://127.0.0.1:8089/content-updates/update-manifest.json');
+  return contentUpdateManager;
+}
 
 function getAppVersion() {
   try {
@@ -1168,7 +1183,150 @@ ipcMain.handle('desktop:generate-voiceovers', async (_event, payload) => {
   return { success: errors.length === 0, slides: updatedSlides, errors };
 });
 
-app.whenReady().then(createWindow);
+// ─── Auto Updater (Core App) ──────────────────────────────────────────────
+
+autoUpdater.on('checking-for-update', () => {
+  log.info('AutoUpdater: checking for update');
+});
+
+autoUpdater.on('update-available', (info) => {
+  log.info('AutoUpdater: update available', info);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('core-updater:status', { phase: 'update-available', info });
+  }
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  log.info('AutoUpdater: update not available');
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('core-updater:status', { phase: 'update-not-available', info });
+  }
+});
+
+autoUpdater.on('download-progress', (progress) => {
+  log.info(`AutoUpdater: download progress ${progress.percent}%`);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('core-updater:status', { phase: 'download-progress', progress });
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  log.info('AutoUpdater: update downloaded');
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('core-updater:status', { phase: 'update-downloaded', info });
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  log.error('AutoUpdater: error', err);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('core-updater:status', { phase: 'error', error: err.message || String(err) });
+  }
+});
+
+ipcMain.handle('core-updater:check', async () => {
+  try {
+    autoUpdater.checkForUpdates();
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('core-updater:download', async () => {
+  try {
+    autoUpdater.downloadUpdate();
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('core-updater:install', async () => {
+  try {
+    setImmediate(() => autoUpdater.quitAndInstall(true, true));
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// ─── Content Updater (Lightweight) ─────────────────────────────────────────
+
+ipcMain.handle('content-updater:check', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    const result = await mgr.check();
+    return { success: true, ...result };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:download', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    const result = await mgr.download();
+    return { success: true, ...result };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:apply', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    const result = await mgr.apply();
+    return { success: true, ...result };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:get-status', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    return { success: true, status: mgr.getStatus() };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:rollback-last', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    const result = await mgr.rollbackLast();
+    return { success: true, ...result };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:open-runtime-folder', async () => {
+  try {
+    const mgr = initContentUpdateManager();
+    const dir = mgr.updatesDir;
+    fs.mkdirSync(dir, { recursive: true });
+    shell.openPath(dir);
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('content-updater:resolve-path', async (_event, relativePath, bundledFallbackPath) => {
+  try {
+    const mgr = initContentUpdateManager();
+    return { success: true, path: mgr.resolvePath(relativePath, bundledFallbackPath) };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+app.whenReady().then(() => {
+  initContentUpdateManager();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
