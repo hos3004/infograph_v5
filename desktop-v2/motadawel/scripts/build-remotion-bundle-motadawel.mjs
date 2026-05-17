@@ -32,6 +32,7 @@ async function run() {
     outDir,
     enableCaching: true,
     publicDir: stagedPublicDir,
+    webpackOverride: (config) => ({ ...config, devtool: false }),
   });
 
   console.log('Desktop V2 Motadawel Remotion bundle ready at:', serveUrl);

@@ -28,7 +28,7 @@ const state = {
   videoScale: 1,
   videoX: 0,
   videoY: 0,
-  keepSourceAudio: false,
+  keepSourceAudio: true,
   segments: [],
   blurRegions: [],
   text: '',

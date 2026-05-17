@@ -70,6 +70,7 @@ await bundle({
   outDir,
   enableCaching: true,
   publicDir: stagedPublicDir,
+  webpackOverride: (config) => ({ ...config, devtool: false }),
 });
 
 console.log(`Desktop V2 Qawaleb Remotion bundle ready at: ${outDir}`);

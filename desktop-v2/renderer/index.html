@@ -1274,6 +1274,24 @@
               <span class="hint">يحدد أسلوب وقواعد توليد نصوص الشرائح.</span>
             </div>
           </div>
+
+          <!-- Updates -->
+          <div class="settings-section">
+            <p class="settings-section-title">التحديثات</p>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
+              <button id="btn-check-core" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;font-family:var(--font);font-size:0.83rem;font-weight:700;">فحص تحديث البرنامج</button>
+              <button id="btn-check-content" style="background:#7a736a;color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;font-family:var(--font);font-size:0.83rem;">فحص تحديثات المحتوى</button>
+              <button id="btn-install-core" style="display:none;background:#dc2626;color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;font-family:var(--font);font-size:0.83rem;font-weight:700;">تثبيت وإعادة تشغيل</button>
+              <button id="btn-apply-content" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;font-family:var(--font);font-size:0.83rem;">تطبيق التحديثات</button>
+              <button id="btn-rollback-content" style="display:none;background:#a89f96;color:#fff;border:none;border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;font-family:var(--font);font-size:0.82rem;">تراجع</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span id="update-status" style="flex:1;color:var(--text-mu);font-size:0.8rem;">جاهز</span>
+              <div id="update-progress-wrap" style="display:none;flex:0 0 180px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+                <div id="update-progress-bar" style="width:0%;height:100%;background:var(--accent);border-radius:3px;transition:width .3s;"></div>
+              </div>
+            </div>
+          </div>
         </div><!-- end settings-modal-body -->
 
         <div class="settings-modal-footer">
@@ -1464,26 +1482,6 @@
       });
     });
   </script>
-
-  <!-- ─── Hybrid Update Panel ─────────────────────────────────────────────── -->
-  <div id="update-panel" style="
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--surface); border-top: 2px solid var(--border);
-    padding: 8px 16px; font-family: var(--font); font-size: 13px;
-    display: flex; align-items: center; gap: 12px; z-index: 9999;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-    direction: rtl;
-  ">
-    <button id="btn-check-core" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;">فحص تحديث البرنامج</button>
-    <button id="btn-check-content" style="background:var(--text-mu);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;">فحص تحديثات المحتوى</button>
-    <span id="update-status" style="flex:1;color:var(--text-mu);font-size:12px;">جاهز</span>
-    <div id="update-progress-wrap" style="display:none;flex:0 0 200px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-      <div id="update-progress-bar" style="width:0%;height:100%;background:var(--accent);border-radius:3px;transition:width .3s;"></div>
-    </div>
-    <button id="btn-install-core" style="display:none;background:var(--danger);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;">تثبيت وإعادة تشغيل</button>
-    <button id="btn-apply-content" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:13px;">تطبيق التحديثات</button>
-    <button id="btn-rollback-content" style="display:none;background:var(--text-fa);color:#fff;border:none;border-radius:var(--r-sm);padding:6px 14px;cursor:pointer;font-family:var(--font);font-size:12px;">تراجع</button>
-  </div>
 
   <script>
   (function() {
