@@ -19,7 +19,8 @@ export function getSlideDurationMs(slide: PersonalitiesSlideData): number {
     } else {
       return 0;
     }
-    return Math.max(0, end - start);
+    const playbackRate = slide.playbackRate || 1;
+    return Math.max(0, (end - start) / playbackRate);
   }
   return slide.durationMs > 0 ? slide.durationMs : DEFAULT_IMAGE_DURATION_MS;
 }

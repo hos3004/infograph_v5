@@ -14,6 +14,7 @@ function normalizePersonalitiesSlides(slides) {
       mediaDurationMs: Number(slide.mediaDurationMs) || 0,
       trimStartMs: Number(slide.trimStartMs) || 0,
       trimEndMs: slide.trimEndMs == null ? null : Number(slide.trimEndMs) || null,
+      playbackRate: Number(slide.playbackRate) > 0 ? Number(slide.playbackRate) : 1,
     }));
 }
 

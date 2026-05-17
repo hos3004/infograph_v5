@@ -8,6 +8,7 @@ export type PersonalitiesSlideData = {
   trimStartMs?: number;
   trimEndMs?: number | null;
   isMuted?: boolean;
+  playbackRate?: number;
 };
 
 export type PersonalitiesCompositionProps = {

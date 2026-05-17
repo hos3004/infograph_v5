@@ -53,6 +53,7 @@ export const PersonalitiesComposition: React.FC<PersonalitiesCompositionProps> =
                   muted={slide.isMuted !== false}
                   startFrom={Math.max(0, Math.round(((slide.trimStartMs || 0) / 1000) * FPS))}
                   endAt={slide.trimEndMs != null && slide.trimEndMs > 0 ? Math.max(1, Math.round((slide.trimEndMs / 1000) * FPS)) : undefined}
+                  playbackRate={slide.playbackRate || 1}
                   style={{ width: 1920, height: 1080, objectFit: 'cover' }}
                 />
               ) : (
