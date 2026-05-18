@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { 
-  Play, Layers, Type, Music, Settings, Layout, 
-  RotateCw, FolderOpen, Save, X, Maximize, RefreshCcw, 
-  Volume2, FastForward, CheckCircle
+import {
+  Play, Layers, Type, Music, Settings, Layout,
+  RotateCw, FolderOpen, Save, X, Maximize, RefreshCcw,
+  Volume2, FastForward, CheckCircle, Mic
 } from 'lucide-react';
 
 export default function InfographV2() {
@@ -155,6 +155,20 @@ export default function InfographV2() {
           <div className="top-bar-btns">
             <button className="btn-blue">الأنفوجراف</button>
             <button className="btn-blue-outline">المتداول</button>
+            <a
+              href="/voiceover"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: 'transparent', color: '#7c3aed',
+                padding: '0.5rem 1.25rem', borderRadius: '6px',
+                fontWeight: 600, border: '1px solid #7c3aed',
+                cursor: 'pointer', textDecoration: 'none', fontSize: '0.95rem',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Mic size={15} />
+              فويس أوفر
+            </a>
           </div>
         </header>
 
