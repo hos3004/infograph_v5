@@ -167,6 +167,7 @@ const state = {
   placeholderPath: null,
   slides: [],
   overlay: '',
+  intro: '',
   frame: '',
   music: '',
   musicVolume: 50,
@@ -224,6 +225,7 @@ const elements = {
   projectOpenBtn: document.getElementById('project-open-btn'),
   projectSaveStatus: document.getElementById('project-save-status'),
   overlaySelect: document.getElementById('overlay-select'),
+  introSelect: document.getElementById('intro-select'),
   frameSelect: document.getElementById('frame-select'),
   musicSelect: document.getElementById('music-select'),
   musicVolumeInput: document.getElementById('music-volume-input'),
@@ -1418,20 +1420,7 @@ function buildTemplateFieldCard(field, value) {
   if (field.type === 'textarea') {
     card.classList.add('full-span');
   }
-
-  const label = document.createElement('label');
-  label.className = 'template-field-label';
-  label.textContent = field.label;
-  card.appendChild(label);
   card.appendChild(buildTemplateFieldInput(field, value));
-
-  if (field.placeholder) {
-    const hint = document.createElement('span');
-    hint.className = 'template-field-hint';
-    hint.textContent = field.placeholder;
-    card.appendChild(hint);
-  }
-
   return card;
 }
 
@@ -1547,6 +1536,7 @@ function buildInfographProjectData() {
     media: {
       frame: state.frame || state.overlay || '',
       overlay: state.overlay,
+      intro: state.intro || '',
       music: state.music,
       voiceover: state.voiceover,
       voiceoverDurationMs: state.voiceoverDurationMs,
@@ -1694,6 +1684,7 @@ async function applyOpenedProject(project, filePath) {
       : {};
     state.frame = media.frame || media.overlay || '';
     state.overlay = state.frame;
+    state.intro = media.intro || '';
     state.music = media.music || '';
     state.voiceover = media.voiceover || null;
     state.voiceoverDurationMs = Number(media.voiceoverDurationMs || 0);
@@ -1811,6 +1802,10 @@ function findMusicAsset() {
 
 function findEndPageAsset() {
   return findAsset(state.assets.endpage, state.endPage);
+}
+
+function findIntroAsset() {
+  return findAsset(state.assets.endpage || [], state.intro);
 }
 
 function updateEndPageDurationHint() {
@@ -3398,8 +3393,12 @@ function syncAssetControlsV2() {
   syncStateWithAssets();
   formatAssetOptions(elements.overlaySelect, state.assets.frame_sewar || [], 'بدون إطار');
   formatAssetOptions(elements.frameSelect, state.assets.frame_sewar || [], 'بدون إطار');
+  if (elements.introSelect) {
+    formatAssetOptions(elements.introSelect, state.assets.endpage || [], 'بدون انترو');
+    elements.introSelect.value = state.intro || '';
+  }
   formatAssetOptions(elements.musicSelect, state.assets.music, 'بدون موسيقى');
-  formatAssetOptions(elements.endPageSelect, state.assets.endpage, 'بدون شاشة ختام');
+  formatAssetOptions(elements.endPageSelect, state.assets.endpage, 'بدون اوترو');
 
   elements.overlaySelect.value = state.frame || '';
   elements.frameSelect.value = state.frame || '';
@@ -3455,6 +3454,8 @@ function buildRenderPayload() {
   const preset = getTemplatePreset();
   const musicAsset = findMusicAsset();
   const frameAsset = findFrameAsset();
+  const introAsset = findIntroAsset();
+  const endPageAsset = findEndPageAsset();
 
   if (!preset) {
     throw new Error('لم يتم اختيار قالب صالح للرندر');
@@ -3465,8 +3466,12 @@ function buildRenderPayload() {
     templateId: preset.id,
     templateLabel: preset.label || '',
     templateFileName: preset.fileName,
-    templateValues: { ...state.templateValues },
+    templateValues: Object.fromEntries(
+      Object.entries(state.templateValues || {}).map(([k, v]) => [k, normalizeTemplatePreviewValue(v)])
+    ),
     backgroundImage: state.backgroundImage || null,
+    intro: introAsset ? introAsset.path : null,
+    outro: endPageAsset ? endPageAsset.path : null,
     backgroundOpacity: Number(state.backgroundOpacity ?? DEFAULT_BACKGROUND_OPACITY),
     backgroundBlur: Number(state.backgroundBlur ?? DEFAULT_BACKGROUND_BLUR),
     backgroundRadius: Number(state.backgroundRadius ?? DEFAULT_BACKGROUND_RADIUS),
@@ -3929,6 +3934,13 @@ elements.endPageSelect.addEventListener('change', async (event) => {
   updateEndPageDurationHint();
   renderPreviewFrame();
 });
+
+if (elements.introSelect) {
+  elements.introSelect.addEventListener('change', (event) => {
+    state.intro = event.target.value;
+    markProjectDirty();
+  });
+}
 
 if (elements.textPresetSelect) {
   elements.textPresetSelect.addEventListener('change', (event) => {

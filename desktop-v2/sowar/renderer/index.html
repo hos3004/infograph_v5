@@ -362,13 +362,10 @@
       border: 1px solid var(--border);
     }
 
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      font-size: 0.86rem;
-      margin-bottom: 0.5rem;
-    }
+    .status-row, .progress-meta, .render-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .render-actions { justify-content: flex-start; flex-wrap: wrap; }
+    .progress-meta { font-size: 0.86rem; }
+    .btn-danger { color: var(--danger) !important; border-color: #fecaca !important; background: #fef2f2 !important; }
 
     .progress-track {
       width: 100%;
@@ -382,6 +379,7 @@
       height: 100%;
       width: 0%;
       background: var(--accent);
+      border-radius: 999px;
       transition: width 0.24s ease;
     }
 
@@ -551,42 +549,38 @@
         </div>
 
         <div class="panel-section save-section">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem;">
-            <div style="display:flex; align-items:center; gap:0.6rem; color:#f59e0b; font-weight:700; font-size:0.95rem;">
-              <label class="switch">
-                <input type="checkbox" id="turbo-render-checkbox" checked />
-                <span class="slider"></span>
-              </label>
-              <span>Turbo Mode</span>
+          <div id="status-panel" class="status-row">
+            <div>
+              <h2 id="status-title" style="margin:0;font-size:1.05rem;">حفظ الفيديو</h2>
+              <div id="status-message" class="muted-text">لم يبدأ الحفظ بعد</div>
             </div>
-            <div id="status-panel" class="status-panel" style="display:flex; align-items:center; gap:0.75rem;">
-              <h2 id="status-title">حفظ الفيديو</h2>
-              <div id="status-message" class="status-note">لم يبدأ الحفظ بعد</div>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <button id="refresh-assets-btn" class="btn-secondary" type="button" title="تحديث الأصول" style="min-height:36px;padding:.4rem .6rem;">
+                <i data-lucide="rotate-cw" style="width:14px;height:14px;"></i>
+              </button>
+              <button id="open-output-btn" class="btn-secondary" type="button" style="min-height:36px;">
+                <i data-lucide="folder-open"></i> مجلد الإخراج
+              </button>
             </div>
           </div>
-          <div id="progress-container" class="progress-container" style="display:flex; gap:0.75rem; align-items:stretch;">
-            <div class="mini-actions-col">
-              <button id="refresh-assets-btn" class="btn-secondary mini-icon-btn" type="button" title="تحديث الأصول" aria-label="تحديث الأصول">
-                <i data-lucide="rotate-cw" style="width:16px; height:16px;"></i>
-              </button>
-              <button id="open-output-btn" class="btn-secondary mini-icon-btn" type="button" title="فتح المخرجات" aria-label="فتح المخرجات">
-                <i data-lucide="folder-open" style="width:16px; height:16px;"></i>
-              </button>
+          <div id="progress-container" class="progress-container">
+            <div class="progress-meta">
+              <span id="progress-label" class="muted-text">في الانتظار...</span>
+              <span id="progress-percent" class="muted-text">0%</span>
             </div>
-            <button id="render-btn" class="btn-primary" type="button" style="min-width:190px; font-size:1.05rem; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;">
-              <i data-lucide="download" style="width:18px; height:18px;"></i>
-              حفظ الفيديو
+            <div class="progress-track" style="margin-top:.5rem;"><div id="progress-bar" class="progress-fill"></div></div>
+          </div>
+          <div class="render-actions">
+            <button id="render-btn" class="btn-primary" type="button" style="min-height:40px;">
+              <i data-lucide="download" style="width:16px;height:16px;"></i> حفظ الفيديو
             </button>
-            <button id="cancel-render-btn" class="btn-secondary" type="button" style="display:none; min-width:140px; background:#ef4444; border-color:#ef4444; color:#fff;">إيقاف</button>
-            <div class="progress-box" style="flex:1; margin:0;">
-              <div class="progress-meta">
-                <span id="progress-percent">0%</span>
-                <span id="progress-label">في الانتظار...</span>
-              </div>
-              <div class="progress-track">
-                <div id="progress-bar" class="progress-fill"></div>
-              </div>
-            </div>
+            <button id="cancel-render-btn" class="btn-secondary btn-danger" type="button" style="display:none;min-height:40px;">
+              <i data-lucide="square" style="width:14px;height:14px;"></i> إيقاف
+            </button>
+            <label style="display:flex;align-items:center;gap:.45rem;font-weight:700;color:#f59e0b;font-size:.88rem;">
+              <i data-lucide="fast-forward" style="width:14px;height:14px;stroke-width:2;"></i> Turbo
+              <label class="switch" style="margin:0;"><input type="checkbox" id="turbo-render-checkbox" checked /><span class="slider"></span></label>
+            </label>
           </div>
           <div id="render-result" class="render-result is-hidden"></div>
         </div>

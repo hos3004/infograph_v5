@@ -608,18 +608,15 @@
     /* ─── Render Zone ──────────────────────────────────────── */
     .save-section {
       background: var(--surface); border-radius: var(--r-lg);
-      border: 1px solid var(--border); padding: 0.75rem 1rem;
-      box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0;
+      border: 1px solid var(--border); padding: 1rem;
+      box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 0.75rem; flex-shrink: 0;
     }
-    .progress-box {
-      background: var(--surface-r); padding: 0.5rem 0.75rem;
-      border-radius: var(--r-sm); border: 1px solid var(--border);
-      flex: 1; display: flex; align-items: center; gap: 0.75rem; margin: 0;
-    }
-    .progress-track { width: 100%; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; position: relative; flex: 1; }
+    .status-row, .progress-meta, .render-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .render-actions { justify-content: flex-start; flex-wrap: wrap; }
+    .progress-track { width: 100%; height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
     .progress-fill {
       height: 100%; width: 0%; background: var(--accent);
-      border-radius: 3px; transition: width 0.3s ease; position: relative;
+      border-radius: 999px; transition: width 0.24s ease; position: relative;
     }
     .progress-fill.is-active::after {
       content: ''; position: absolute; inset: 0;
@@ -630,6 +627,8 @@
       0%   { transform: translateX(-100%); }
       100% { transform: translateX(200%); }
     }
+    .btn-danger { color: var(--danger) !important; border-color: #fecaca !important; background: #fef2f2 !important; }
+    .render-result { min-height: 24px; font-size: 0.88rem; color: var(--text-mu); word-break: break-word; }
 
     /* ─── Scrollbars ───────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1023,59 +1022,38 @@
 
         <!-- ─── Render Zone ─────────────────────────────────── -->
         <div class="save-section render-zone" style="margin-top: 0;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <h3 id="status-title" style="margin: 0; color: var(--text); font-size: 0.88rem; font-weight: 700;">حفظ الفيديو</h3>
-              <p id="status-text" class="muted-text" style="margin: 0; font-size: 0.74rem; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; display: none;">لم يبدأ الحفظ بعد</p>
+          <div class="status-row">
+            <div>
+              <h2 id="status-title" style="margin:0;font-size:1.05rem;">حفظ الفيديو</h2>
+              <div id="status-text" class="muted-text">لم يبدأ الحفظ بعد</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <div id="render-result" class="render-result" style="font-size: 0.78rem; color: var(--success); display: none; align-items: center; gap: 0.25rem; font-weight: 600; white-space: nowrap;"></div>
-              <!-- Turbo toggle -->
-              <div style="display: flex; align-items: center; gap: 0.35rem; color: #f59e0b; font-weight: 700; font-size: 0.82rem; flex-shrink: 0;">
-                <i data-lucide="fast-forward" style="width: 14px; height: 14px; stroke-width: 2;"></i>
-                Turbo
-                <label class="switch" style="margin-right: 0.25rem;">
-                  <input type="checkbox" id="turbo-render-checkbox" checked />
-                  <span class="slider"></span>
-                </label>
-              </div>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <button id="refresh-assets-btn" class="btn-secondary" type="button" title="تحديث الأصول" style="min-height:36px;padding:.4rem .6rem;">
+                <i data-lucide="rotate-cw" style="width:14px;height:14px;"></i>
+              </button>
+              <button id="open-output-btn" class="btn-secondary" type="button" style="min-height:36px;">
+                <i data-lucide="folder-open"></i> مجلد الإخراج
+              </button>
             </div>
           </div>
-
-          <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <!-- Progress bar -->
-            <div class="progress-box">
-              <strong id="progress-percent" class="accent-text"
-                style="flex-shrink: 0; width: 34px; text-align: right; font-size: 0.82rem;">0%</strong>
-              <div class="progress-track">
-                <div id="progress-fill" class="progress-fill"></div>
-              </div>
-              <span id="progress-label" class="muted-text"
-                style="flex-shrink: 0; width: 130px; text-align: left; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">في الانتظار...</span>
-            </div>
-
-            <!-- Action buttons -->
-            <div class="render-actions" style="display: flex; gap: 0.25rem; flex-shrink: 0;">
-              <button id="render-btn" class="btn-blue"
-                style="padding: 0.4rem 1.1rem; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.92rem; min-height: 44px;">
-                <i data-lucide="download" style="width: 16px; height: 16px; fill: white;"></i> حفظ الفيديو
-              </button>
-              <button id="cancel-render-btn" class="btn-blue"
-                style="display: none; background-color: var(--danger) !important; padding: 0.4rem 1.1rem; border-radius: var(--r-sm); align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.92rem; min-height: 44px;">
-                إيقاف
-              </button>
-              <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                <button id="refresh-assets-btn" class="btn-secondary"
-                  style="padding: 0.22rem 0.5rem; border-radius: 4px; flex: 1; display: flex; align-items: center; justify-content: center;" title="تحديث الأصول">
-                  <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i>
-                </button>
-                <button id="open-output-btn" class="btn-secondary"
-                  style="padding: 0.22rem 0.5rem; border-radius: 4px; flex: 1; display: flex; align-items: center; justify-content: center;" title="المخرجات">
-                  <i data-lucide="folder-open" style="width: 13px; height: 13px; color: var(--success);"></i>
-                </button>
-              </div>
-            </div>
+          <div class="progress-meta">
+            <span id="progress-label" class="muted-text">في الانتظار...</span>
+            <span id="progress-percent" class="muted-text">0%</span>
           </div>
+          <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          <div class="render-actions">
+            <button id="render-btn" class="btn-primary" type="button" style="min-height:40px;">
+              <i data-lucide="download" style="width:16px;height:16px;fill:white;"></i> حفظ الفيديو
+            </button>
+            <button id="cancel-render-btn" class="btn-secondary btn-danger" type="button" style="display:none;min-height:40px;">
+              <i data-lucide="square" style="width:14px;height:14px;"></i> إيقاف
+            </button>
+            <label style="display:flex;align-items:center;gap:.45rem;font-weight:700;color:#f59e0b;font-size:.88rem;">
+              <i data-lucide="fast-forward" style="width:14px;height:14px;stroke-width:2;"></i> Turbo
+              <label class="switch" style="margin:0;"><input type="checkbox" id="turbo-render-checkbox" checked /><span class="slider"></span></label>
+            </label>
+          </div>
+          <div id="render-result" class="render-result"></div>
         </div>
       </div><!-- end left-panel -->
     </div><!-- end main-content -->
