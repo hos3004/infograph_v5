@@ -28,6 +28,7 @@ module.exports = {
     'desktop-v2/sowar/**/*',
     'desktop-v2/qawaleb/**/*',
     'desktop-v2/personalities/**/*',
+    'desktop-v2/voiceover/**/*',
     'desktop-v2/updater/**/*',
     'package.json',
     '!**/*.map',
