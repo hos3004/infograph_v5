@@ -24,8 +24,38 @@ function escapeTemplateLiteral(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/`/g, '\\`');
 }
 
-function buildTemplateRenderScript(values) {
+function buildTemplateRenderScript(values, options = {}) {
   const serializedValues = JSON.stringify(values || {});
+
+  const bgInject = options.backgroundImageUrl
+    ? `
+        (function() {
+          const existing = document.getElementById('__qawaleb-bg-overlay');
+          if (existing) existing.remove();
+          const overlay = document.createElement('div');
+          overlay.id = '__qawaleb-bg-overlay';
+          overlay.style.cssText = [
+            'position:absolute', 'inset:0', 'z-index:0', 'pointer-events:none',
+            'background-image:url(' + JSON.stringify(${JSON.stringify(options.backgroundImageUrl)}) + ')',
+            'background-size:cover', 'background-position:center',
+            'opacity:' + ${(options.backgroundOpacity || 10) / 100},
+            'filter:blur(' + ${options.backgroundBlur || 0} + 'px)',
+          ].join(';');
+          const stage = document.getElementById('stage') || document.querySelector('.stage') || document.body;
+          stage.insertBefore(overlay, stage.firstChild);
+        })();`
+    : '';
+
+  const emptyFieldHide = `
+        (function() {
+          const vals = ${serializedValues};
+          Object.entries(vals).forEach(function([id, val]) {
+            if (!id.startsWith('i-')) return;
+            const visEl = document.getElementById(id.slice(2));
+            if (visEl) visEl.style.display = (!val || !String(val).trim()) ? 'none' : '';
+          });
+        })();`;
+
   return `
     new Promise(async (resolve, reject) => {
       try {
@@ -35,6 +65,8 @@ function buildTemplateRenderScript(values) {
 
         window.QAWALEB_TEMPLATE_BRIDGE.applyValues(${serializedValues});
         window.QAWALEB_TEMPLATE_BRIDGE.renderNow();
+        ${bgInject}
+        ${emptyFieldHide}
 
         const fontPromise = document.fonts?.ready
           ? document.fonts.ready.catch(() => undefined)
@@ -205,8 +237,18 @@ async function captureTemplateFrames(renderWindow, session, framesDir, payload, 
   const durationMs = Math.max(1000, Number(payload.durationMs || 20000));
   const totalFrames = Math.max(1, Math.round((durationMs / 1000) * fps));
 
+  const backgroundImageUrl = payload.backgroundImage && hasFile(payload.backgroundImage)
+    ? pathToFileURL(payload.backgroundImage).href
+    : null;
+
+  const renderOptions = {
+    backgroundImageUrl,
+    backgroundOpacity: Number(payload.backgroundOpacity ?? 10),
+    backgroundBlur: Number(payload.backgroundBlur ?? 0),
+  };
+
   await renderWindow.webContents.executeJavaScript(
-    buildTemplateRenderScript(payload.templateValues || {}),
+    buildTemplateRenderScript(payload.templateValues || {}, renderOptions),
     true,
   );
 
@@ -297,6 +339,45 @@ async function finalizeVideoWithAudio(session, silentVideoPath, outputPath, payl
   ], session);
 }
 
+async function concatenateWithIntroOutro(session, mainVideoPath, outputPath, payload, workingDir, sendProgress) {
+  const introParts = [];
+  const outroParts = [];
+
+  if (hasFile(payload.intro)) {
+    introParts.push(payload.intro);
+  }
+  if (hasFile(payload.outro)) {
+    outroParts.push(payload.outro);
+  }
+
+  if (introParts.length === 0 && outroParts.length === 0) {
+    if (mainVideoPath !== outputPath) {
+      await fs.promises.copyFile(mainVideoPath, outputPath);
+    }
+    return;
+  }
+
+  sendProgress({
+    stage: 'concat',
+    progress: 0.94,
+    message: 'Concatenating intro / outro...',
+  });
+
+  const concatListPath = path.join(workingDir, 'concat-list.txt');
+  const segments = [...introParts, mainVideoPath, ...outroParts];
+  const listContent = segments.map((p) => `file '${p.replace(/\\/g, '/').replace(/'/g, "'\\''")}'`).join('\n');
+  await fs.promises.writeFile(concatListPath, listContent, 'utf8');
+
+  await runFfmpeg([
+    '-y',
+    '-f', 'concat',
+    '-safe', '0',
+    '-i', concatListPath,
+    '-c', 'copy',
+    outputPath,
+  ], session);
+}
+
 async function renderQawalebVideo({
   BrowserWindow,
   desktopPaths,
@@ -320,7 +401,13 @@ async function renderQawalebVideo({
     const workingDir = path.join(desktopPaths.tempDir, `qawaleb-render-${Date.now()}`);
     const framesDir = path.join(workingDir, 'frames');
     const silentVideoPath = path.join(workingDir, 'qawaleb-silent.mp4');
-    const outputPath = path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`);
+    const hasIntroOutro = hasFile(payload.intro) || hasFile(payload.outro);
+    const mainVideoPath = hasIntroOutro
+      ? path.join(workingDir, 'qawaleb-main.mp4')
+      : path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`);
+    const outputPath = hasIntroOutro
+      ? path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`)
+      : mainVideoPath;
     session.workingDir = workingDir;
 
     await fs.promises.mkdir(framesDir, { recursive: true });
@@ -371,9 +458,18 @@ async function renderQawalebVideo({
     await finalizeVideoWithAudio(
       session,
       silentVideoPath,
-      outputPath,
+      mainVideoPath,
       payload,
       captureStats.durationMs,
+      sendProgress,
+    );
+
+    await concatenateWithIntroOutro(
+      session,
+      mainVideoPath,
+      outputPath,
+      payload,
+      workingDir,
       sendProgress,
     );
 

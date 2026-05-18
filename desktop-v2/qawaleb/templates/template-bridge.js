@@ -93,6 +93,18 @@
     });
   }
 
+  function applyEmptyFieldVisibility(values) {
+    if (!values || typeof values !== 'object') return;
+    Object.entries(values).forEach(([fieldId, value]) => {
+      if (!fieldId.startsWith('i-')) return;
+      const visualId = fieldId.slice(2);
+      const visualEl = document.getElementById(visualId);
+      if (!visualEl) return;
+      const isEmpty = value === null || value === undefined || String(value).trim() === '';
+      visualEl.style.display = isEmpty ? 'none' : '';
+    });
+  }
+
   function renderNow() {
     if (typeof window.render === 'function') {
       window.render();
@@ -160,6 +172,7 @@
       case 'qawaleb:update':
         applyValues(data.values);
         renderNow();
+        applyEmptyFieldVisibility(data.values);
         stageAt(data.timeMs || 0, data.autoplay === true);
         break;
       case 'qawaleb:restart':
