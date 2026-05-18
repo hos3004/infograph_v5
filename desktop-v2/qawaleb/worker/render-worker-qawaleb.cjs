@@ -1,8 +1,47 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const { spawn } = require('child_process');
 const { bundle } = require('@remotion/bundler');
 const { renderMedia, selectComposition } = require('@remotion/renderer');
+
+let ffmpegExecutable = 'ffmpeg';
+try { ffmpegExecutable = require('ffmpeg-static'); } catch {}
+
+function hasFile(filePath) {
+  return Boolean(filePath && fs.existsSync(filePath));
+}
+
+function runFfmpeg(args) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ffmpegExecutable, args, { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+    let stderr = '';
+    proc.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+    proc.on('error', reject);
+    proc.on('exit', (code) => {
+      if (code === 0) { resolve(); return; }
+      reject(new Error(stderr.trim().split(/\r?\n/).slice(-8).join('\n') || `ffmpeg exit ${code}`));
+    });
+  });
+}
+
+async function concatenateWithIntroOutro(mainVideoPath, outputPath, payload, workingDir) {
+  const segments = [];
+  if (hasFile(payload.intro)) segments.push(payload.intro);
+  segments.push(mainVideoPath);
+  if (hasFile(payload.outro)) segments.push(payload.outro);
+
+  if (segments.length === 1) {
+    if (mainVideoPath !== outputPath) await fs.promises.copyFile(mainVideoPath, outputPath);
+    return;
+  }
+
+  const listPath = path.join(workingDir, 'concat-list.txt');
+  const listContent = segments.map((p) => `file '${p.replace(/\\/g, '/').replace(/'/g, "'\\''")}'`).join('\n');
+  await fs.promises.writeFile(listPath, listContent, 'utf8');
+
+  await runFfmpeg(['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', outputPath]);
+}
 
 const { createDesktopPaths, ensureDesktopDirs } = require('../../shared/paths.cjs');
 const { prepareRemotionPublicDir } = require('../../shared/remotion-public.cjs');
@@ -268,6 +307,10 @@ async function renderQawaleb(payload) {
   const normalizedValues = normalizeTemplateValues(payload.templateValues, fileMap);
   const mediaServer = await startMediaServer(fileMap);
 
+  const hasIntroOutro = hasFile(payload.intro) || hasFile(payload.outro);
+  const tempDir = hasIntroOutro ? path.join(desktopPaths.tempDir, `qawaleb-concat-${Date.now()}`) : null;
+  if (tempDir) await fs.promises.mkdir(tempDir, { recursive: true });
+
   try {
     const resolvedValues = Object.fromEntries(
       Object.entries(normalizedValues).map(([key, value]) => {
@@ -324,7 +367,8 @@ async function renderQawaleb(payload) {
       binariesDirectory,
     });
 
-    const outputPath = path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`);
+    const finalOutputPath = path.join(desktopPaths.outputDir, `Qawaleb_${Date.now()}.mp4`);
+    const outputPath = hasIntroOutro ? path.join(tempDir, 'main.mp4') : finalOutputPath;
 
     reply({
       type: 'progress',
@@ -369,13 +413,22 @@ async function renderQawaleb(payload) {
       },
     });
 
+    if (hasIntroOutro) {
+      reply({
+        type: 'progress',
+        payload: { stage: 'concat', progress: 0.95, message: 'Concatenating intro / outro...' },
+      });
+      await concatenateWithIntroOutro(outputPath, finalOutputPath, payload, tempDir);
+    }
+
     return {
       success: true,
-      outputPath,
+      outputPath: finalOutputPath,
       totalFrames: composition.durationInFrames,
     };
   } finally {
     await mediaServer.close();
+    if (tempDir) await fs.promises.rm(tempDir, { recursive: true, force: true }).catch(() => {});
   }
 }
 

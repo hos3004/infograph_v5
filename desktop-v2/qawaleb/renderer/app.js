@@ -3466,9 +3466,7 @@ function buildRenderPayload() {
     templateId: preset.id,
     templateLabel: preset.label || '',
     templateFileName: preset.fileName,
-    templateValues: Object.fromEntries(
-      Object.entries(state.templateValues || {}).map(([k, v]) => [k, normalizeTemplatePreviewValue(v)])
-    ),
+    templateValues: { ...(state.templateValues || {}) },
     backgroundImage: state.backgroundImage || null,
     intro: introAsset ? introAsset.path : null,
     outro: endPageAsset ? endPageAsset.path : null,
