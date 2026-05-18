@@ -10,9 +10,10 @@ type GeminiTtsRequest = {
   text?: string;
   apiKey?: string;
   ttsModel?: string;
-  // legacy/future hooks (kept for API stability with callers)
-  languageCode?: string;
   voiceName?: string;
+  instructions?: string; // style/tone instructions passed as systemInstruction
+  // legacy fields kept for API stability
+  languageCode?: string;
   ssmlGender?: 'MALE' | 'FEMALE' | 'NEUTRAL';
   speakingRate?: number;
   pitch?: number;
@@ -136,6 +137,7 @@ export async function POST(request: NextRequest) {
 
     const voiceName = payload.voiceName || DEFAULT_VOICE;
     const ttsModel = (payload.ttsModel && payload.ttsModel.trim()) || DEFAULT_TTS_MODEL;
+    const instructions = payload.instructions?.trim() || '';
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${ttsModel}:generateContent?key=${encodeURIComponent(
       apiKey
@@ -145,6 +147,12 @@ export async function POST(request: NextRequest) {
     // Without this prefix, the model often replies with text instead of audio for Arabic input.
     // We try a couple of phrasings to recover from the rare "model produced text" case.
     const promptVariants = [`Read aloud: ${text}`, `Say in a clear neutral voice: ${text}`];
+
+    // Build system instruction: merge default TTS instruction with user style instructions
+    const defaultInstruction = 'You are a professional voice over artist. Read the provided text naturally and clearly.';
+    const systemInstructionText = instructions
+      ? `${defaultInstruction} Style: ${instructions}`
+      : defaultInstruction;
 
     let result: GeminiResponse | null = null;
     let lastStatus = 0;
@@ -157,6 +165,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstructionText }] },
           contents: [{ parts: [{ text: ttsPrompt }] }],
           generationConfig: {
             responseModalities: ['AUDIO'],
@@ -226,6 +235,7 @@ export async function POST(request: NextRequest) {
       model: ttsModel,
       voiceName,
       sampleRate,
+      instructions: instructions || null,
     });
   } catch (error: any) {
     console.error('[Gemini TTS] Error:', error);
