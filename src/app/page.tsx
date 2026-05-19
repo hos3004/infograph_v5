@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Player } from '@remotion/player';
 import { MainComposition } from '../remotion/MainComposition';
 import { SlideData, VisualEffect, TextPreset, TextAnimationPreset, TEXT_PRESETS } from '../remotion/types';
@@ -94,7 +95,7 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Load real files from disk on mount ────────────────────────────────────
-  const loadAssets = async () => {
+  const loadAssets = useCallback(async () => {
     setAssetsLoading(true);
     try {
       const [ovRes, muRes, epRes] = await Promise.all([
@@ -105,22 +106,25 @@ export default function Dashboard() {
       const ovData = await ovRes.json();
       const muData = await muRes.json();
       const epData = await epRes.json();
-      setOverlayFiles(ovData.files ?? []);
-      setMusicFiles(muData.files ?? []);
-      setEndPageFiles(epData.files ?? []);
+      const overlayList = Array.isArray(ovData.files) ? ovData.files : [];
+      const musicList = Array.isArray(muData.files) ? muData.files : [];
+      const endPageList = Array.isArray(epData.files) ? epData.files : [];
+      setOverlayFiles(overlayList);
+      setMusicFiles(musicList);
+      setEndPageFiles(endPageList);
 
       // Clear selection if file no longer exists
-      if (overlay  && !ovData.files.includes(overlay))  setOverlay(null);
-      if (music    && !muData.files.includes(music))     setMusic(null);
-      if (endPage  && !epData.files.includes(endPage))   setEndPage(null);
+      setOverlay(current => current && !overlayList.includes(current) ? null : current);
+      setMusic(current => current && !musicList.includes(current) ? null : current);
+      setEndPage(current => current && !endPageList.includes(current) ? null : current);
     } catch {
       // silently keep empty lists
     } finally {
       setAssetsLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadAssets(); }, []);
+  useEffect(() => { loadAssets(); }, [loadAssets]);
 
   // Pretty display name: remove extension and replace dashes/underscores with spaces
   const prettify = (filename: string) =>
@@ -349,7 +353,14 @@ export default function Dashboard() {
                      ))}
                    </div>
                    <div style={{fontWeight: 'bold', width: '24px', textAlign: 'center', fontSize: '0.9rem'}}>{index + 1}</div>
-                   <img src={slide.imageUrl} alt={`Slide ${index}`} className="slide-img-preview" />
+                   <Image
+                     src={slide.imageUrl}
+                     alt={`Slide ${index}`}
+                     className="slide-img-preview"
+                     width={160}
+                     height={90}
+                     unoptimized
+                   />
                    <div className="slide-content">
                       <input
                         type="text"

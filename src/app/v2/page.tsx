@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   Play, Layers, Type, Music, Settings, Layout,
   RotateCw, FolderOpen, Save, X, Maximize, RefreshCcw,
@@ -143,10 +144,13 @@ export default function InfographV2() {
         {/* TOP BAR */}
         <header className="top-bar">
           <div className="logo-section">
-            <img
+            <Image
               id="brand-logo"
               className="brand-logo-image"
               src="/api/serve-asset?type=assets&file=logo.png"
+              width={180}
+              height={42}
+              unoptimized
               alt="فيديوجراف"
             />
             <span>فيديوجراف</span>
