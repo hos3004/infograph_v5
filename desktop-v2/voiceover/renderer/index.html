@@ -192,6 +192,7 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
   </style>
+  <link rel="stylesheet" href="../../shared/minimal-ui.css" />
 </head>
 <body>
 
@@ -392,8 +393,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load brand logo
   try {
     const bs = await window.desktopApi.bootstrap();
-    if (bs?.logoPath) {
-      document.getElementById('brand-logo').src = window.desktopApi.toFileUrl(bs.logoPath);
+    const brandLogo = document.getElementById('brand-logo');
+    if (brandLogo && bs?.logoDataUrl) {
+      brandLogo.src = bs.logoDataUrl;
+    } else if (brandLogo && bs?.logoPath) {
+      brandLogo.src = window.desktopApi.toFileUrl(bs.logoPath);
     }
   } catch {}
 

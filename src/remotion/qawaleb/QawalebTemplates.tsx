@@ -502,10 +502,6 @@ const buildRoundedMask = ({
 const PointsBackgroundOverlay: React.FC<{ appearance: TemplateAppearance }> = ({ appearance }) => {
   const frame = useCurrentFrame();
   const safeOpacity = clamp(Number(appearance.backgroundOpacity ?? 10) / 100, 0, 1);
-  if (safeOpacity <= 0.001) {
-    return null;
-  }
-
   const maskImage = React.useMemo(
     () => buildRoundedMask({
       width: 1920,
@@ -515,6 +511,10 @@ const PointsBackgroundOverlay: React.FC<{ appearance: TemplateAppearance }> = ({
     }),
     [appearance.backgroundFeather, appearance.backgroundRadius],
   );
+
+  if (safeOpacity <= 0.001) {
+    return null;
+  }
 
   const offsetX = appearance.parallaxEnabled !== false ? Math.sin(frame / 60) * 20 : 0;
   const offsetY = appearance.parallaxEnabled !== false ? Math.cos(frame / 82) * 14 : 0;

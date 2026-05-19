@@ -25,6 +25,7 @@ export const PersonalitiesComposition: React.FC<PersonalitiesCompositionProps> =
   const slidesTotalMs = getTotalSlidesDurationMs(slides);
   const audioMs = mainVoiceoverDurationMs || voiceoverDurationMs || 0;
   const effectiveDurationMs = audioMs > 0 ? audioMs : slidesTotalMs;
+  const activeVoiceover = mainVoiceover || voiceover || undefined;
 
   const extendMs = audioMs > 0 ? Math.max(0, effectiveDurationMs - slidesTotalMs) : 0;
   const lastSlide = slides.length > 0 ? slides[slides.length - 1] : null;
@@ -107,9 +108,9 @@ export const PersonalitiesComposition: React.FC<PersonalitiesCompositionProps> =
         </Sequence>
       )}
 
-      {(mainVoiceover || voiceover) && (
+      {activeVoiceover && (
         <Audio
-          src={mainVoiceover || voiceover}
+          src={activeVoiceover}
           volume={(typeof voiceoverVolume === 'number' && !isNaN(voiceoverVolume)) ? voiceoverVolume / 100 : 1}
         />
       )}

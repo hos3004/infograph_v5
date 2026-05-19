@@ -1,0 +1,264 @@
+/* Shared compact UI layer for Desktop V2.
+   Keep this file small and override only cross-section density/tokens. */
+
+:root {
+  --bg: #f6f7f6;
+  --surface: #ffffff;
+  --surface-r: #f8faf9;
+  --border: #e3e7e4;
+  --border-s: #ccd6d0;
+  --accent: #2f7d57;
+  --accent-dk: #1f6845;
+  --accent-lt: #e9f5ef;
+  --text: #181c1a;
+  --text-mu: #64706a;
+  --text-fa: #96a19b;
+  --sh-sm: 0 1px 2px rgba(16, 24, 20, 0.06);
+  --sh-md: 0 6px 18px rgba(16, 24, 20, 0.08);
+  --sh-lg: 0 18px 46px rgba(16, 24, 20, 0.14);
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 8px;
+  --unified-header-height: 56px;
+  --unified-header-bg: #ffffff;
+  --unified-header-border: #e3e7e4;
+  --unified-header-text: #181c1a;
+  --unified-header-muted: #64706a;
+  --unified-header-accent: #2f7d57;
+  --unified-header-accent-soft: #e9f5ef;
+  --unified-header-bg-soft: #f6f7f6;
+  --unified-header-shadow: 0 1px 2px rgba(16, 24, 20, 0.06);
+  --unified-radius-sm: 6px;
+}
+
+body,
+.paper-light-body,
+.v2-root,
+.vo-root {
+  font-size: 13px;
+}
+
+.v2-root,
+.vo-root {
+  height: calc(100vh - var(--unified-header-height)) !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+.v2-root {
+  --bg-app: var(--bg);
+  --bg-panel: var(--surface);
+  --bg-input: var(--surface);
+  --border-color: var(--border);
+  --border-focus: var(--border-s);
+  --text-main: var(--text);
+  --text-muted: var(--text-mu);
+  --accent: #2f7d57;
+  --accent-hover: #1f6845;
+}
+
+.paper-top-bar,
+.top-bar,
+.app-top-bar,
+.main-top-bar,
+.header-bar {
+  padding-inline: 16px !important;
+  gap: 12px !important;
+}
+
+.unified-laqtat-header {
+  height: var(--unified-header-height) !important;
+  min-height: var(--unified-header-height) !important;
+  max-height: var(--unified-header-height) !important;
+}
+
+#brand-logo,
+.paper-brand-logo-image,
+.brand-logo-image,
+.logo-image,
+.logo img,
+.paper-logo-section img,
+.logo-section img {
+  height: 40px !important;
+  max-height: 40px !important;
+  max-width: 210px !important;
+}
+
+.unified-laqtat-header .paper-brand-logo-image,
+.unified-laqtat-header #brand-logo {
+  height: 40px !important;
+  max-height: 40px !important;
+  max-width: 210px !important;
+}
+
+.paper-project-icon-btn,
+.project-icon-btn,
+#project-save-btn,
+#project-open-btn,
+.btn-icon {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-radius: 6px !important;
+}
+
+.paper-nav-pills-wrap,
+.nav-pills-wrap,
+.nav-wrapper,
+.nav-links {
+  min-height: 34px !important;
+  padding: 3px !important;
+  border-radius: 999px !important;
+}
+
+.unified-laqtat-header .paper-nav-pills-wrap {
+  min-width: 0 !important;
+}
+
+.paper-nav-pill,
+.nav-pill,
+.nav-btn,
+.paper-nav-pills-wrap a,
+.nav-pills-wrap a {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 11px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.main-content,
+.vo-left,
+.tab-content,
+.panel-center,
+.panel-side {
+  gap: 10px !important;
+  padding: 10px !important;
+}
+
+.right-panel,
+.left-panel,
+.preview-container,
+.save-section,
+.setting-group,
+.prop-section,
+.vo-card,
+.vo-player-card,
+.scene-card,
+.slide-card,
+.template-card,
+.voice-card,
+.vo-voice-card,
+details.advanced,
+.settings-modal-card,
+.success-modal-card {
+  border-radius: 8px !important;
+  box-shadow: var(--sh-sm) !important;
+}
+
+.tabs-header {
+  min-height: 56px !important;
+}
+
+.tab-btn {
+  min-height: 52px !important;
+  padding: 8px 6px !important;
+  font-size: 12.5px !important;
+  gap: 4px !important;
+}
+
+.setting-group,
+.prop-section,
+.vo-card,
+.scene-card {
+  padding: 10px !important;
+}
+
+button,
+select,
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  letter-spacing: 0 !important;
+}
+
+select,
+.input-v2,
+.number-input,
+.modern-input,
+.modern-textarea,
+.textarea-v2,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  min-height: 32px !important;
+  padding: 6px 9px !important;
+  border-radius: 6px !important;
+  font-size: 12.5px !important;
+}
+
+.btn,
+.btn-blue,
+.btn-blue-outline,
+.btn-primary,
+.btn-secondary,
+.btn-download,
+.scene-mini-btn,
+.content-action-btn {
+  min-height: 32px !important;
+  padding: 0 11px !important;
+  border-radius: 6px !important;
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+}
+
+.btn-generate {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+.preview-container,
+.save-section {
+  gap: 8px !important;
+}
+
+.preview-stage-outer,
+.player-wrapper,
+.preview-stage-shell,
+.preview-stage-shell-fix {
+  border-radius: 8px !important;
+}
+
+.slide-thumb-wrap,
+.video-thumb-wrap {
+  border-radius: 6px !important;
+}
+
+.badge,
+.vo-tone-badge {
+  font-size: 11px !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-s);
+  border-radius: 6px;
+}
+
+@media (max-width: 1100px) {
+  .paper-nav-pill,
+  .nav-pill,
+  .nav-btn {
+    padding: 0 8px !important;
+    font-size: 11.5px !important;
+  }
+}

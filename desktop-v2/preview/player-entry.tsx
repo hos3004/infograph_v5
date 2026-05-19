@@ -5,7 +5,7 @@ import { MainComposition } from '../../src/remotion/MainComposition';
 import type { CompositionProps } from '../../src/remotion/types';
 
 type PreviewPayload = {
-  inputProps: CompositionProps;
+  inputProps: Record<string, unknown>;
   durationInFrames: number;
 };
 
@@ -66,7 +66,7 @@ const PreviewApp: React.FC<{ payload: PreviewPayload }> = ({ payload }) => {
     <Player
       ref={playerRef}
       component={MainComposition}
-      inputProps={payload.inputProps}
+      inputProps={payload.inputProps as CompositionProps}
       durationInFrames={Math.max(30, payload.durationInFrames)}
       compositionWidth={1920}
       compositionHeight={1080}

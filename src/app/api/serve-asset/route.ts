@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     const safeFilename = path.basename(filename);
 
     if (!fs.existsSync(filePath)) {
-      return NextResponse.json({ error: 'File not found at ' + filePath }, { status: 404 });
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
     const stat = fs.statSync(filePath);

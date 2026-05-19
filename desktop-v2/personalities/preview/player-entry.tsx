@@ -12,7 +12,7 @@ type PreviewInputProps = CompositionProps & PersonalitiesCompositionProps & {
 };
 
 type PreviewPayload = {
-  inputProps: PreviewInputProps;
+  inputProps: Record<string, unknown>;
   durationInFrames: number;
 };
 
@@ -63,12 +63,13 @@ let currentPayload: PreviewPayload = {
   durationInFrames: 30,
 };
 
-function isPersonalitiesMode(props: PreviewInputProps): boolean {
+function isPersonalitiesMode(props: PreviewPayload['inputProps']): boolean {
   return props.renderMode === 'personalities' || props.projectType === 'personalities';
 }
 
 const PreviewApp: React.FC<{ payload: PreviewPayload }> = ({ payload }) => {
   const playerRef = useRef<PlayerRef>(null);
+  const inputProps = payload.inputProps as PreviewInputProps;
   const isPersonalities = isPersonalitiesMode(payload.inputProps);
   const SlideComponent: React.ComponentType<any> = isPersonalities
     ? PersonalitiesComposition
@@ -87,7 +88,7 @@ const PreviewApp: React.FC<{ payload: PreviewPayload }> = ({ payload }) => {
     <Player
       ref={playerRef}
       component={SlideComponent}
-      inputProps={payload.inputProps}
+      inputProps={inputProps}
       durationInFrames={Math.max(30, payload.durationInFrames)}
       compositionWidth={1920}
       compositionHeight={1080}

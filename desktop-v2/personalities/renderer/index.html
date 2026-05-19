@@ -94,6 +94,7 @@
 
   </style>
   <link rel="stylesheet" href="../../shared/unified-header.css" />
+  <link rel="stylesheet" href="../../shared/minimal-ui.css" />
 </head>
 <body>
 
@@ -279,6 +280,15 @@
 
   <script>
     (function compactPersonalitiesScenes() {
+      function escapeSceneTitleHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
       function normalizeSceneTitle(card, index) {
         const title = card.querySelector('.scene-title');
         if (!title || title.querySelector('.scene-number-chip')) return;
@@ -289,7 +299,7 @@
           .replace(/^المشهد\s*\d+\s*[—|\-|:]?\s*/i, '')
           .replace(/^\d+\s*[—|\-|:]?\s*/i, '')
           .trim() || raw;
-        title.innerHTML = `<span class="scene-number-chip">${number}</span><span class="scene-title-text">${cleanTitle}</span>`;
+        title.innerHTML = `<span class="scene-number-chip">${number}</span><span class="scene-title-text">${escapeSceneTitleHtml(cleanTitle)}</span>`;
       }
 
       function normalizeSceneButton(button) {
