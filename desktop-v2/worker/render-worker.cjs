@@ -18,8 +18,10 @@ const desktopPaths = createDesktopPaths({
 ensureDesktopDirs(desktopPaths);
 
 try {
-  process.env.REMOTION_FFMPEG_EXECUTABLE = require('ffmpeg-static');
-  process.env.REMOTION_FFPROBE_EXECUTABLE = require('ffprobe-static').path;
+  // asarUnpack: binaries are in app.asar.unpacked, not inside the ASAR archive
+  const _fa = (p) => p ? p.replace(/app\.asar([\/\\])/, 'app.asar.unpacked$1') : p;
+  process.env.REMOTION_FFMPEG_EXECUTABLE = _fa(require('ffmpeg-static'));
+  process.env.REMOTION_FFPROBE_EXECUTABLE = _fa(require('ffprobe-static').path);
 } catch {
   // Falls back to system binaries if the packaged ones are unavailable.
 }

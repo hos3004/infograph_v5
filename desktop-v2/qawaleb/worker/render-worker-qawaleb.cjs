@@ -6,7 +6,7 @@ const { bundle } = require('@remotion/bundler');
 const { renderMedia, selectComposition } = require('@remotion/renderer');
 
 let ffmpegExecutable = 'ffmpeg';
-try { ffmpegExecutable = require('ffmpeg-static'); } catch {}
+try { ffmpegExecutable = require('ffmpeg-static').replace(/app\.asar([\/\\])/, 'app.asar.unpacked$1'); } catch {}
 
 function hasFile(filePath) {
   return Boolean(filePath && fs.existsSync(filePath));
@@ -64,8 +64,9 @@ desktopPaths.bundleDir = path.join(
 ensureDesktopDirs(desktopPaths);
 
 try {
-  process.env.REMOTION_FFMPEG_EXECUTABLE = require('ffmpeg-static');
-  process.env.REMOTION_FFPROBE_EXECUTABLE = require('ffprobe-static').path;
+  const _fa = (p) => p ? p.replace(/app\.asar([\/\\])/, 'app.asar.unpacked$1') : p;
+  process.env.REMOTION_FFMPEG_EXECUTABLE = _fa(require('ffmpeg-static'));
+  process.env.REMOTION_FFPROBE_EXECUTABLE = _fa(require('ffprobe-static').path);
 } catch {}
 
 function readJsonIfExists(filePath) {

@@ -7,7 +7,7 @@ let activeSession = null;
 
 let ffmpegExecutable = 'ffmpeg';
 try {
-  ffmpegExecutable = require('ffmpeg-static');
+  ffmpegExecutable = require('ffmpeg-static').replace(/app\.asar([\/\\])/, 'app.asar.unpacked$1');
 } catch {
   // Fall back to a system ffmpeg if the packaged binary is unavailable.
 }
