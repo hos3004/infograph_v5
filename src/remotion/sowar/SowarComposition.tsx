@@ -213,10 +213,11 @@ const SegmentImageLayer: React.FC<{
     : 0;
   const currentY = imageY + motionY;
   const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${currentY}px)`;
-  const entryOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const entryBrightness = interpolate(frame, [0, 12], [1.75, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const entryFlashOpacity = interpolate(frame, [0, 10], [0.55, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#000', opacity: entryOpacity }}>
+    <AbsoluteFill style={{ backgroundColor: '#000' }}>
       {fitMode === 'blurred-background' ? (
         <>
           <Img
@@ -229,8 +230,7 @@ const SegmentImageLayer: React.FC<{
               objectFit: 'cover',
               objectPosition: 'center center',
               transform: `scale(${backgroundScale})`,
-              filter: `blur(${blurBackgroundAmount}px) brightness(0.85)`,
-              opacity: entryOpacity,
+              filter: `blur(${blurBackgroundAmount}px) brightness(${0.85 * entryBrightness})`,
             }}
           />
           <AbsoluteFill
@@ -246,6 +246,7 @@ const SegmentImageLayer: React.FC<{
               style={buildCenteredImageStyle({
                 objectFit: 'contain',
                 transform: sharedTransform,
+                filter: `brightness(${entryBrightness})`,
               })}
             />
           </AbsoluteFill>
@@ -264,10 +265,14 @@ const SegmentImageLayer: React.FC<{
             style={buildCenteredImageStyle({
               objectFit: fitMode === 'cover' ? 'cover' : 'contain',
               transform: sharedTransform,
+              filter: `brightness(${entryBrightness})`,
             })}
           />
         </AbsoluteFill>
       )}
+      {entryFlashOpacity > 0 ? (
+        <AbsoluteFill style={{ backgroundColor: '#ffffff', opacity: entryFlashOpacity, pointerEvents: 'none' }} />
+      ) : null}
     </AbsoluteFill>
   );
 };

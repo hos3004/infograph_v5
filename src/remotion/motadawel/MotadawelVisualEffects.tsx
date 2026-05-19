@@ -30,23 +30,27 @@ const DustEffect: React.FC = () => {
 };
 
 // ── Light leak ────────────────────────────────────────────────────────────
-const LightLeakEffect: React.FC = () => (
-  <AbsoluteFill>
-    <svg width="1920" height="1080" style={{ position: 'absolute' }}>
-      <defs>
-        <radialGradient id="ml1" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="#ff9900" stopOpacity="0.9" />
-          <stop offset="60%"  stopColor="#ff5500" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#ff3300" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <ellipse cx="220" cy="200" rx="320" ry="220" fill="url(#ml1)" opacity="0.18" />
-    </svg>
-  </AbsoluteFill>
-);
+const LightLeakEffect: React.FC = () => {
+  const uid = React.useId().replace(/:/g, '');
+  return (
+    <AbsoluteFill>
+      <svg width="1920" height="1080" style={{ position: 'absolute' }}>
+        <defs>
+          <radialGradient id={`${uid}-ml1`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stopColor="#ff9900" stopOpacity="0.9" />
+            <stop offset="60%"  stopColor="#ff5500" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#ff3300" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="220" cy="200" rx="320" ry="220" fill={`url(#${uid}-ml1)`} opacity="0.18" />
+      </svg>
+    </AbsoluteFill>
+  );
+};
 
 // ── Bokeh ─────────────────────────────────────────────────────────────────
 const BokehEffect: React.FC = () => {
+  const uid = React.useId().replace(/:/g, '');
   const circles = React.useMemo(() => {
     const list = [];
     for (let i = 0; i < 12; i++) {
@@ -61,16 +65,18 @@ const BokehEffect: React.FC = () => {
     return list;
   }, []);
 
+  const filterId = `${uid}-mb`;
+
   return (
     <AbsoluteFill>
       <svg width="1920" height="1080" style={{ position: 'absolute' }}>
         <defs>
-          <filter id="mb">
+          <filter id={filterId}>
             <feGaussianBlur stdDeviation="28" />
           </filter>
         </defs>
         {circles.map((c, i) => (
-          <circle key={i} cx={c.cx} cy={c.cy} r={c.r} fill="#ffffaa" opacity={c.opacity} filter="url(#mb)" />
+          <circle key={i} cx={c.cx} cy={c.cy} r={c.r} fill="#ffffaa" opacity={c.opacity} filter={`url(#${filterId})`} />
         ))}
       </svg>
     </AbsoluteFill>

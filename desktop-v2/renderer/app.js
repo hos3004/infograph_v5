@@ -2685,7 +2685,7 @@ async function saveSettings() {
 }
 
 // Gear button
-const openSettingsBtn = document.getElementById('open-settings-btn');
+const openSettingsBtn = document.getElementById('settings-btn') || document.getElementById('open-settings-btn');
 if (openSettingsBtn) {
   openSettingsBtn.addEventListener('click', openSettingsModal);
 }
@@ -2742,4 +2742,9 @@ if (apiKeyInput) {
   apiKeyInput.addEventListener('input', () => updateApiKeyStatus(apiKeyInput.value));
 }
 
-bootstrap();
+bootstrap().then(() => {
+  if (location.hash === '#settings') {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch {}
+    openSettingsModal();
+  }
+});

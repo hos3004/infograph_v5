@@ -534,59 +534,10 @@
 
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal-overlay" style="display:flex;position:fixed;inset:0;background:rgba(28,26,24,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;">
-    <div id="settings-modal-card" style="background:#fff;border-radius:18px;width:90vw;max-width:480px;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22);direction:rtl;font-family:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;transform:translateY(22px) scale(.96);transition:transform .32s cubic-bezier(.34,1.56,.64,1);">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem .9rem;border-bottom:1px solid #e8e3da;position:sticky;top:0;background:#fff;z-index:1;border-radius:18px 18px 0 0;">
-        <h2 style="font-size:1.05rem;font-weight:700;color:#1c1a18;margin:0;">إعدادات البرنامج</h2>
-        <button id="settings-modal-close-btn" style="background:none;border:none;cursor:pointer;color:#a89f96;padding:.28rem;border-radius:6px;font-size:1.1rem;line-height:1;">✕</button>
-      </div>
-      <div style="padding:1.2rem 1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
-        <div style="background:#faf8f4;border:1px solid #e8e3da;border-radius:10px;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.7rem;">
-          <p style="font-size:.76rem;font-weight:700;color:#7a736a;text-transform:uppercase;letter-spacing:.05em;margin:0;padding-bottom:.45rem;border-bottom:1px solid #e8e3da;">التحديثات</p>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
-            <button id="btn-check-core" style="background:#5a9a6a;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.83rem;font-weight:700;">فحص تحديث البرنامج</button>
-            <button id="btn-check-content" style="background:#7a736a;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.83rem;">فحص تحديثات المحتوى</button>
-            <button id="btn-install-core" style="display:none;background:#dc2626;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.83rem;font-weight:700;">تثبيت وإعادة تشغيل</button>
-            <button id="btn-apply-content" style="display:none;background:#5a9a6a;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.83rem;">تطبيق التحديثات</button>
-            <button id="btn-rollback-content" style="display:none;background:#a89f96;color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;">تراجع</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:.5rem;">
-            <span id="update-status" style="flex:1;color:#7a736a;font-size:.8rem;">جاهز</span>
-            <div id="update-progress-wrap" style="display:none;flex:0 0 180px;height:5px;background:#e8e3da;border-radius:3px;overflow:hidden;">
-              <div id="update-progress-bar" style="width:0%;height:100%;background:#5a9a6a;border-radius:3px;transition:width .3s;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:flex-end;padding:.9rem 1.5rem;border-top:1px solid #e8e3da;position:sticky;bottom:0;background:#fff;border-radius:0 0 18px 18px;">
-        <button id="settings-cancel-btn" style="background:#faf8f4;border:1px solid #d4ccbf;color:#1c1a18;padding:.55rem 1.4rem;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;">إغلاق</button>
-      </div>
-    </div>
-  </div>
   <script>
   (function(){
-    var overlay=document.getElementById('settings-modal-overlay'),card=document.getElementById('settings-modal-card'),settingsBtn=document.getElementById('settings-btn'),closeBtn=document.getElementById('settings-modal-close-btn'),cancelBtn=document.getElementById('settings-cancel-btn');
-    function open(){if(!overlay)return;overlay.style.opacity='1';overlay.style.pointerEvents='auto';if(card)card.style.transform='translateY(0) scale(1)';}
-    function close(){if(!overlay)return;overlay.style.opacity='0';overlay.style.pointerEvents='none';if(card)card.style.transform='translateY(22px) scale(.96)';}
-    if(settingsBtn)settingsBtn.addEventListener('click',open);
-    if(closeBtn)closeBtn.addEventListener('click',close);
-    if(cancelBtn)cancelBtn.addEventListener('click',close);
-    if(overlay)overlay.addEventListener('click',function(e){if(e.target===overlay)close();});
-    if(typeof window.updateApi!=='undefined'){
-      var $=function(id){return document.getElementById(id);},statusEl=$('update-status'),progressWrap=$('update-progress-wrap'),progressBar=$('update-progress-bar'),btnCore=$('btn-check-core'),btnContent=$('btn-check-content'),btnInstall=$('btn-install-core'),btnApply=$('btn-apply-content'),btnRollback=$('btn-rollback-content'),busy=false;
-      function setStatus(msg,color){if(statusEl){statusEl.textContent=msg;if(color)statusEl.style.color=color;}}
-      function showProgress(pct){if(progressWrap)progressWrap.style.display='block';if(progressBar)progressBar.style.width=pct+'%';}
-      function hideProgress(){if(progressWrap)progressWrap.style.display='none';if(progressBar)progressBar.style.width='0%';}
-      function setBusy(b){busy=b;[btnCore,btnContent,btnInstall,btnApply,btnRollback].forEach(function(el){if(el)el.disabled=b;});}
-      if(btnCore)btnCore.addEventListener('click',async function(){if(busy)return;setBusy(true);setStatus('جاري فحص تحديث البرنامج...','');try{await window.updateApi.checkCoreUpdate();}catch(e){setStatus('❌ '+e.message,'#dc2626');}setBusy(false);});
-      var coreCleanup=null;
-      function setupCoreListener(){if(coreCleanup)coreCleanup();coreCleanup=window.updateApi.onCoreUpdateStatus(function(s){switch(s.phase){case 'checking-for-update':setStatus('جاري فحص التحديثات...');break;case 'update-available':setStatus('📦 تحديث متوفر','#5a9a6a');if(btnInstall){btnInstall.style.display='inline-block';btnInstall.onclick=async function(){if(busy)return;setBusy(true);setStatus('جاري تنزيل التحديث...');try{await window.updateApi.downloadCoreUpdate();}catch(e){hideProgress();setStatus('❌ '+e.message,'#dc2626');}setBusy(false);};}break;case 'update-not-available':setStatus('البرنامج محدث','#16a34a');if(btnInstall)btnInstall.style.display='none';break;case 'download-progress':showProgress(s.progress.percent);setStatus('جاري التنزيل... '+Math.round(s.progress.percent)+'%');break;case 'update-downloaded':hideProgress();setStatus('✅ جاهز للتثبيت','#16a34a');if(btnInstall){btnInstall.textContent='🔄 تثبيت وإعادة تشغيل';btnInstall.style.display='inline-block';btnInstall.onclick=async function(){if(busy)return;setBusy(true);setStatus('جاري التثبيت...');try{await window.updateApi.installCoreUpdate();}catch(e){hideProgress();setStatus('❌ '+e.message,'#dc2626');}setBusy(false);};}break;case 'error':hideProgress();setStatus('❌ '+(s.error||'خطأ'),'#dc2626');if(btnInstall){btnInstall.style.display='none';btnInstall.disabled=false;}break;}});}
-      setupCoreListener();
-      if(btnContent)btnContent.addEventListener('click',async function(){if(busy)return;setBusy(true);setStatus('جاري فحص تحديثات المحتوى...');try{var r=await window.updateApi.checkContentUpdate();if(r.error){setStatus('❌ '+r.error,'#dc2626');if(btnApply)btnApply.style.display='none';if(btnRollback)btnRollback.style.display='none';}else if(r.upToDate){setStatus('المحتوى محدث','#16a34a');if(btnApply)btnApply.style.display='none';if(btnRollback)btnRollback.style.display='none';}else{var mb=(r.totalSize/1024/1024).toFixed(1);setStatus('توجد '+r.changedFiles.length+' ملفات ('+mb+' MB)','#5a9a6a');if(btnRollback)btnRollback.style.display='none';if(btnApply){btnApply.style.display='inline-block';btnApply.onclick=async function(){if(busy)return;setBusy(true);setStatus('جاري التنزيل...');showProgress(0);var dl=await window.updateApi.downloadContentUpdate();if(dl.success){setStatus('جاري التطبيق...');var ap=await window.updateApi.applyContentUpdate();hideProgress();if(ap.success){setStatus('✅ تم','#16a34a');if(btnApply)btnApply.style.display='none';if(btnRollback)btnRollback.style.display='inline-block';}else{setStatus('❌ '+(ap.error||'فشل'),'#dc2626');}}else{hideProgress();setStatus('❌ '+(dl.error||'فشل'),'#dc2626');}setBusy(false);};}}}catch(e){setStatus('❌ '+e.message,'#dc2626');}setBusy(false);});
-      if(btnRollback)btnRollback.addEventListener('click',async function(){if(busy)return;setBusy(true);setStatus('جاري التراجع...');try{var r=await window.updateApi.rollbackContentUpdate();if(r.success){setStatus('✅ تم التراجع','#7a736a');if(btnRollback)btnRollback.style.display='none';if(btnApply)btnApply.style.display='none';}else{setStatus('❌ '+(r.error||'فشل'),'#dc2626');}}catch(e){setStatus('❌ '+e.message,'#dc2626');}setBusy(false);});
-      window.updateApi.getContentUpdateStatus().then(function(r){if(r.success&&r.status&&r.status.installedFiles&&r.status.installedFiles.length>0){if(btnRollback)btnRollback.style.display='inline-block';setStatus('آخر تحديث: '+(r.status.lastAppliedUpdateId||'مثبت'),'#7a736a');}}).catch(function(){});
-    }
+    var btn=document.getElementById('settings-btn');
+    if(btn)btn.addEventListener('click',function(){window.location.href='../../renderer/index.html#settings';});
   })();
   </script>
 

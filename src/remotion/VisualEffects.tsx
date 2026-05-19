@@ -66,6 +66,7 @@ const DustParticles: React.FC = () => {
 // Warm amber/orange radial light blobs that drift slowly across corners
 const LightLeaks: React.FC = () => {
   const frame = useCurrentFrame();
+  const uid = React.useId().replace(/:/g, '');
 
   // Leak 1 — top-left drift
   const x1 = interpolate(Math.sin(frame * 0.012), [-1, 1], [-200, 100]);
@@ -81,12 +82,12 @@ const LightLeaks: React.FC = () => {
     <AbsoluteFill>
       <svg width="1920" height="1080" style={{ position: 'absolute' }}>
         <defs>
-          <radialGradient id="lg1" cx="50%" cy="50%" r="50%">
+          <radialGradient id={`${uid}-lg1`} cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stopColor="#ff9900" stopOpacity="1" />
             <stop offset="60%"  stopColor="#ff5500" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#ff3300" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="lg2" cx="50%" cy="50%" r="50%">
+          <radialGradient id={`${uid}-lg2`} cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stopColor="#ffcc44" stopOpacity="1" />
             <stop offset="70%"  stopColor="#ff8800" stopOpacity="0.3" />
             <stop offset="100%" stopColor="#ff6600" stopOpacity="0" />
@@ -97,7 +98,7 @@ const LightLeaks: React.FC = () => {
         <ellipse
           cx={x1} cy={y1}
           rx={500} ry={380}
-          fill="url(#lg1)"
+          fill={`url(#${uid}-lg1)`}
           opacity={op1}
           style={{ mixBlendMode: 'screen' }}
         />
@@ -106,7 +107,7 @@ const LightLeaks: React.FC = () => {
         <ellipse
           cx={x2} cy={y2}
           rx={420} ry={320}
-          fill="url(#lg2)"
+          fill={`url(#${uid}-lg2)`}
           opacity={op2}
           style={{ mixBlendMode: 'screen' }}
         />
@@ -119,6 +120,7 @@ const LightLeaks: React.FC = () => {
 // Large out-of-focus blurred circles drifting slowly — like background city lights
 const BokehEffect: React.FC = () => {
   const frame = useCurrentFrame();
+  const uid = React.useId().replace(/:/g, '');
 
   const circles = [
     { baseX: 200,  baseY: 200,  r: 160, color: 'rgba(255,200,80,0.18)',  speed: 0.008, phase: 0   },
@@ -129,11 +131,13 @@ const BokehEffect: React.FC = () => {
     { baseX: 400,  baseY: 600,  r: 170, color: 'rgba(180,220,255,0.10)', speed: 0.010, phase: 1.8 },
   ];
 
+  const filterId = `${uid}-bokeh-blur`;
+
   return (
     <AbsoluteFill>
       <svg width="1920" height="1080" style={{ position: 'absolute' }}>
         <defs>
-          <filter id="bokeh-blur">
+          <filter id={filterId}>
             <feGaussianBlur stdDeviation="28" />
           </filter>
         </defs>
@@ -148,7 +152,7 @@ const BokehEffect: React.FC = () => {
               cy={c.baseY + dy}
               r={c.r}
               fill={c.color}
-              filter="url(#bokeh-blur)"
+              filter={`url(#${filterId})`}
               style={{ mixBlendMode: 'screen' }}
             />
           );
@@ -177,10 +181,12 @@ const Scanlines: React.FC = () => {
 // Deterministic grain using SVG feTurbulence with a low octave count
 const FilmGrain: React.FC = () => {
   const frame = useCurrentFrame();
-  // We use a modulo operation to create a fast but deterministic "flicker" 
+  const uid = React.useId().replace(/:/g, '');
+  // We use a modulo operation to create a fast but deterministic "flicker"
   // pattern across frames (e.g. 10 frames loop) without recalculating pure random turbulence
   const offset = (frame % 10) * 10;
-  
+  const filterId = `${uid}-film-grain`;
+
   return (
     <AbsoluteFill style={{ overflow: 'hidden', mixBlendMode: 'overlay', opacity: 0.15 }}>
       <svg
@@ -193,11 +199,11 @@ const FilmGrain: React.FC = () => {
           transform: `translate(${offset}px, ${offset}px)`
         }}
       >
-        <filter id="film-grain">
+        <filter id={filterId}>
           <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="1" seed="10" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
-        <rect width="100%" height="100%" filter="url(#film-grain)" />
+        <rect width="100%" height="100%" filter={`url(#${filterId})`} />
       </svg>
     </AbsoluteFill>
   );

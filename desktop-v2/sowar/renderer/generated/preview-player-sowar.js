@@ -26,9 +26,9 @@
     mod
   ));
 
-  // ../../../node_modules/react/cjs/react.production.min.js
+  // node_modules/react/cjs/react.production.min.js
   var require_react_production_min = __commonJS({
-    "../../../node_modules/react/cjs/react.production.min.js"(exports) {
+    "node_modules/react/cjs/react.production.min.js"(exports) {
       "use strict";
       var l = Symbol.for("react.element");
       var n = Symbol.for("react.portal");
@@ -325,9 +325,9 @@
     }
   });
 
-  // ../../../node_modules/react/index.js
+  // node_modules/react/index.js
   var require_react = __commonJS({
-    "../../../node_modules/react/index.js"(exports, module) {
+    "node_modules/react/index.js"(exports, module) {
       "use strict";
       if (true) {
         module.exports = require_react_production_min();
@@ -337,9 +337,9 @@
     }
   });
 
-  // ../../../node_modules/scheduler/cjs/scheduler.production.min.js
+  // node_modules/scheduler/cjs/scheduler.production.min.js
   var require_scheduler_production_min = __commonJS({
-    "../../../node_modules/scheduler/cjs/scheduler.production.min.js"(exports) {
+    "node_modules/scheduler/cjs/scheduler.production.min.js"(exports) {
       "use strict";
       function f(a, b) {
         var c = a.length;
@@ -608,9 +608,9 @@
     }
   });
 
-  // ../../../node_modules/scheduler/index.js
+  // node_modules/scheduler/index.js
   var require_scheduler = __commonJS({
-    "../../../node_modules/scheduler/index.js"(exports, module) {
+    "node_modules/scheduler/index.js"(exports, module) {
       "use strict";
       if (true) {
         module.exports = require_scheduler_production_min();
@@ -620,9 +620,9 @@
     }
   });
 
-  // ../../../node_modules/react-dom/cjs/react-dom.production.min.js
+  // node_modules/react-dom/cjs/react-dom.production.min.js
   var require_react_dom_production_min = __commonJS({
-    "../../../node_modules/react-dom/cjs/react-dom.production.min.js"(exports) {
+    "node_modules/react-dom/cjs/react-dom.production.min.js"(exports) {
       "use strict";
       var aa = require_react();
       var ca = require_scheduler();
@@ -7760,9 +7760,9 @@
     }
   });
 
-  // ../../../node_modules/react-dom/index.js
+  // node_modules/react-dom/index.js
   var require_react_dom = __commonJS({
-    "../../../node_modules/react-dom/index.js"(exports, module) {
+    "node_modules/react-dom/index.js"(exports, module) {
       "use strict";
       function checkDCE() {
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") {
@@ -7786,9 +7786,9 @@
     }
   });
 
-  // ../../../node_modules/react-dom/client.js
+  // node_modules/react-dom/client.js
   var require_client = __commonJS({
-    "../../../node_modules/react-dom/client.js"(exports) {
+    "node_modules/react-dom/client.js"(exports) {
       "use strict";
       var m = require_react_dom();
       if (true) {
@@ -7817,9 +7817,9 @@
     }
   });
 
-  // ../../../node_modules/react/cjs/react-jsx-runtime.production.min.js
+  // node_modules/react/cjs/react-jsx-runtime.production.min.js
   var require_react_jsx_runtime_production_min = __commonJS({
-    "../../../node_modules/react/cjs/react-jsx-runtime.production.min.js"(exports) {
+    "node_modules/react/cjs/react-jsx-runtime.production.min.js"(exports) {
       "use strict";
       var f = require_react();
       var k = Symbol.for("react.element");
@@ -7845,9 +7845,9 @@
     }
   });
 
-  // ../../../node_modules/react/jsx-runtime.js
+  // node_modules/react/jsx-runtime.js
   var require_jsx_runtime = __commonJS({
-    "../../../node_modules/react/jsx-runtime.js"(exports, module) {
+    "node_modules/react/jsx-runtime.js"(exports, module) {
       "use strict";
       if (true) {
         module.exports = require_react_jsx_runtime_production_min();
@@ -7861,10 +7861,10 @@
   var import_react5 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
-  // ../../../node_modules/@remotion/player/dist/esm/index.mjs
+  // node_modules/@remotion/player/dist/esm/index.mjs
   var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 
-  // ../../../node_modules/remotion/dist/esm/index.mjs
+  // node_modules/remotion/dist/esm/index.mjs
   var import_react = __toESM(require_react(), 1);
   var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
   var import_react_dom = __toESM(require_react_dom(), 1);
@@ -11749,10 +11749,10 @@ Check that all your Remotion packages are on the same version. If your dependenc
   });
   addSequenceStackTraces(Sequence);
 
-  // ../../../node_modules/@remotion/player/dist/esm/index.mjs
+  // node_modules/@remotion/player/dist/esm/index.mjs
   var import_react2 = __toESM(require_react(), 1);
 
-  // ../../../node_modules/remotion/dist/esm/no-react.mjs
+  // node_modules/remotion/dist/esm/no-react.mjs
   function interpolateFunction2(input, inputRange, outputRange, options) {
     const { extrapolateLeft, extrapolateRight, easing } = options;
     let result = input;
@@ -12437,7 +12437,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
     getExpectedMediaFrameUncorrected: getExpectedMediaFrameUncorrected2
   };
 
-  // ../../../node_modules/@remotion/player/dist/esm/index.mjs
+  // node_modules/@remotion/player/dist/esm/index.mjs
   var ICON_SIZE2 = 25;
   var fullscreenIconSize = 16;
   var PlayIcon = () => {
@@ -14739,20 +14739,21 @@ Check that all your Remotion packages are on the same version. If your dependenc
   };
   var LightLeaks = () => {
     const frame = useCurrentFrame();
+    const uid = import_react3.default.useId().replace(/:/g, "");
     const x1 = interpolate(Math.sin(frame * 0.012), [-1, 1], [-200, 100]);
     const y1 = interpolate(Math.cos(frame * 9e-3), [-1, 1], [-150, 50]);
     const op1 = interpolate(Math.sin(frame * 0.018), [-1, 1], [0.08, 0.22]);
     const x2 = interpolate(Math.sin(frame * 0.014 + 2), [-1, 1], [1600, 2e3]);
     const y2 = interpolate(Math.cos(frame * 0.011 + 1), [-1, 1], [700, 1e3]);
     const op2 = interpolate(Math.sin(frame * 0.016 + 1), [-1, 1], [0.05, 0.18]);
-    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, null, /* @__PURE__ */ import_react3.default.createElement("svg", { width: "1920", height: "1080", style: { position: "absolute" } }, /* @__PURE__ */ import_react3.default.createElement("defs", null, /* @__PURE__ */ import_react3.default.createElement("radialGradient", { id: "lg1", cx: "50%", cy: "50%", r: "50%" }, /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "0%", stopColor: "#ff9900", stopOpacity: "1" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "60%", stopColor: "#ff5500", stopOpacity: "0.4" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "100%", stopColor: "#ff3300", stopOpacity: "0" })), /* @__PURE__ */ import_react3.default.createElement("radialGradient", { id: "lg2", cx: "50%", cy: "50%", r: "50%" }, /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "0%", stopColor: "#ffcc44", stopOpacity: "1" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "70%", stopColor: "#ff8800", stopOpacity: "0.3" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "100%", stopColor: "#ff6600", stopOpacity: "0" }))), /* @__PURE__ */ import_react3.default.createElement(
+    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, null, /* @__PURE__ */ import_react3.default.createElement("svg", { width: "1920", height: "1080", style: { position: "absolute" } }, /* @__PURE__ */ import_react3.default.createElement("defs", null, /* @__PURE__ */ import_react3.default.createElement("radialGradient", { id: `${uid}-lg1`, cx: "50%", cy: "50%", r: "50%" }, /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "0%", stopColor: "#ff9900", stopOpacity: "1" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "60%", stopColor: "#ff5500", stopOpacity: "0.4" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "100%", stopColor: "#ff3300", stopOpacity: "0" })), /* @__PURE__ */ import_react3.default.createElement("radialGradient", { id: `${uid}-lg2`, cx: "50%", cy: "50%", r: "50%" }, /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "0%", stopColor: "#ffcc44", stopOpacity: "1" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "70%", stopColor: "#ff8800", stopOpacity: "0.3" }), /* @__PURE__ */ import_react3.default.createElement("stop", { offset: "100%", stopColor: "#ff6600", stopOpacity: "0" }))), /* @__PURE__ */ import_react3.default.createElement(
       "ellipse",
       {
         cx: x1,
         cy: y1,
         rx: 500,
         ry: 380,
-        fill: "url(#lg1)",
+        fill: `url(#${uid}-lg1)`,
         opacity: op1,
         style: { mixBlendMode: "screen" }
       }
@@ -14763,7 +14764,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
         cy: y2,
         rx: 420,
         ry: 320,
-        fill: "url(#lg2)",
+        fill: `url(#${uid}-lg2)`,
         opacity: op2,
         style: { mixBlendMode: "screen" }
       }
@@ -14771,6 +14772,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
   };
   var BokehEffect = () => {
     const frame = useCurrentFrame();
+    const uid = import_react3.default.useId().replace(/:/g, "");
     const circles = [
       { baseX: 200, baseY: 200, r: 160, color: "rgba(255,200,80,0.18)", speed: 8e-3, phase: 0 },
       { baseX: 700, baseY: 800, r: 220, color: "rgba(200,150,255,0.12)", speed: 0.011, phase: 1.2 },
@@ -14779,7 +14781,8 @@ Check that all your Remotion packages are on the same version. If your dependenc
       { baseX: 960, baseY: 500, r: 130, color: "rgba(255,240,180,0.10)", speed: 0.013, phase: 0.7 },
       { baseX: 400, baseY: 600, r: 170, color: "rgba(180,220,255,0.10)", speed: 0.01, phase: 1.8 }
     ];
-    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, null, /* @__PURE__ */ import_react3.default.createElement("svg", { width: "1920", height: "1080", style: { position: "absolute" } }, /* @__PURE__ */ import_react3.default.createElement("defs", null, /* @__PURE__ */ import_react3.default.createElement("filter", { id: "bokeh-blur" }, /* @__PURE__ */ import_react3.default.createElement("feGaussianBlur", { stdDeviation: "28" }))), circles.map((c, i) => {
+    const filterId = `${uid}-bokeh-blur`;
+    return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, null, /* @__PURE__ */ import_react3.default.createElement("svg", { width: "1920", height: "1080", style: { position: "absolute" } }, /* @__PURE__ */ import_react3.default.createElement("defs", null, /* @__PURE__ */ import_react3.default.createElement("filter", { id: filterId }, /* @__PURE__ */ import_react3.default.createElement("feGaussianBlur", { stdDeviation: "28" }))), circles.map((c, i) => {
       const dx = Math.sin(frame * c.speed + c.phase) * 60;
       const dy = Math.cos(frame * c.speed + c.phase + 0.5) * 40;
       return /* @__PURE__ */ import_react3.default.createElement(
@@ -14790,7 +14793,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
           cy: c.baseY + dy,
           r: c.r,
           fill: c.color,
-          filter: "url(#bokeh-blur)",
+          filter: `url(#${filterId})`,
           style: { mixBlendMode: "screen" }
         }
       );
@@ -14809,7 +14812,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
   };
   var FilmGrain = () => {
     const frame = useCurrentFrame();
+    const uid = import_react3.default.useId().replace(/:/g, "");
     const offset = frame % 10 * 10;
+    const filterId = `${uid}-film-grain`;
     return /* @__PURE__ */ import_react3.default.createElement(AbsoluteFill, { style: { overflow: "hidden", mixBlendMode: "overlay", opacity: 0.15 } }, /* @__PURE__ */ import_react3.default.createElement(
       "svg",
       {
@@ -14822,8 +14827,8 @@ Check that all your Remotion packages are on the same version. If your dependenc
           transform: `translate(${offset}px, ${offset}px)`
         }
       },
-      /* @__PURE__ */ import_react3.default.createElement("filter", { id: "film-grain" }, /* @__PURE__ */ import_react3.default.createElement("feTurbulence", { type: "fractalNoise", baseFrequency: "0.65", numOctaves: "1", seed: "10" }), /* @__PURE__ */ import_react3.default.createElement("feColorMatrix", { type: "saturate", values: "0" })),
-      /* @__PURE__ */ import_react3.default.createElement("rect", { width: "100%", height: "100%", filter: "url(#film-grain)" })
+      /* @__PURE__ */ import_react3.default.createElement("filter", { id: filterId }, /* @__PURE__ */ import_react3.default.createElement("feTurbulence", { type: "fractalNoise", baseFrequency: "0.65", numOctaves: "1", seed: "10" }), /* @__PURE__ */ import_react3.default.createElement("feColorMatrix", { type: "saturate", values: "0" })),
+      /* @__PURE__ */ import_react3.default.createElement("rect", { width: "100%", height: "100%", filter: `url(#${filterId})` })
     ));
   };
   var Vignette = () => {
@@ -15007,8 +15012,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
     }) : 0;
     const currentY = imageY + motionY;
     const sharedTransform = `scale(${imageScale}) translateX(${imageX}px) translateY(${currentY}px)`;
-    const entryOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-    return /* @__PURE__ */ import_react4.default.createElement(AbsoluteFill, { style: { backgroundColor: "#000", opacity: entryOpacity } }, fitMode === "blurred-background" ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(
+    const entryBrightness = interpolate(frame, [0, 12], [1.75, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const entryFlashOpacity = interpolate(frame, [0, 10], [0.55, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    return /* @__PURE__ */ import_react4.default.createElement(AbsoluteFill, { style: { backgroundColor: "#000" } }, fitMode === "blurred-background" ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(
       Img,
       {
         src,
@@ -15020,8 +15026,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
           objectFit: "cover",
           objectPosition: "center center",
           transform: `scale(${backgroundScale})`,
-          filter: `blur(${blurBackgroundAmount}px) brightness(0.85)`,
-          opacity: entryOpacity
+          filter: `blur(${blurBackgroundAmount}px) brightness(${0.85 * entryBrightness})`
         }
       }
     ), /* @__PURE__ */ import_react4.default.createElement(
@@ -15040,7 +15045,8 @@ Check that all your Remotion packages are on the same version. If your dependenc
           src,
           style: buildCenteredImageStyle({
             objectFit: "contain",
-            transform: sharedTransform
+            transform: sharedTransform,
+            filter: `brightness(${entryBrightness})`
           })
         }
       )
@@ -15060,11 +15066,12 @@ Check that all your Remotion packages are on the same version. If your dependenc
           src,
           style: buildCenteredImageStyle({
             objectFit: fitMode === "cover" ? "cover" : "contain",
-            transform: sharedTransform
+            transform: sharedTransform,
+            filter: `brightness(${entryBrightness})`
           })
         }
       )
-    ));
+    ), entryFlashOpacity > 0 ? /* @__PURE__ */ import_react4.default.createElement(AbsoluteFill, { style: { backgroundColor: "#ffffff", opacity: entryFlashOpacity, pointerEvents: "none" } }) : null);
   };
   var buildBlurRegionMask = ({
     width,
