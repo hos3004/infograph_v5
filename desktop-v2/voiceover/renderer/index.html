@@ -10,188 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <link rel="stylesheet" href="../../shared/unified-header.css" />
-  <style>
-    :root {
-      --bg: #f4f1ec; --surface: #fff; --surface-r: #faf8f4;
-      --border: #e8e3da; --border-s: #d4ccbf;
-      --accent: #5a9a6a; --accent-dk: #3d7a4d; --accent-lt: #eaf3ec;
-      --text: #1c1a18; --text-mu: #7a736a; --text-fa: #a89f96;
-      --danger: #dc2626; --success: #16a34a; --warn: #b45309;
-      --purple: #7c3aed; --purple-lt: #f5f3ff;
-      --font: 'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
-      --font-mono: 'JetBrains Mono','Courier New',monospace;
-      --sh-sm: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-      --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
-    }
-
-    * { box-sizing: border-box; }
-    body { background: var(--bg) !important; color: var(--text) !important; margin: 0; padding: 0; overflow: hidden; font-family: var(--font); }
-
-    /* ── Layout ── */
-    .vo-root { height: calc(100vh - 64px); display: flex; flex-direction: column; overflow: hidden; }
-    .vo-main { display: grid; grid-template-columns: 1fr 340px; flex: 1; min-height: 0; overflow: hidden; }
-
-    /* ── Left panel ── */
-    .vo-left {
-      display: flex; flex-direction: column; gap: .75rem;
-      padding: 1rem 1rem 1rem 1.25rem; overflow-y: auto;
-    }
-
-    /* ── Right panel (voice grid) ── */
-    .vo-right {
-      background: var(--surface); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: .6rem;
-      padding: .85rem; overflow-y: auto;
-    }
-    .vo-right-title {
-      font-size: .78rem; font-weight: 900; color: var(--text-mu);
-      text-transform: uppercase; letter-spacing: .06em;
-    }
-    .vo-right-hint { font-size: .74rem; color: var(--text-fa); margin-top: -.35rem; }
-
-    /* ── Section cards ── */
-    .vo-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--r-md); padding: .85rem;
-    }
-    .vo-card-label {
-      font-size: .82rem; font-weight: 900; color: var(--text);
-      margin-bottom: .55rem; display: flex; align-items: center; gap: .4rem;
-    }
-    .vo-card-label i, .vo-card-label svg { width: 15px !important; height: 15px !important; color: var(--accent); }
-
-    /* ── Form controls ── */
-    textarea, select, input[type="text"], input[type="password"] {
-      font-family: var(--font); width: 100%;
-      padding: .6rem .75rem; border-radius: var(--r-sm); border: 1px solid var(--border);
-      color: var(--text); background: var(--surface); font-size: .88rem;
-      box-sizing: border-box; direction: rtl;
-    }
-    textarea:focus, select:focus, input:focus {
-      outline: none; border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(90,154,106,.12);
-    }
-    textarea { min-height: 130px; resize: vertical; line-height: 1.65; }
-    .char-count { font-size: .75rem; color: var(--text-fa); text-align: left; margin-top: .2rem; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
-
-    /* ── Active voice badge ── */
-    .vo-active-badge {
-      display: flex; align-items: center; gap: .65rem;
-      background: var(--surface-r); border: 1px solid var(--border);
-      border-radius: var(--r-sm); padding: .55rem .75rem;
-    }
-    .vo-active-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .vo-active-name { font-weight: 900; font-size: .95rem; }
-    .vo-active-meta { font-size: .76rem; color: var(--text-mu); }
-
-    /* ── Buttons ── */
-    .btn-primary, .btn-secondary {
-      border-radius: var(--r-sm); border: 1px solid var(--border); cursor: pointer;
-      font-family: var(--font); font-size: .87rem; font-weight: 700;
-      transition: all .2s; display: inline-flex; align-items: center;
-      justify-content: center; gap: .4rem; min-height: 40px; padding: .6rem .95rem;
-    }
-    .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
-    .btn-secondary { background: var(--surface); color: var(--text-mu); }
-    .btn-secondary:hover:not(:disabled) { background: var(--bg); color: var(--text); }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    button i, button svg { width: 16px !important; height: 16px !important; }
-
-    .btn-generate {
-      background: var(--accent); color: white; border: none;
-      border-radius: var(--r-md); font-family: var(--font);
-      font-size: 1rem; font-weight: 900; padding: .85rem 2rem;
-      cursor: pointer; width: 100%; display: flex; align-items: center;
-      justify-content: center; gap: .55rem; transition: filter .2s, transform .1s;
-    }
-    .btn-generate:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
-    .btn-generate:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    .btn-generate i, .btn-generate svg { width: 20px !important; height: 20px !important; }
-
-    .btn-download {
-      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
-      border-radius: var(--r-sm); font-family: var(--font);
-      font-size: .88rem; font-weight: 700; padding: .6rem 1rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      gap: .4rem; width: 100%; transition: background .15s;
-    }
-    .btn-download:hover { background: #dbeafe; }
-    .btn-download i, .btn-download svg { width: 16px !important; height: 16px !important; }
-
-    /* ── Status / error ── */
-    .vo-status { font-size: .83rem; color: var(--text-mu); min-height: 18px; }
-    .vo-error {
-      background: #fef2f2; border: 1px solid #fecaca;
-      border-radius: var(--r-sm); color: var(--danger);
-      font-size: .85rem; padding: .6rem .85rem;
-    }
-    .vo-success {
-      background: var(--accent-lt); border: 1px solid #86efac;
-      border-radius: var(--r-sm); color: #166534;
-      font-size: .85rem; padding: .6rem .85rem;
-    }
-
-    /* ── Audio player ── */
-    .vo-player-card {
-      background: #f0fdf4; border: 1px solid #86efac;
-      border-radius: var(--r-md); padding: .85rem; display: flex;
-      flex-direction: column; gap: .65rem;
-    }
-    .vo-player-header {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .vo-player-title { font-size: .85rem; font-weight: 900; color: #166534; display: flex; align-items: center; gap: .4rem; }
-    .vo-player-meta { font-size: .75rem; color: var(--text-mu); }
-    audio { width: 100%; height: 38px; border-radius: 6px; accent-color: var(--accent); }
-
-    /* ── Voice grid ── */
-    .vo-voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .38rem; }
-
-    .vo-voice-card {
-      background: var(--surface-r); border: 2px solid transparent;
-      border-radius: var(--r-sm); padding: .5rem .6rem;
-      cursor: pointer; transition: border-color .15s, background .15s;
-      display: flex; flex-direction: column; gap: .22rem;
-    }
-    .vo-voice-card:hover { background: var(--bg); }
-    .vo-voice-card.selected { background: var(--accent-lt); }
-
-    .vo-voice-top { display: flex; align-items: center; justify-content: space-between; }
-    .vo-voice-name { font-size: .78rem; font-weight: 900; color: var(--text); direction: ltr; text-align: left; }
-    .vo-voice-check { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .vo-voice-check i, .vo-voice-check svg { width: 8px !important; height: 8px !important; color: #fff; }
-
-    .vo-tone-badge {
-      display: inline-block; font-size: .66rem; font-weight: 700;
-      padding: .1rem .38rem; border-radius: 4px; width: fit-content;
-    }
-    .vo-voice-meta { font-size: .69rem; color: var(--text-fa); }
-
-    .vo-preview-btn {
-      display: flex; align-items: center; justify-content: center; gap: .25rem;
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 5px; color: var(--text-mu); font-family: var(--font);
-      font-size: .68rem; font-weight: 700; padding: .2rem .4rem;
-      cursor: pointer; margin-top: .15rem; width: 100%;
-      transition: border-color .15s, color .15s;
-    }
-    .vo-preview-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .vo-preview-btn.playing { border-color: var(--accent); color: var(--accent-dk); }
-    .vo-preview-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .vo-preview-btn i, .vo-preview-btn svg { width: 10px !important; height: 10px !important; }
-
-    /* ── Spin animation ── */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spin { animation: spin .7s linear infinite; display: inline-flex; }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-s); border-radius: 3px; }
-  </style>
+  <link rel="stylesheet" href="./voiceover.css" />
   <link rel="stylesheet" href="../../shared/minimal-ui.css" />
 </head>
 <body>
@@ -199,7 +18,7 @@
   <!-- ── Unified Header ── -->
   <header class="paper-top-bar unified-laqtat-header">
     <div class="paper-logo-section">
-      <img id="brand-logo" class="paper-brand-logo-image" alt="Infograph" />
+      <img id="brand-logo" class="paper-brand-logo-image" src="../../../public/assets/logo.png" alt="Infograph" />
     </div>
 
     <div class="paper-top-bar-btns">
@@ -212,7 +31,7 @@
         <a href="../../qawaleb/renderer/index.html" class="paper-nav-pill">قوالب</a>
         <a href="#" class="paper-nav-pill paper-nav-pill-active">🎙 فويس أوفر</a>
       </div>
-      <button id="settings-btn" class="paper-project-icon-btn paper-settings-btn" type="button" title="الإعدادات">
+      <button id="settings-btn" class="paper-project-icon-btn paper-settings-btn" type="button" title="الإعدادات" aria-label="الإعدادات">
         <i data-lucide="settings" style="width:20px;height:20px;"></i>
       </button>
     </div>
@@ -309,302 +128,63 @@
     </div>
   </div>
 
+  <div id="settings-modal-overlay" aria-hidden="true">
+    <div class="settings-modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+      <div class="settings-modal-header">
+        <h2 id="settings-modal-title" class="settings-modal-title">
+          <i data-lucide="settings" style="width:17px;height:17px;color:#5a9a6a;"></i>
+          إعدادات فويس أوفر
+        </h2>
+        <button id="settings-modal-close-btn" class="settings-modal-close" type="button" aria-label="إغلاق">
+          <i data-lucide="x" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+
+      <div class="settings-modal-body">
+        <div class="settings-section">
+          <p class="settings-section-title">مفتاح Gemini</p>
+          <div class="settings-row">
+            <label for="settings-api-key">مفتاح API</label>
+            <div class="api-key-wrapper">
+              <input id="settings-api-key" type="password" class="input-v2" placeholder="AIza..." autocomplete="off" spellcheck="false" />
+              <button id="toggle-api-key-visibility" class="btn-icon-toggle" type="button" title="إظهار أو إخفاء المفتاح" aria-label="إظهار أو إخفاء المفتاح">
+                <i id="eye-icon" data-lucide="eye" style="width:15px;height:15px;"></i>
+              </button>
+            </div>
+            <div id="api-key-status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-section-title">إعدادات الصوت الافتراضية</p>
+          <div class="settings-row">
+            <label for="settings-tts-model">موديل Gemini TTS</label>
+            <select id="settings-tts-model" class="input-v2">
+              <option value="gemini-2.5-flash-preview-tts">gemini-2.5-flash-preview-tts</option>
+              <option value="gemini-2.5-pro-preview-tts">gemini-2.5-pro-preview-tts</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label for="settings-tts-style-prompt">تعليمات أسلوب الصوت</label>
+            <textarea id="settings-tts-style-prompt" class="input-v2" rows="4" placeholder="Premium commercial. Calm professional tone..."></textarea>
+          </div>
+          <div id="settings-status" class="settings-inline-status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="settings-modal-footer">
+        <button id="settings-cancel-btn" class="btn-secondary" type="button">إلغاء</button>
+        <button id="settings-save-btn" class="btn-primary" type="button">
+          <i data-lucide="save" style="width:14px;height:14px;"></i>
+          حفظ الإعدادات
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Hidden preview audio ── -->
   <audio id="preview-audio" style="display:none;"></audio>
 
-<script>
-// ── Voice catalogue ──────────────────────────────────────────────────────────
-const VOICES = [
-  { name:'Zephyr',        tone:'Bright',        toneAr:'مشرق',      gender:'f' },
-  { name:'Puck',          tone:'Upbeat',        toneAr:'متحمس',     gender:'m' },
-  { name:'Charon',        tone:'Informational', toneAr:'إخباري',    gender:'m' },
-  { name:'Kore',          tone:'Firm',          toneAr:'حازم',      gender:'f' },
-  { name:'Fenrir',        tone:'Excitable',     toneAr:'متهيج',     gender:'m' },
-  { name:'Leda',          tone:'Youthful',      toneAr:'شبابي',     gender:'f' },
-  { name:'Orus',          tone:'Firm',          toneAr:'حازم',      gender:'m' },
-  { name:'Aoede',         tone:'Breezy',        toneAr:'منعش',      gender:'f' },
-  { name:'Callirrhoe',    tone:'Easy-going',    toneAr:'هادئ',      gender:'f' },
-  { name:'Autonoe',       tone:'Bright',        toneAr:'مشرق',      gender:'f' },
-  { name:'Enceladus',     tone:'Breathy',       toneAr:'ناعم',      gender:'m' },
-  { name:'Iapetus',       tone:'Clear',         toneAr:'واضح',      gender:'m' },
-  { name:'Umbriel',       tone:'Easy-going',    toneAr:'هادئ',      gender:'m' },
-  { name:'Algieba',       tone:'Smooth',        toneAr:'سلس',       gender:'m' },
-  { name:'Despina',       tone:'Smooth',        toneAr:'سلس',       gender:'f' },
-  { name:'Erinome',       tone:'Clear',         toneAr:'واضح',      gender:'f' },
-  { name:'Algenib',       tone:'Gravelly',      toneAr:'خشن',       gender:'m' },
-  { name:'Rasalhaghue',   tone:'Informational', toneAr:'إخباري',    gender:'m' },
-  { name:'Laomedeia',     tone:'Upbeat',        toneAr:'متحمس',     gender:'f' },
-  { name:'Achernar',      tone:'Soft',          toneAr:'ناعم جداً', gender:'f' },
-  { name:'Alnilam',       tone:'Firm',          toneAr:'حازم',      gender:'m' },
-  { name:'Schedar',       tone:'Even',          toneAr:'متوازن',    gender:'m' },
-  { name:'Gacrux',        tone:'Mature',        toneAr:'ناضج',      gender:'f' },
-  { name:'Pulcherrima',   tone:'Forward',       toneAr:'مباشر',     gender:'f' },
-  { name:'Achird',        tone:'Friendly',      toneAr:'ودود',      gender:'m' },
-  { name:'Zubenelgenubi', tone:'Casual',        toneAr:'عفوي',      gender:'m' },
-  { name:'Vindemiatrix',  tone:'Gentle',        toneAr:'لطيف',      gender:'f' },
-  { name:'Sadachbia',     tone:'Lively',        toneAr:'حيوي',      gender:'f' },
-  { name:'Sadaltager',    tone:'Knowledgeable', toneAr:'واثق',      gender:'m' },
-  { name:'Sulafat',       tone:'Warm',          toneAr:'دافئ',      gender:'f' },
-];
-
-const TONE_COLOR = {
-  Bright:'#f59e0b', Upbeat:'#10b981', Informational:'#3b82f6',
-  Firm:'#6366f1', Excitable:'#ef4444', Youthful:'#ec4899',
-  Breezy:'#06b6d4', 'Easy-going':'#84cc16', Breathy:'#a78bfa',
-  Clear:'#22d3ee', Gravelly:'#78716c', Smooth:'#14b8a6',
-  Soft:'#f472b6', Even:'#94a3b8', Mature:'#d97706',
-  Forward:'#f97316', Friendly:'#4ade80', Casual:'#facc15',
-  Gentle:'#c084fc', Lively:'#fb7185', Knowledgeable:'#60a5fa',
-  Warm:'#fb923c',
-};
-
-const PREVIEW_TEXT = 'مرحباً، هذا مقطع صوتي تجريبي لاختبار جودة الصوت وأسلوب القراءة.';
-
-// ── State ────────────────────────────────────────────────────────────────────
-let selectedVoice = 'Charon';
-let isGenerating   = false;
-let previewingVoice = null;
-let playingVoice    = null;
-let previewUrls     = {};
-let currentFilePath = null;
-
-// ── DOM refs ─────────────────────────────────────────────────────────────────
-const voText        = document.getElementById('vo-text');
-const charCount     = document.getElementById('char-count');
-const modelSelect   = document.getElementById('model-select');
-const voInstructions= document.getElementById('vo-instructions');
-const generateBtn   = document.getElementById('generate-btn');
-const generateLabel = document.getElementById('generate-label');
-const voError       = document.getElementById('vo-error');
-const playerCard    = document.getElementById('player-card');
-const mainAudio     = document.getElementById('main-audio');
-const playerMeta    = document.getElementById('player-meta');
-const downloadBtn   = document.getElementById('download-btn');
-const previewAudio  = document.getElementById('preview-audio');
-const voiceGrid     = document.getElementById('voice-grid');
-const activeVoiceDot  = document.getElementById('active-voice-dot');
-const activeVoiceName = document.getElementById('active-voice-name');
-const activeVoiceMeta = document.getElementById('active-voice-meta');
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-
-  // Load brand logo
-  try {
-    const bs = await window.desktopApi.bootstrap();
-    const brandLogo = document.getElementById('brand-logo');
-    if (brandLogo && bs?.logoDataUrl) {
-      brandLogo.src = bs.logoDataUrl;
-    } else if (brandLogo && bs?.logoPath) {
-      brandLogo.src = window.desktopApi.toFileUrl(bs.logoPath);
-    }
-  } catch {}
-
-  buildVoiceGrid();
-  updateActiveBadge();
-
-  voText.addEventListener('input', () => {
-    charCount.textContent = voText.value.length;
-    generateBtn.disabled = !voText.value.trim() || isGenerating;
-  });
-});
-
-// ── Build voice grid ─────────────────────────────────────────────────────────
-function buildVoiceGrid() {
-  voiceGrid.innerHTML = '';
-  VOICES.forEach(voice => {
-    const color = TONE_COLOR[voice.tone] || '#3b82f6';
-    const card = document.createElement('div');
-    card.className = 'vo-voice-card' + (voice.name === selectedVoice ? ' selected' : '');
-    card.style.borderColor = voice.name === selectedVoice ? color : 'transparent';
-    card.dataset.voice = voice.name;
-
-    card.innerHTML = `
-      <div class="vo-voice-top">
-        <span class="vo-voice-name">${voice.name}</span>
-        ${voice.name === selectedVoice
-          ? `<span class="vo-voice-check"><i data-lucide="check"></i></span>`
-          : ''}
-      </div>
-      <span class="vo-tone-badge" style="background:${color}22;color:${color};border:1px solid ${color}44;">${voice.tone}</span>
-      <div class="vo-voice-meta">${voice.toneAr} · ${voice.gender === 'f' ? 'أنثى' : 'ذكر'}</div>
-      <button class="vo-preview-btn" data-voice="${voice.name}" title="معاينة الصوت">
-        <i data-lucide="play"></i> معاينة
-      </button>
-    `;
-
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.vo-preview-btn')) return;
-      selectVoice(voice.name);
-    });
-
-    card.querySelector('.vo-preview-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (playingVoice === voice.name) {
-        stopPreview();
-      } else {
-        handlePreviewVoice(voice.name);
-      }
-    });
-
-    voiceGrid.appendChild(card);
-  });
-
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-}
-
-// ── Select voice ─────────────────────────────────────────────────────────────
-function selectVoice(name) {
-  selectedVoice = name;
-  buildVoiceGrid();
-  updateActiveBadge();
-}
-
-function updateActiveBadge() {
-  const v = VOICES.find(x => x.name === selectedVoice);
-  if (!v) return;
-  const color = TONE_COLOR[v.tone] || '#3b82f6';
-  activeVoiceDot.style.background = color;
-  activeVoiceName.textContent = v.name;
-  activeVoiceMeta.textContent = `${v.toneAr} · ${v.gender === 'f' ? 'أنثى' : 'ذكر'}`;
-}
-
-// ── Generate main audio ──────────────────────────────────────────────────────
-generateBtn.addEventListener('click', async () => {
-  const text = voText.value.trim();
-  if (!text || isGenerating) return;
-
-  setGenerating(true);
-  hideError();
-  playerCard.style.display = 'none';
-
-  try {
-    const result = await window.desktopApi.generateSingleVoiceover({
-      text,
-      voiceName: selectedVoice,
-      ttsModel:  modelSelect.value,
-      stylePrompt: voInstructions.value.trim() || undefined,
-    });
-
-    if (!result.success) throw new Error(result.error);
-
-    currentFilePath = result.voiceoverPath;
-    mainAudio.src   = result.voiceoverUrl;
-    playerMeta.textContent = `${selectedVoice} · ${modelSelect.value.replace('gemini-2.5-','').replace('-preview-tts','')}`;
-    playerCard.style.display = 'flex';
-    setTimeout(() => mainAudio.play().catch(() => {}), 200);
-
-  } catch (err) {
-    showError(err.message || 'حدث خطأ غير متوقع');
-  } finally {
-    setGenerating(false);
-  }
-});
-
-// ── Preview a voice ──────────────────────────────────────────────────────────
-async function handlePreviewVoice(voiceName) {
-  if (previewingVoice === voiceName) return;
-
-  stopPreview();
-
-  // Use cached URL
-  if (previewUrls[voiceName]) {
-    playingVoice = voiceName;
-    previewAudio.src = previewUrls[voiceName];
-    previewAudio.play().catch(() => {});
-    updatePreviewBtn(voiceName, 'playing');
-    return;
-  }
-
-  previewingVoice = voiceName;
-  updatePreviewBtn(voiceName, 'loading');
-
-  try {
-    const result = await window.desktopApi.generateSingleVoiceover({
-      text:      PREVIEW_TEXT,
-      voiceName,
-      ttsModel:  modelSelect.value,
-    });
-
-    if (!result.success) throw new Error(result.error);
-
-    previewUrls[voiceName] = result.voiceoverUrl;
-    playingVoice = voiceName;
-    previewAudio.src = result.voiceoverUrl;
-    previewAudio.play().catch(() => {});
-    updatePreviewBtn(voiceName, 'playing');
-  } catch {
-    updatePreviewBtn(voiceName, 'idle');
-  } finally {
-    previewingVoice = null;
-  }
-}
-
-function stopPreview() {
-  previewAudio.pause();
-  previewAudio.currentTime = 0;
-  if (playingVoice) updatePreviewBtn(playingVoice, 'idle');
-  playingVoice = null;
-}
-
-previewAudio.addEventListener('ended', () => {
-  if (playingVoice) updatePreviewBtn(playingVoice, 'idle');
-  playingVoice = null;
-});
-
-function updatePreviewBtn(voiceName, state) {
-  const btn = voiceGrid.querySelector(`.vo-preview-btn[data-voice="${voiceName}"]`);
-  if (!btn) return;
-  btn.classList.toggle('playing', state === 'playing');
-  btn.disabled = state === 'loading';
-  if (state === 'loading') {
-    btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> تحميل`;
-  } else if (state === 'playing') {
-    btn.innerHTML = `<i data-lucide="square"></i> إيقاف`;
-  } else {
-    btn.innerHTML = `<i data-lucide="play"></i> معاينة`;
-  }
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-}
-
-// ── Download ─────────────────────────────────────────────────────────────────
-downloadBtn.addEventListener('click', async () => {
-  if (!currentFilePath) return;
-  try {
-    await window.desktopApi.revealInFolder(currentFilePath);
-  } catch {
-    // fallback: open the file directly
-    try { await window.desktopApi.openFile(currentFilePath); } catch {}
-  }
-});
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-function setGenerating(val) {
-  isGenerating = val;
-  generateBtn.disabled = val || !voText.value.trim();
-  if (val) {
-    generateLabel.textContent = 'جارِ التوليد...';
-    generateBtn.innerHTML = `<i data-lucide="loader-2" class="spin"></i><span id="generate-label">جارِ التوليد...</span>`;
-  } else {
-    generateBtn.innerHTML = `<i data-lucide="mic"></i><span id="generate-label">توليد الصوت</span>`;
-  }
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-}
-
-function showError(msg) {
-  voError.textContent = '⚠️ ' + msg;
-  voError.style.display = 'block';
-}
-function hideError() {
-  voError.style.display = 'none';
-}
-
-// Clear preview cache when model changes
-modelSelect.addEventListener('change', () => {
-  previewUrls = {};
-  stopPreview();
-});
-</script>
+<script src="./voiceover.js"></script>
 </body>
 </html>
