@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: file: blob: https://unpkg.com https://fonts.googleapis.com; img-src 'self' data: file: blob:; media-src 'self' data: file: blob:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://unpkg.com;" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>متابعات</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../renderer/styles.css" />
+  <link rel="stylesheet" href="../../renderer/page-shell.css" />
+  <link rel="stylesheet" href="../../shared/unified-header.css" />
+  <link rel="stylesheet" href="../../shared/minimal-ui.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="background-color: var(--bg); color: var(--text); margin: 0; padding: 0;">
+  <div class="v2-root" id="app-mutabaat">
+    <header class="paper-top-bar unified-laqtat-header">
+      <div class="paper-logo-section">
+        <img id="brand-logo" class="paper-brand-logo-image" alt="Infograph" />
+        <div class="paper-project-actions" aria-label="إدارة المشروع">
+          <button id="project-open-btn" class="paper-project-icon-btn" type="button" title="فتح مشروع" aria-label="فتح مشروع">
+            <i data-lucide="folder-open" style="width: 21px; height: 21px;"></i>
+          </button>
+          <button id="project-save-btn" class="paper-project-icon-btn" type="button" title="حفظ المشروع" aria-label="حفظ المشروع">
+            <i data-lucide="save" style="width: 21px; height: 21px;"></i>
+            <span class="paper-project-status-dot" aria-hidden="true"></span>
+          </button>
+          <span id="project-save-status" class="paper-project-save-status">مشروع جديد</span>
+        </div>
+      </div>
+
+      <div class="paper-top-bar-btns">
+        <div class="paper-nav-pills-wrap">
+          <a href="../../renderer/index.html" class="paper-nav-pill">الأنفوجراف</a>
+          <a href="../../motadawel/renderer/index.html" class="paper-nav-pill">المتداول</a>
+          <a href="#" class="paper-nav-pill paper-nav-pill-active">متابعات</a>
+          <a href="../../personalities/renderer/index.html" class="paper-nav-pill">شخصيات</a>
+          <a href="../../laqtat/renderer/index.html" class="paper-nav-pill">لقطات</a>
+          <a href="../../sowar/renderer/index.html" class="paper-nav-pill">صور</a>
+          <a href="../../qawaleb/renderer/index.html" class="paper-nav-pill">قوالب</a>
+          <a href="../../voiceover/renderer/index.html" class="paper-nav-pill">فويس أوفر</a>
+        </div>
+
+        <button id="settings-btn" class="paper-project-icon-btn paper-settings-btn" type="button" title="الإعدادات" aria-label="الإعدادات">
+          <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <div class="right-panel panel-left" style="flex: 1;">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-target="tab-content-slides">
+            <i data-lucide="layers" style="width: 15px; height: 15px;"></i> الشرائح
+          </button>
+          <div class="tabs-indicator" id="tabs-indicator"></div>
+        </div>
+
+        <div class="tab-content">
+          <div id="tab-content-slides" style="display: flex; flex-direction: column; flex: 1; height: 100%; min-height: 0; overflow: hidden;">
+            <div class="setting-group prop-section slides-section" style="border: none; padding: 0.75rem; flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0.5rem; overflow: hidden; background: transparent;">
+              <label class="setting-label" style="flex-shrink: 0;">
+                <span>إدارة الصور (<span id="slides-count">0</span>)</span>
+                <button id="pick-slides-btn" class="btn-blue-outline" style="padding: 0.2rem 0.6rem; font-size: 0.78rem;">+ إضافة صور</button>
+              </label>
+              <div id="slides-list" class="slides-list" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0;">
+                <div id="empty-state" class="empty-state" tabindex="0">
+                  <i data-lucide="image-plus" style="width: 44px; height: 44px; opacity: 0.5;"></i>
+                  <span style="font-size: 1rem; font-weight: 700;">اضغط هنا لإضافة صور</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding: 0.65rem 0.75rem 0.85rem; color: var(--text-mu); font-size: 0.82rem; font-weight: 600;">
+              <span id="runtime-summary">كل شريحة 15 ثانية، والأخيرة 20 ثانية.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="left-panel" style="flex: 1.2;">
+        <div class="preview-container">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <h2 style="font-size: 1rem; margin: 0; color: var(--text); font-weight: 700;">المعاينة</h2>
+            <button id="preview-fullscreen-btn" class="btn-secondary"
+              style="padding: 0.25rem 0.55rem; font-size: 0.76rem; background: transparent; border: none;">
+              <i data-lucide="maximize" style="width: 14px; height: 14px;"></i> ملء الشاشة
+            </button>
+          </div>
+
+          <div class="preview-stage-outer" style="width: 100%;">
+            <div class="preview-stage-container">
+              <div id="preview-stage-shell" class="player-wrapper preview-stage-shell-fix">
+                <div id="preview-stage" class="preview-stage"
+                  style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;">
+                  <div id="preview-exact-root" style="width: 100%; height: 100%; position: absolute;"></div>
+                  <i data-lucide="play" stroke-width="1"
+                    style="width: 44px; height: 44px; fill: #c5bdb2; opacity: 0.35;"></i>
+                </div>
+
+                <div class="preview-player-ui" style="z-index: 10;">
+                  <div class="preview-player-bottom">
+                    <div class="preview-control-row">
+                      <button id="preview-play-btn" class="preview-icon-btn large">▶</button>
+                      <button id="preview-mute-btn" class="preview-icon-btn">🔊</button>
+                      <span id="preview-time-inline" class="preview-time-inline">00:00 / 00:00</span>
+                      <button id="preview-restart-btn" class="preview-icon-btn">↺</button>
+                    </div>
+                    <input id="preview-seek" type="range" class="range-input preview-seek" min="0" max="1000" value="0" style="height: 4px;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="piano-effects-bar">
+            <label class="piano-key-label"><span class="piano-key-content">شرائح 15ث</span></label>
+            <label class="piano-key-label"><span class="piano-key-content">الأخيرة 20ث</span></label>
+            <label class="piano-key-label"><span class="piano-key-content">Overlay تلقائي</span></label>
+            <label class="piano-key-label"><span class="piano-key-content">موسيقى Loop</span></label>
+          </div>
+        </div>
+
+        <div class="save-section render-zone" style="margin-top: 0;">
+          <div class="status-row">
+            <div>
+              <h2 id="status-title" style="margin:0;font-size:1.05rem;">حفظ الفيديو</h2>
+              <div id="status-text" class="muted-text">لم يبدأ الحفظ بعد</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <button id="open-output-btn" class="btn-secondary" type="button" style="min-height:36px;">
+                <i data-lucide="folder-open"></i> مجلد الإخراج
+              </button>
+            </div>
+          </div>
+          <div class="progress-meta">
+            <span id="progress-label" class="muted-text">في الانتظار...</span>
+            <span id="progress-percent" class="muted-text">0%</span>
+          </div>
+          <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+          <div class="render-actions">
+            <button id="render-btn" class="btn-primary" type="button" style="min-height:40px;">
+              <i data-lucide="film" style="width:16px;height:16px;"></i> حفظ الفيديو
+            </button>
+            <button id="cancel-render-btn" class="btn-secondary btn-danger" type="button" style="display:none;min-height:40px;">
+              <i data-lucide="square" style="width:14px;height:14px;"></i> إيقاف
+            </button>
+            <label style="display:flex;align-items:center;gap:.45rem;font-weight:700;color:#f59e0b;font-size:.88rem;">
+              <i data-lucide="fast-forward" style="width:14px;height:14px;stroke-width:2;"></i> Turbo
+              <label class="switch" style="margin:0;"><input type="checkbox" id="turbo-render-checkbox" checked /><span class="slider"></span></label>
+            </label>
+          </div>
+          <div id="render-result" class="render-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./generated/preview-player-mutabaat.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

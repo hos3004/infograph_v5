@@ -18,6 +18,13 @@ const PROJECT_CONFIGS = {
     displayName: 'Motadawel',
     dialogName: 'Motadawel Project',
   },
+  mutabaat: {
+    projectType: 'mutabaat',
+    extension: '.mtb',
+    extensionName: 'mtb',
+    displayName: 'Mutabaat',
+    dialogName: 'Mutabaat Project',
+  },
   laqtat: {
     projectType: 'laqtat',
     extension: '.lqt',
@@ -57,6 +64,10 @@ function getProjectConfig(projectType) {
 }
 
 function inferProjectConfigFromUrl(url = '') {
+  if (/[\\/]mutabaat[\\/]renderer[\\/]|\/mutabaat\/renderer\//i.test(url)) {
+    return PROJECT_CONFIGS.mutabaat;
+  }
+
   if (/[\\/]qawaleb[\\/]renderer[\\/]|\/qawaleb\/renderer\//i.test(url)) {
     return PROJECT_CONFIGS.qawaleb;
   }

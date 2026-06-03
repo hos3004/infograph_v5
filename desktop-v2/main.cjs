@@ -343,6 +343,7 @@ function clearPendingRequests(errorMessage, targetWorkerName = null) {
 
 let renderWorkerInfograph = null;
 let renderWorkerMotadawel = null;
+let renderWorkerMutabaat = null;
 let renderWorkerPersonalities = null;
 let renderWorkerLaqtat = null;
 let renderWorkerSowar = null;
@@ -350,6 +351,7 @@ let renderWorkerQawaleb = null;
 
 function getWorkerName(model) {
   if (model === 'motadawel') return 'motadawel';
+  if (model === 'mutabaat') return 'mutabaat';
   if (model === 'personalities') return 'personalities';
   if (model === 'laqtat') return 'laqtat';
   if (model === 'sowar') return 'sowar';
@@ -359,6 +361,7 @@ function getWorkerName(model) {
 
 function getWorkerRef(workerName) {
   if (workerName === 'motadawel') return renderWorkerMotadawel;
+  if (workerName === 'mutabaat') return renderWorkerMutabaat;
   if (workerName === 'personalities') return renderWorkerPersonalities;
   if (workerName === 'laqtat') return renderWorkerLaqtat;
   if (workerName === 'sowar') return renderWorkerSowar;
@@ -368,6 +371,7 @@ function getWorkerRef(workerName) {
 
 function setWorkerRef(workerName, worker) {
   if (workerName === 'motadawel') renderWorkerMotadawel = worker;
+  else if (workerName === 'mutabaat') renderWorkerMutabaat = worker;
   else if (workerName === 'personalities') renderWorkerPersonalities = worker;
   else if (workerName === 'laqtat') renderWorkerLaqtat = worker;
   else if (workerName === 'sowar') renderWorkerSowar = worker;
@@ -386,6 +390,8 @@ function spawnRenderWorker(model) {
   let workerEntry;
   if (workerName === 'motadawel') {
     workerEntry = path.join(desktopPaths.codeRoot, 'motadawel', 'worker', 'render-worker-motadawel.cjs');
+  } else if (workerName === 'mutabaat') {
+    workerEntry = path.join(desktopPaths.codeRoot, 'mutabaat', 'worker', 'render-worker-mutabaat.cjs');
   } else if (workerName === 'personalities') {
     workerEntry = path.join(desktopPaths.codeRoot, 'personalities', 'worker', 'render-worker-personalities.cjs');
   } else if (workerName === 'laqtat') {

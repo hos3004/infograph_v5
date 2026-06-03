@@ -5,6 +5,7 @@ const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppDat
 const buildRoot = path.join(localAppData, 'InfographicGeneratorDesktopV2BuildSizeLab');
 const bundleStagingDir = path.join(buildRoot, 'bundle-staging', 'remotion-bundle');
 const motadawelBundleStagingDir = path.join(buildRoot, 'bundle-staging-motadawel', 'remotion-bundle');
+const mutabaatBundleStagingDir = path.join(buildRoot, 'bundle-staging-mutabaat', 'remotion-bundle');
 const laqtatBundleStagingDir = path.join(buildRoot, 'bundle-staging-laqtat', 'remotion-bundle');
 const sowarBundleStagingDir = path.join(buildRoot, 'bundle-staging-sowar', 'remotion-bundle');
 const personalitiesBundleStagingDir = path.join(buildRoot, 'bundle-staging-personalities', 'remotion-bundle');
@@ -24,6 +25,7 @@ module.exports = {
     'desktop-v2/worker/**/*',
     'desktop-v2/shared/**/*',
     'desktop-v2/motadawel/**/*',
+    'desktop-v2/mutabaat/**/*',
     'desktop-v2/laqtat/**/*',
     'desktop-v2/sowar/**/*',
     'desktop-v2/qawaleb/**/*',
@@ -64,6 +66,11 @@ module.exports = {
     {
       from: motadawelBundleStagingDir,
       to: 'desktop-v2/generated/bundle-staging-motadawel/remotion-bundle',
+      filter: ['**/*', '!**/*.map'],
+    },
+    {
+      from: mutabaatBundleStagingDir,
+      to: 'desktop-v2/generated/bundle-staging-mutabaat/remotion-bundle',
       filter: ['**/*', '!**/*.map'],
     },
     {
