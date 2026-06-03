@@ -15223,9 +15223,6 @@ Check that all your Remotion packages are on the same version. If your dependenc
   var PointsBackgroundOverlay = ({ appearance }) => {
     const frame = useCurrentFrame();
     const safeOpacity = clamp(Number(appearance.backgroundOpacity ?? 10) / 100, 0, 1);
-    if (safeOpacity <= 1e-3) {
-      return null;
-    }
     const maskImage = import_react3.default.useMemo(
       () => buildRoundedMask({
         width: 1920,
@@ -15235,6 +15232,9 @@ Check that all your Remotion packages are on the same version. If your dependenc
       }),
       [appearance.backgroundFeather, appearance.backgroundRadius]
     );
+    if (safeOpacity <= 1e-3) {
+      return null;
+    }
     const offsetX = appearance.parallaxEnabled !== false ? Math.sin(frame / 60) * 20 : 0;
     const offsetY = appearance.parallaxEnabled !== false ? Math.cos(frame / 82) * 14 : 0;
     const scale = appearance.parallaxEnabled !== false ? 1.1 + Math.sin(frame / 120) * 0.018 : 1.08;

@@ -16816,6 +16816,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
     const slidesTotalMs = getTotalSlidesDurationMs(slides);
     const audioMs = mainVoiceoverDurationMs || voiceoverDurationMs || 0;
     const effectiveDurationMs = audioMs > 0 ? audioMs : slidesTotalMs;
+    const activeVoiceover = mainVoiceover || voiceover || void 0;
     const extendMs = audioMs > 0 ? Math.max(0, effectiveDurationMs - slidesTotalMs) : 0;
     const lastSlide = slides.length > 0 ? slides[slides.length - 1] : null;
     const endPagePresent = endPage && endPageDurationFrames > 0;
@@ -16891,10 +16892,10 @@ Check that all your Remotion packages are on the same version. If your dependenc
           ) })
         }
       ),
-      (mainVoiceover || voiceover) && /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
+      activeVoiceover && /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
         Audio,
         {
-          src: mainVoiceover || voiceover,
+          src: activeVoiceover,
           volume: typeof voiceoverVolume === "number" && !isNaN(voiceoverVolume) ? voiceoverVolume / 100 : 1
         }
       ),
@@ -16954,6 +16955,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
   }
   var PreviewApp = ({ payload }) => {
     const playerRef = (0, import_react4.useRef)(null);
+    const inputProps = payload.inputProps;
     const isPersonalities = isPersonalitiesMode(payload.inputProps);
     const SlideComponent = isPersonalities ? PersonalitiesComposition : MainComposition;
     (0, import_react4.useEffect)(() => {
@@ -16969,7 +16971,7 @@ Check that all your Remotion packages are on the same version. If your dependenc
       {
         ref: playerRef,
         component: SlideComponent,
-        inputProps: payload.inputProps,
+        inputProps,
         durationInFrames: Math.max(30, payload.durationInFrames),
         compositionWidth: 1920,
         compositionHeight: 1080,
